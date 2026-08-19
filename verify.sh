@@ -24,10 +24,8 @@ echo
 echo "== adversarial precision set =="
 python3 collector/adversarial.py
 echo
-echo "== collection: the RED gate and the contract boundary =="
-python3 collect/test_adjudicate.py
-echo
-python3 collect/test_normalise.py
+echo "== sweep: adapter, arm combination, detectors, all offline =="
+python3 collector/test_sweep.py
 echo
 echo "== wall renderer, headless =="
 node test_render.js
