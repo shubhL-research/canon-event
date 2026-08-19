@@ -159,6 +159,67 @@ true, sourced, dated, falsifiable claim, the row is not finished.
 
 ---
 
+## How Bright Data Scraper Studio is used
+
+Every collector here is custom, built through Scraper Studio's AI Agent from a natural-language
+description. None is a library scraper. The seed layer deliberately never touches the platform, for
+the reason at the top of this file, so **every credit spent is spent on the one question no free
+endpoint answers: is this exact recalled product buyable right now, in this market.**
+
+```
+c_mt00jidz6zhqjbpew   DE   kaufland.de     built, returning rows
+c_mt000dde2qdd6uln7z  DE   amazon.de       built, healed twice
+c_mt01usw31e8y5ubqjs  US   amazon.com      built, heal in flight
+```
+
+Four commands, in the order the project actually used them:
+
+```bash
+bdata scraper create <search-url> "<fields to extract>"   # AI builds the collector
+bdata scraper run    <collector_id> <url> --json          # sweep
+bdata scraper heal   <collector_id> "<what broke>" --url  # repair, stops at a gate
+bdata scraper approve <collector_id> [--reject]           # promote, or refuse
+```
+
+**Geo comes from the Search scraper type**, which takes a keyword and a country, not from a CLI
+flag — there is no `--country`. That matters because it means the country we requested lives in our
+own configuration, and a config file is not evidence. See the weakness above: the page's own `lang`
+attribute is the attestation.
+
+### The heal loop, and the one that was refused
+
+Both heals in `heals/` are on real breaks that nobody staged.
+
+`amazon.de` was built from a search URL, so it waited for `.s-main-slot` — the search-results grid —
+on every page it was given. Product pages do not have one, so every product page died on a
+thirty-second timeout. Since identity re-assertion is only valid against the product page itself, an
+arm that cannot open one cannot make a RED claim at all.
+
+**DE-001 fixed exactly that, and was refused anyway.** The repair worked; the canary caught two
+things the prompt had not asked about. `ean` came back holding the review star rating, and `brand`
+came back holding the visit-the-store link. Approving it would have restored the arm to working
+order while filling the GTIN field with review furniture — an arm that looks healthier than before
+and is less trustworthy than before, which is the exact outcome a two-sided gate exists to prevent.
+Production template unchanged, arm stayed withheld.
+
+**DE-002 was written against those three defects and approved, 3 of 3 canaries.** Same collector id
+across both, nothing downstream touched, which is the property that made refusing the first one
+cheap enough to be worth doing.
+
+### What the platform's output actually looks like
+
+`collector/fromstudio.py` is the only module allowed to know Bright Data's field names, because the
+AI names its own fields and they differ per collector. Two things it handles that a naive reader
+would not:
+
+- **Absent keys are omitted, not nulled.** Preserved all the way to the screen as `MISSING`.
+- **Identifiers came back doubled.** 25 of 28 real `kaufland.de` rows returned
+  `"8721003407246 8721003407246"` — 26 digits, which fails its own check digit and throws away a
+  usable barcode. Exact repeats are collapsed and counted. All 28 repaired EANs validate, which is
+  the evidence the repair is right rather than merely convenient.
+
+---
+
 ## Run it
 
 No dependencies. No build step. Python 3 and Node, both standard library only.
