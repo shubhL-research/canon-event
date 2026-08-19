@@ -471,6 +471,96 @@ def _now():
     return datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 
 
+def adjudicate_from_raw(seeds, arms=None, now=None):
+    """Re-decide every verdict from the archived raw rows. No network, no spend.
+
+    WHY THIS EXISTS
+    ---------------
+    Every raw row is written to data/sweeps/raw/<ARM>.jsonl the moment it arrives,
+    because Bright Data snapshots expire after 16 days and an expired snapshot is
+    indistinguishable from a sweep that found nothing. That archive turns out to be
+    worth more than insurance: it means the matcher can be changed and every past
+    sweep re-scored for free.
+
+    That matters because the matcher HAS changed twice in one day, both times in a
+    direction that altered published verdicts — the GTIN leading-zero fix recovered
+    real matches, and the check-digit rule removed rows that should never have been
+    RED. Without this function each of those corrections would have cost another
+    full sweep to observe.
+
+    Reconstruction works because every row carries the `input.url` that produced
+    it, and the plan that generated those URLs is deterministic: plan_arm() rebuilt
+    from the same seeds yields the same url -> (ref, strategy, needle) mapping. No
+    state is stored between runs and none needs to be.
+    """
+    now = now or datetime.datetime.now(datetime.timezone.utc)
+    captured_at = now.strftime("%Y-%m-%dT%H:%M:%SZ")
+    raw_dir = pathlib.Path(__file__).parent.parent / "data" / "sweeps" / "raw"
+    seeds_by_ref = {s["ref"]: s for s in seeds}
+    arms = arms or sorted(ARM_SEARCH)
+
+    per_arm, reports, arm_states = {}, [], {}
+    for arm in arms:
+        path = raw_dir / ("%s.jsonl" % arm)
+        if not path.exists():
+            continue
+        rows = []
+        for line in path.read_text(encoding="utf-8").splitlines():
+            if line.strip():
+                rows.append(json.loads(line))
+
+        by_url = {url: (ref, strategy, needle)
+                  for url, ref, strategy, needle in plan_arm(arm, seeds)}
+        grouped = group_by_input(rows)
+
+        flat, adapters, unclaimed = [], [], 0
+        for url, got in grouped.items():
+            meta = by_url.get(url)
+            if not meta:
+                # A URL the current plan no longer generates. Counted rather than
+                # dropped: it means the corpus or the query rule changed since the
+                # sweep, and that is a fact about the archive worth reporting.
+                unclaimed += len(got)
+                continue
+            ref, strategy, needle = meta
+            converted, report = convert(got, ref, arm, strategy, needle, captured_at)
+            flat.extend(converted)
+            adapters.append(report)
+
+        arm_rows, report = normalize_sweep(flat, seeds_by_ref)
+        report["arm"] = arm
+        report["collector_id"] = COLLECTORS.get(arm, "replayed-from-archive")
+        report["planned_loads"] = len(by_url)
+        report["batches"] = 0
+        report["fetch_errors"] = []
+        report["replayed"] = True
+        report["raw_rows"] = len(rows)
+        report["unclaimed_rows"] = unclaimed
+        report["unmapped_fields"] = sorted({f for a in adapters
+                                           for f in a["unmapped_fields"]})
+        report["with_language"] = sum(a["with_language"] for a in adapters)
+        report["with_currency"] = sum(a["with_currency"] for a in adapters)
+        per_arm[arm] = arm_rows
+        reports.append(report)
+
+        reds = sum(1 for r in arm_rows if r["tier"] == "RED")
+        joined = sum(1 for r in arm_rows if r["tier"] in ("RED", "AMBER"))
+        arm_states[arm] = dict(
+            health.arm_state(arm, reds, len(seeds), 0, joined),
+            rows=reds, fails=0, inputs=len(seeds), joined=joined,
+            collector_id=COLLECTORS.get(arm, "replayed-from-archive"),
+        )
+
+    if not per_arm:
+        return [], None
+
+    rows = combine(seeds, per_arm)
+    sweep_id = "s_" + now.strftime("%Y-%m-%dT%H:%MZ") + "-replay"
+    doc = health.build(sweep_id, now, arm_states, rows, reports, now=now)
+    doc["replayed_from_archive"] = True
+    return rows, doc
+
+
 def load_seeds(limit=None, authority=None):
     """Read the corpus. `limit` exists for trial sweeps, and says so on the run.
 
@@ -503,6 +593,7 @@ def main(argv):
     """Run a sweep and write it to data/sweeps/. Trial slices are labelled."""
     limit = None
     dry = "--dry-run" in argv
+    replay = "--from-raw" in argv
     arms = dict(COLLECTORS)
     for i, a in enumerate(argv):
         if a == "--limit" and i + 1 < len(argv):
@@ -512,6 +603,16 @@ def main(argv):
             arms = {k: v for k, v in COLLECTORS.items() if k in wanted}
 
     seeds = load_seeds(limit=limit)
+
+    if replay:
+        # Re-score the archive. Costs nothing and needs no network, so it is the
+        # right way to observe a change to the matcher.
+        rows, doc = adjudicate_from_raw(seeds, arms=sorted(arms))
+        if doc is None:
+            print("no archived raw rows in data/sweeps/raw/. Run a sweep first.")
+            return 1
+        return _write(rows, doc, seeds, limit, replayed=True)
+
     plans = {arm: plan_arm(arm, seeds) for arm in arms}
     loads = sum(len(p) for p in plans.values())
     batches = sum((len(p) + BATCH_SIZE - 1) // BATCH_SIZE for p in plans.values())
@@ -552,6 +653,15 @@ def main(argv):
                 fh.write(json.dumps(row, ensure_ascii=False) + "\n")
 
     rows, doc = run(seeds, arms, on_batch=on_batch, raw_sink=raw_sink)
+    return _write(rows, doc, seeds, limit)
+
+
+def _write(rows, doc, seeds, limit, replayed=False):
+    """Persist a sweep and report it. Shared by the live and replay paths so the
+    two cannot drift in how they label or count what they produced."""
+    out = pathlib.Path(__file__).parent.parent / "data" / "sweeps"
+    out.mkdir(parents=True, exist_ok=True)
+
     if limit:
         doc["trial_slice"] = limit
         doc["_STATUS"] = ("TRIAL SLICE, %d of %d notices. Denominators are not "
@@ -567,11 +677,17 @@ def main(argv):
     reds = sum(1 for r in rows if r["tier"] == "RED")
     ambers = sum(1 for r in rows if r["tier"] == "AMBER")
     print()
+    if replayed:
+        print("REPLAYED from data/sweeps/raw/. No network, no credits spent.")
     print("rows      %d   RED %d   AMBER %d" % (len(rows), reds, ambers))
     for arm, state in sorted(doc["arms"].items()):
         print("  %-3s %-10s red=%-4d fails=%-3d %s"
               % (arm, state["state"], state["rows"], state["fails"],
                  state["reason"] or ""))
+    for r in doc.get("reports", []):
+        if r.get("replayed"):
+            print("  %-3s replayed %d raw rows, %d unclaimed by the current plan"
+                  % (r["arm"], r.get("raw_rows", 0), r.get("unclaimed_rows", 0)))
     fired = [k for k, v in doc["detectors"].items() if v["fired"]]
     print("detectors fired: %s" % (", ".join(fired) if fired else "none"))
     print()
