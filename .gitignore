@@ -7,3 +7,6 @@ node_modules/
 
 # Internal status docs, not part of the submission
 CANON-EVENT-Status.pdf
+
+# Live sweep output, written by collector/sweep.py
+data/sweeps/

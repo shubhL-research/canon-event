@@ -57,7 +57,7 @@ sys.path.insert(0, str(pathlib.Path(__file__).parent))
 
 import health                                                    # noqa: E402
 from fromstudio import convert                                   # noqa: E402
-from normalize import normalize_sweep                            # noqa: E402
+from normalize import normalize_sweep, gtin_check_digit_ok       # noqa: E402
 
 # Contract values. contract/row.schema.json enumerates found_by_query as
 # brand_model, model_only or both, and stats/recapture.py reads exactly these.
@@ -70,8 +70,29 @@ MODEL_ONLY = "model_only"
 ARM_SEARCH = {
     "DE": "https://www.kaufland.de/s/?search_value={q}",
     "US": "https://www.amazon.com/s?k={q}",
-    "IN": "https://www.amazon.in/s?k={q}",
+    "IN": "https://www.flipkart.com/search?q={q}",
 }
+
+# The live collectors, by arm. Not secrets — a collector id is a handle, and
+# publishing them is what lets a judge re-run any figure on this wall against the
+# same scraper that produced it.
+#
+# The US entry is the arm that does not work. Its heal was refused for returning
+# rows containing only a URL (heals/2026-08-19-us-001.md), so it sits on its
+# original template, which cannot open a search page. It is listed rather than
+# quietly omitted, because an arm missing from a config file is invisible and an
+# arm reporting WITHHELD is a measurement.
+COLLECTORS = {
+    "DE": "c_mt00jidz6zhqjbpew",   # kaufland.de, built clean, first try
+    "IN": "c_mt03cj5z2fo651wy8q",  # flipkart.com, built clean, first try
+    "US": "c_mt01usw31e8y5ubqjs",  # amazon.com, broken, heal refused
+}
+
+# amazon.de, healed twice and approved. Held separately because it is a SECOND
+# German storefront rather than a fourth arm: it exists to demonstrate the heal
+# loop on a property that fought back, and the DE arm's published rows come from
+# kaufland. Running both into one arm would double-count German listings.
+AMAZON_DE = "c_mt000dde2qdd6uln7z"
 
 # Row tier to the verdict the wall renders for that arm. The distinction that
 # matters is DISCARDED splitting two ways: a blocked fetch is our own failure and
@@ -287,3 +308,84 @@ def _stub(seed):
 
 def _now():
     return datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+
+
+def load_seeds(limit=None, authority=None):
+    """Read the corpus. `limit` exists for trial sweeps, and says so on the run.
+
+    A trial slice is honest only if it is labelled. An unlabelled partial sweep
+    published next to a full one is indistinguishable from it, and the
+    denominators differ.
+    """
+    path = pathlib.Path(__file__).parent.parent / "data" / "seeds.json"
+    seeds = json.loads(path.read_text(encoding="utf-8"))["seeds"]
+    if authority:
+        seeds = [s for s in seeds if s["authority"] == authority]
+    # Order by how strong an identifier the notice carries, because a trial slice
+    # is only informative if it can actually reach a verdict. A check-digit-valid
+    # GTIN is the strongest; a `gtin` field that fails its own check digit is
+    # worth less than a model number, since it will be refused as unassertable.
+    # This is ordering only — a full sweep still gets every notice.
+    def strength(seed):
+        gtin = seed.get("gtin")
+        if gtin and gtin_check_digit_ok(gtin):
+            return 0
+        if seed.get("model"):
+            return 1
+        return 2 if gtin else 3
+
+    seeds.sort(key=lambda s: (strength(s), s["ref"]))
+    return seeds[:limit] if limit else seeds
+
+
+def main(argv):
+    """Run a sweep and write it to data/sweeps/. Trial slices are labelled."""
+    limit = None
+    arms = dict(COLLECTORS)
+    for i, a in enumerate(argv):
+        if a == "--limit" and i + 1 < len(argv):
+            limit = int(argv[i + 1])
+        if a == "--arms" and i + 1 < len(argv):
+            wanted = argv[i + 1].split(",")
+            arms = {k: v for k, v in COLLECTORS.items() if k in wanted}
+
+    seeds = load_seeds(limit=limit)
+    loads = len(seeds) * 2 * len(arms)
+    print("sweep: %d seeds x 2 queries x %d arms = %d search loads"
+          % (len(seeds), len(arms), loads))
+    print("arms:  " + ", ".join("%s=%s" % kv for kv in sorted(arms.items())))
+    if limit:
+        print("TRIAL SLICE of %d seeds. Not a full sweep, and stamped as such."
+              % limit)
+    print()
+
+    rows, doc = run(seeds, arms)
+    if limit:
+        doc["trial_slice"] = limit
+        doc["_STATUS"] = ("TRIAL SLICE, %d of %d notices. Denominators are not "
+                          "the full corpus." % (limit, len(load_seeds())))
+
+    out = pathlib.Path(__file__).parent.parent / "data" / "sweeps"
+    out.mkdir(exist_ok=True)
+    stem = doc["sweep_id"].replace(":", "").replace("-", "")
+    (out / (stem + ".jsonl")).write_text(
+        "\n".join(json.dumps(r, ensure_ascii=False) for r in rows) + "\n",
+        encoding="utf-8")
+    (out / (stem + "-health.json")).write_text(
+        json.dumps(doc, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+
+    reds = sum(1 for r in rows if r["tier"] == "RED")
+    print("rows      %d" % len(rows))
+    print("RED       %d" % reds)
+    for arm, state in sorted(doc["arms"].items()):
+        print("  %-3s %-10s rows=%-4d fails=%-3d %s"
+              % (arm, state["state"], state["rows"], state["fails"],
+                 state["reason"] or ""))
+    print()
+    print("verdict   " + doc["verdict"])
+    print("written   data/sweeps/%s.jsonl" % stem)
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main(sys.argv[1:]))
