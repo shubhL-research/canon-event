@@ -2,7 +2,7 @@
 """Validate CANON EVENT structured output against the frozen contract.
 
 Standard library only, deliberately. A clean clone must validate with nothing
-installed: `git clone && python validate.py`. Adding a dependency here would
+installed: `git clone && python3 validate.py`. Adding a dependency here would
 break the no-build-step promise that the whole "swap day is cp" architecture
 rests on, and it would break the D6 clean-clone check.
 
@@ -10,8 +10,8 @@ Supports the JSON Schema subset the contract actually uses: type, required,
 properties, additionalProperties, enum, $ref/$defs, pattern, minimum, minLength,
 items, and format for date / date-time / uri.
 
-Run:  python validate.py
-      python validate.py data/fixture-v1.json
+Run:  python3 validate.py
+      python3 validate.py data/fixture-v1.json
 Exit code 0 if everything validates, 1 otherwise.
 """
 

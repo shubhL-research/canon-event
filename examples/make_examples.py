@@ -15,7 +15,7 @@ Formats, one per consumer:
   MISSING.json     a row where declared keys are absent, because absence is
                    part of the contract and not an error
 
-Run:  python examples/make_examples.py
+Run:  python3 examples/make_examples.py
 """
 
 import json

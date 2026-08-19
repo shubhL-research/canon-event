@@ -18,7 +18,7 @@ Emits four fixtures so the renderer can be driven through every state:
 Between them every arm state, the rejected-heal modifier, every row chip state and
 both global page states are exercised. LOADING is a render mode with no data.
 
-Run:  python make_fixture.py
+Run:  python3 make_fixture.py
 """
 
 import json

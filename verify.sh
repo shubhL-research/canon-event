@@ -4,19 +4,19 @@
 set -e
 cd "$(dirname "$0")"
 echo "== regenerating fixtures from real CPSC notices =="
-python data/make_fixture.py
+python3 data/make_fixture.py
 echo
 echo "== structured output against the frozen contract =="
-python validate.py
+python3 validate.py
 echo
 echo "== statistics =="
-python stats/test_stats.py
+python3 stats/test_stats.py
 echo
 echo "== example structured output =="
-python examples/make_examples.py
+python3 examples/make_examples.py
 echo
 echo "== identifier extractor =="
-python extract/test_identifier.py
+python3 extract/test_identifier.py
 echo
 echo "== wall renderer, headless =="
 node test_render.js

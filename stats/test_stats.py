@@ -1,6 +1,6 @@
 """Tests for the statistics module. Standard library only, no pytest required.
 
-Run:  python stats/test_stats.py
+Run:  python3 stats/test_stats.py
 
 These are not smoke tests. Wilson and Chapman are checked against values that
 can be derived by hand, and the isotonic fit is checked for the monotonicity

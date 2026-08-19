@@ -481,7 +481,7 @@
     var all = window.CANON_FIXTURES;
     if (!all) {
       el("verdict").innerHTML = "<h1>No data loaded.</h1>" +
-        '<p class="sub">data/fixtures.js did not load. Run <code>python data/make_fixture.py</code>.</p>';
+        '<p class="sub">data/fixtures.js did not load. Run <code>python3 data/make_fixture.py</code>.</p>';
       return;
     }
     var doc = all[variant] || all.v1;

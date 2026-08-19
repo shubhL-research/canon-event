@@ -5,7 +5,7 @@ the CPSC model field, pulled 16 Aug 2026. This is a regression suite against
 real data, not invented cases: the whole reason this module exists is that the
 original rule passed the first list.
 
-Run:  python extract/test_identifier.py
+Run:  python3 extract/test_identifier.py
 No network, no API key. The second-opinion model is a stub.
 """
 

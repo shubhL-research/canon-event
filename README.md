@@ -192,7 +192,7 @@ observations are flagged `thin` and are not publishable.
 **Unsearchable rate** is computed entirely from the free seed layer. No scraper can contaminate it,
 and it survives every collector failing.
 
-Tests: `python stats/test_stats.py` and `python extract/test_identifier.py`. They check against
+Tests: `python3 stats/test_stats.py` and `python3 extract/test_identifier.py`. They check against
 values derivable by hand, not against the code's own output.
 
 ---
