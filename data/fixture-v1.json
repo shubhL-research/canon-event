@@ -1,0 +1,2470 @@
+{
+  "sweep_id": "s_2026-08-21T14:02Z",
+  "swept_at": "2026-08-21T14:02:11Z",
+  "freshness_bound_s": 14400,
+  "variant": "v1",
+  "provenance": {
+    "seed_source": "CPSC official REST API, saferproducts.gov/RestWebServices/Recall",
+    "seed_note": "Every hazard sentence is the regulator's verbatim text. Never paraphrased.",
+    "fixture": true,
+    "stamp": "illustrative, fixture data"
+  },
+  "arms": [
+    {
+      "code": "US",
+      "host": "amazon.com",
+      "state": "MEASURED",
+      "collector_id": "c_mp3tuab31lswoxvpwa",
+      "template": "t_m9jty150kxgwtzcgi.4",
+      "attest": {
+        "exit_ip": "72.14.201.55",
+        "country": "US",
+        "asn_org": "Comcast Cable Communications",
+        "asn": 7922,
+        "city": "Denver",
+        "tz": "America/Denver"
+      },
+      "job": {
+        "id": "j_ma13y9ay1piehrso8r",
+        "inputs": 180,
+        "data_lines": 164,
+        "fails": 0,
+        "pages": 180,
+        "success_rate": 0.9111,
+        "job_time_ms": 71459,
+        "queue_time_ms": 645,
+        "page_loads": 180
+      },
+      "heal": {
+        "status": "none",
+        "step": null,
+        "completed_steps": [],
+        "started_at": null,
+        "canary_pass": null,
+        "canary_total": 3,
+        "ledger": null
+      },
+      "reason": null
+    },
+    {
+      "code": "DE",
+      "host": "amazon.de",
+      "state": "WITHHELD",
+      "collector_id": "c_mp3tuab31lswoxvpws",
+      "template": "t_m9jty150kxgwtzcgi.4",
+      "attest": {
+        "exit_ip": "93.104.212.77",
+        "country": "DE",
+        "asn_org": "Vodafone GmbH",
+        "asn": 3209,
+        "city": "Munchen",
+        "tz": "Europe/Berlin"
+      },
+      "job": {
+        "id": "j_ma13y9ay1piehrso8r",
+        "inputs": 180,
+        "data_lines": 0,
+        "fails": 0,
+        "pages": 180,
+        "success_rate": 0.0,
+        "job_time_ms": 71459,
+        "queue_time_ms": 645,
+        "page_loads": 180
+      },
+      "heal": {
+        "status": "rejected",
+        "step": null,
+        "completed_steps": [],
+        "started_at": "2026-08-21T14:02:44Z",
+        "canary_pass": 2,
+        "canary_total": 3,
+        "ledger": "heals/2026-08-21-de-004.md",
+        "failed_canary": "GTIN 4006381333931 did not re-assert on the proposed template"
+      },
+      "reason": "zero_rows_uncorroborated"
+    },
+    {
+      "code": "IN",
+      "host": "amazon.in",
+      "state": "DEGRADED",
+      "collector_id": "c_mp3tuab31lswoxvpwi",
+      "template": "t_m9jty150kxgwtzcgi.4",
+      "attest": {
+        "exit_ip": "49.36.180.14",
+        "country": "IN",
+        "asn_org": "Reliance Jio Infocomm",
+        "asn": 55836,
+        "city": "Mumbai",
+        "tz": "Asia/Kolkata"
+      },
+      "job": {
+        "id": "j_ma13y9ay1piehrso8r",
+        "inputs": 180,
+        "data_lines": 139,
+        "fails": 41,
+        "pages": 180,
+        "success_rate": 0.7722,
+        "job_time_ms": 71459,
+        "queue_time_ms": 645,
+        "page_loads": 180
+      },
+      "heal": {
+        "status": "none",
+        "step": null,
+        "completed_steps": [],
+        "started_at": null,
+        "canary_pass": null,
+        "canary_total": 3,
+        "ledger": null
+      },
+      "reason": "join_key_coverage_below_bound"
+    }
+  ],
+  "stats": {
+    "arithmetic": {
+      "corpus_seeds": 180,
+      "queries_per_seed_per_arm": 2,
+      "arms": 3,
+      "search_page_loads": 1080,
+      "pdp_promotions": 121,
+      "total_page_loads": 1201,
+      "working": "180 seeds x 2 queries x 3 arms = 1080 search loads, + 121 product-page promotions = 1201 page loads at 1 credit each.",
+      "note": "Promotion to a product page is decided outside Scraper Studio by the matcher, so only RED candidates cost a browser load. Chaining with next_stage would have promoted every discovered listing and multiplied this by roughly forty."
+    },
+    "survival": {
+      "v": 0.25,
+      "n": 45,
+      "d": 180,
+      "ci95": [
+        0.1924,
+        0.318
+      ],
+      "contaminated": true
+    },
+    "border_escape": {
+      "v": null,
+      "n": 0,
+      "d": 0,
+      "ci95": null,
+      "contaminated": true,
+      "pending": "EU Safety Gate seeds are not yet in the corpus. Border escape is 'of EU-recalled products, what share are buyable from an Indian residential IP', and it cannot be computed from CPSC notices alone."
+    },
+    "unsearchable": {
+      "v": 0.2889,
+      "n": 52,
+      "d": 180,
+      "ci95": [
+        0.2276,
+        0.359
+      ],
+      "contaminated": false
+    },
+    "precision": {
+      "v": 0.94,
+      "n": 47,
+      "d": 50,
+      "ci95": [
+        0.8378,
+        0.9794
+      ],
+      "contaminated": false,
+      "recall": {
+        "n1_brand_model": 38,
+        "n2_model_only": 24,
+        "m_both": 17,
+        "observed": 45,
+        "n_hat": 53.17,
+        "missed_floor": 8.17,
+        "estimator": "Chapman (bias-corrected Lincoln-Petersen)",
+        "independence_violated": true,
+        "note": "The two query strategies share the model token and are positively correlated. N-hat is therefore biased downward, so missed_floor is a LOWER bound on what we failed to see."
+      }
+    },
+    "discarded": {
+      "v": 0.0833,
+      "n": 45,
+      "d": 540,
+      "by_code": {
+        "AMBER": 12,
+        "dead_page": 9,
+        "blocked": 6,
+        "no_join_key": 14,
+        "identity_mismatch": 4
+      },
+      "contaminated": true
+    },
+    "hero": {
+      "n": 7,
+      "oldest_days": 722,
+      "oldest": {
+        "name": "Dumbbell toy sold with Baby Biceps Gift Set",
+        "ref": "24351",
+        "hazard": "The gray caps on the end of the dumbbell toy can come off, posing a choking hazard to infants.",
+        "rank_on_wall": 23
+      },
+      "sentence": "7 products recalled for burning or choking children are in a cart right now. The oldest has been buyable for 722 days.",
+      "method": "Transparent keyword rule over the regulator's verbatim hazard sentence. Matched terms are recorded per row so the classification is auditable. See hazard_class()."
+    },
+    "findings": {
+      "red": 45,
+      "amber": 30,
+      "total": 75,
+      "shown": 47,
+      "footer": "47 of 75 shown, full set in examples/"
+    },
+    "arms_measured": {
+      "n": 2,
+      "d": 3
+    },
+    "credits": {
+      "used": 1201,
+      "cap": 5000,
+      "code": 1080,
+      "browser": 121
+    },
+    "adversarial_precision_set": {
+      "n": 6,
+      "all_discarded": true,
+      "note": "Deliberate near-misses fed to the matcher. Every one must land in DISCARDED. Any that reaches RED is a precision bug and blocks the freeze. Distinct from the heal loop's negative canaries, which are dead listings.",
+      "probes": [
+        {
+          "probe": "Papablic Archie Infant Swing (2025 revision, PAPABLIC61B)",
+          "against": "24325",
+          "kind": "successor_sku",
+          "expect": "identity_mismatch"
+        },
+        {
+          "probe": "HALO 2000 Portable Power Station PS-2000",
+          "against": "24350",
+          "kind": "same_brand_different_model",
+          "expect": "identity_mismatch"
+        },
+        {
+          "probe": "Generic 'PS-1000' bench power supply, unrelated brand",
+          "against": "24350",
+          "kind": "same_model_different_brand",
+          "expect": "identity_mismatch"
+        },
+        {
+          "probe": "Ambiano Single Serve Coffee Maker 708926",
+          "against": "24341",
+          "kind": "same_brand_adjacent_model",
+          "expect": "identity_mismatch"
+        },
+        {
+          "probe": "Fisher-Price Baby Biceps Gift Set (no dumbbell, GJD50)",
+          "against": "24351",
+          "kind": "successor_sku",
+          "expect": "identity_mismatch"
+        },
+        {
+          "probe": "Squeeze Plush Ball Toy, GTIN 810447020543",
+          "against": "24348",
+          "kind": "adjacent_gtin",
+          "expect": "identity_mismatch"
+        }
+      ]
+    }
+  },
+  "rows": [
+    {
+      "rank": 1,
+      "name": "Lancaster Table & Seating Plastic Restaurant High Chairs",
+      "hazard": "The T-bar located at the front middle of the chair can become loose and fall or break off while the high chair is in use, posing a fall hazard to children.",
+      "source": {
+        "authority": "CPSC",
+        "ref": "24311",
+        "published": "2024-07-25",
+        "url": "https://www.cpsc.gov/Recalls/2026/24311"
+      },
+      "days": 757,
+      "days_frozen": false,
+      "tier": "RED",
+      "arms": {
+        "US": "RED",
+        "DE": "WITHHELD",
+        "IN": "RED"
+      },
+      "hazard_class": {
+        "qualifies": false,
+        "burn_terms": [],
+        "choke_terms": [],
+        "child_terms": [
+          "child",
+          "children"
+        ],
+        "child_scoped_standard": false
+      },
+      "model": "274HCBKWTASM",
+      "found_by_query": "both",
+      "evidence": {
+        "captured_at": "2026-08-21T09:14:22Z",
+        "assertion": {
+          "needle": "274HCBKWTASM",
+          "dom_path": "#productDetails > tr:nth-child(4)",
+          "context": "... Item model number 274HCBKWTASM Manufacturer recommended age ..."
+        },
+        "buy_control": {
+          "present": true,
+          "label": "Add to Cart",
+          "in_stock": true,
+          "ships_from": "IN"
+        },
+        "currency": "INR",
+        "http": 200,
+        "viewport": "1440x900",
+        "sha256": "3f9a0001c3d0",
+        "trace": "ce-2026-08-21-0001",
+        "job_id": "j_ma13y9ay1piehrso8r"
+      }
+    },
+    {
+      "rank": 2,
+      "name": "Wood dining chairs",
+      "hazard": "The recalled chairs can shift, break or collapse, posing a fall hazard to consumers.",
+      "source": {
+        "authority": "CPSC",
+        "ref": "24314",
+        "published": "2024-07-25",
+        "url": "https://www.cpsc.gov/Recalls/2026/24314"
+      },
+      "days": 757,
+      "days_frozen": false,
+      "tier": "RED",
+      "arms": {
+        "US": "RED",
+        "DE": "WITHHELD",
+        "IN": "RED"
+      },
+      "hazard_class": {
+        "qualifies": false,
+        "burn_terms": [],
+        "choke_terms": [],
+        "child_terms": [],
+        "child_scoped_standard": false
+      },
+      "model": "W520-11",
+      "found_by_query": "brand_model",
+      "evidence": {
+        "captured_at": "2026-08-21T09:14:22Z",
+        "assertion": {
+          "needle": "W520-11",
+          "dom_path": "#productDetails > tr:nth-child(4)",
+          "context": "... Item model number W520-11 Manufacturer recommended age ..."
+        },
+        "buy_control": {
+          "present": true,
+          "label": "Add to Cart",
+          "in_stock": true,
+          "ships_from": "IN"
+        },
+        "currency": "INR",
+        "http": 200,
+        "viewport": "1440x900",
+        "sha256": "3f9a0002c3d0",
+        "trace": "ce-2026-08-21-0002",
+        "job_id": "j_ma13y9ay1piehrso8r"
+      }
+    },
+    {
+      "rank": 3,
+      "name": "Besrey Twins Strollers",
+      "hazard": "Entrapment, fall and choking hazards; violation of federal regulation for strollers.",
+      "source": {
+        "authority": "CPSC",
+        "ref": "24316",
+        "published": "2024-07-25",
+        "url": "https://www.cpsc.gov/Recalls/2026/24316"
+      },
+      "days": 757,
+      "days_frozen": false,
+      "tier": "RED",
+      "arms": {
+        "US": "RED",
+        "DE": "WITHHELD",
+        "IN": "RED"
+      },
+      "hazard_class": {
+        "qualifies": false,
+        "burn_terms": [],
+        "choke_terms": [
+          "chok"
+        ],
+        "child_terms": [],
+        "child_scoped_standard": false
+      },
+      "model": "BR-C708S",
+      "found_by_query": "brand_model",
+      "evidence": {
+        "captured_at": "2026-08-21T09:14:22Z",
+        "assertion": {
+          "needle": "BR-C708S",
+          "context": "... Item model number BR-C708S Manufacturer recommended age ..."
+        },
+        "buy_control": {
+          "present": true,
+          "label": "Add to Cart",
+          "in_stock": true
+        },
+        "currency": "INR"
+      }
+    },
+    {
+      "rank": 4,
+      "name": "ProForm 50 LB Adjustable Dumbbell Sets",
+      "hazard": "The weight plates can dislodge from the handle during use, posing an impact injury hazard.",
+      "source": {
+        "authority": "CPSC",
+        "ref": "24310",
+        "published": "2024-07-25",
+        "url": "https://www.cpsc.gov/Recalls/2026/24310"
+      },
+      "days": 757,
+      "days_frozen": false,
+      "tier": "RED",
+      "arms": {
+        "US": "RED",
+        "DE": "WITHHELD",
+        "IN": "NOT_FOUND"
+      },
+      "hazard_class": {
+        "qualifies": false,
+        "burn_terms": [],
+        "choke_terms": [],
+        "child_terms": [],
+        "child_scoped_standard": false
+      },
+      "model": "PAMSDB20",
+      "found_by_query": "both",
+      "evidence": {
+        "captured_at": "2026-08-21T09:14:22Z",
+        "assertion": {
+          "needle": "PAMSDB20",
+          "dom_path": "#productDetails > tr:nth-child(4)",
+          "context": "... Item model number PAMSDB20 Manufacturer recommended age ..."
+        },
+        "buy_control": {
+          "present": true,
+          "label": "Add to Cart",
+          "in_stock": true,
+          "ships_from": "US"
+        },
+        "currency": "USD",
+        "http": 200,
+        "viewport": "1440x900",
+        "sha256": "3f9a0004c3d0",
+        "trace": "ce-2026-08-21-0004",
+        "job_id": "j_ma13y9ay1piehrso8r"
+      }
+    },
+    {
+      "rank": 5,
+      "name": "Razor Icon electric scooters",
+      "hazard": "The downtube of the recalled electric scooter can separate from the floorboard during use, posing a fall hazard.",
+      "source": {
+        "authority": "CPSC",
+        "ref": "24313",
+        "published": "2024-07-25",
+        "url": "https://www.cpsc.gov/Recalls/2026/24313"
+      },
+      "days": 757,
+      "days_frozen": false,
+      "tier": "AMBER",
+      "arms": {
+        "US": "NOT_FOUND",
+        "DE": "WITHHELD",
+        "IN": "NOT_FOUND"
+      },
+      "hazard_class": {
+        "qualifies": false,
+        "burn_terms": [],
+        "choke_terms": [],
+        "child_terms": [],
+        "child_scoped_standard": false
+      },
+      "model": "13110003",
+      "discarded": [
+        {
+          "code": "AMBER",
+          "reason": "identifier not re-asserted on the fetched page"
+        },
+        {
+          "code": "no_join_key",
+          "reason": "identifier '13110003' is not distinctive enough to search: it collides with unrelated products"
+        }
+      ]
+    },
+    {
+      "rank": 6,
+      "name": "Ophanie Area Rugs",
+      "hazard": "The recalled area rugs violate the mandatory federal flammability regulations for carpets and rugs, posing a fire hazard.",
+      "source": {
+        "authority": "CPSC",
+        "ref": "24315",
+        "published": "2024-07-25",
+        "url": "https://www.cpsc.gov/Recalls/2026/24315"
+      },
+      "days": 757,
+      "days_frozen": false,
+      "tier": "AMBER",
+      "arms": {
+        "US": "NOT_FOUND",
+        "DE": "WITHHELD",
+        "IN": "NOT_FOUND"
+      },
+      "hazard_class": {
+        "qualifies": false,
+        "burn_terms": [
+          "fire",
+          "flammability"
+        ],
+        "choke_terms": [],
+        "child_terms": [],
+        "child_scoped_standard": false
+      },
+      "discarded": [
+        {
+          "code": "AMBER",
+          "reason": "identifier not re-asserted on the fetched page"
+        },
+        {
+          "code": "no_join_key",
+          "reason": "notice published with no machine-matchable identifier"
+        }
+      ]
+    },
+    {
+      "rank": 7,
+      "name": "Hover-1 Dynamo E-scooters",
+      "hazard": "The e-scooter's brakes can fail, posing a risk of serious injury and crash hazard.",
+      "source": {
+        "authority": "CPSC",
+        "ref": "24321",
+        "published": "2024-07-25",
+        "url": "https://www.cpsc.gov/Recalls/2026/24321"
+      },
+      "days": 757,
+      "days_frozen": false,
+      "tier": "AMBER",
+      "arms": {
+        "US": "NOT_FOUND",
+        "DE": "WITHHELD",
+        "IN": "NOT_FOUND"
+      },
+      "hazard_class": {
+        "qualifies": false,
+        "burn_terms": [],
+        "choke_terms": [],
+        "child_terms": [],
+        "child_scoped_standard": false
+      },
+      "discarded": [
+        {
+          "code": "AMBER",
+          "reason": "identifier not re-asserted on the fetched page"
+        },
+        {
+          "code": "no_join_key",
+          "reason": "notice published with no machine-matchable identifier"
+        }
+      ]
+    },
+    {
+      "rank": 8,
+      "name": "Beberoad New Moon Travel Bassinets",
+      "hazard": "They do not have a stand, posing a fall hazard if used on elevated surfaces.",
+      "source": {
+        "authority": "CPSC",
+        "ref": "24324",
+        "published": "2024-08-01",
+        "url": "https://www.cpsc.gov/Recalls/2026/24324"
+      },
+      "days": 750,
+      "days_frozen": false,
+      "tier": "RED",
+      "arms": {
+        "US": "RED",
+        "DE": "WITHHELD",
+        "IN": "RED"
+      },
+      "hazard_class": {
+        "qualifies": false,
+        "burn_terms": [],
+        "choke_terms": [],
+        "child_terms": [],
+        "child_scoped_standard": false
+      },
+      "model": "TB999-1",
+      "found_by_query": "model_only",
+      "evidence": {
+        "captured_at": "2026-08-21T09:14:22Z",
+        "assertion": {
+          "needle": "TB999-1",
+          "dom_path": "#productDetails > tr:nth-child(4)",
+          "context": "... Item model number TB999-1 Manufacturer recommended age ..."
+        },
+        "buy_control": {
+          "present": true,
+          "label": "Add to Cart",
+          "in_stock": true,
+          "ships_from": "IN"
+        },
+        "currency": "INR",
+        "http": 200,
+        "viewport": "1440x900",
+        "sha256": "3f9a0008c3d0",
+        "trace": "ce-2026-08-21-0008",
+        "job_id": "j_ma13y9ay1piehrso8r"
+      }
+    },
+    {
+      "rank": 9,
+      "name": "Papablic Archie Infant Swings",
+      "hazard": "The swings pose a suffocation risk because they have an incline angle greater than 10 degrees in violation of the federal safety regulations.",
+      "source": {
+        "authority": "CPSC",
+        "ref": "24325",
+        "published": "2024-08-01",
+        "url": "https://www.cpsc.gov/Recalls/2026/24325"
+      },
+      "days": 750,
+      "days_frozen": false,
+      "tier": "RED",
+      "arms": {
+        "US": "RED",
+        "DE": "WITHHELD",
+        "IN": "RED"
+      },
+      "hazard_class": {
+        "qualifies": false,
+        "burn_terms": [],
+        "choke_terms": [
+          "suffocat"
+        ],
+        "child_terms": [],
+        "child_scoped_standard": false
+      },
+      "model": "PAPABLIC61A",
+      "found_by_query": "brand_model",
+      "evidence": {
+        "captured_at": "2026-08-21T09:14:22Z",
+        "assertion": {
+          "needle": "PAPABLIC61A",
+          "dom_path": "#productDetails > tr:nth-child(4)",
+          "context": "... Item model number PAPABLIC61A Manufacturer recommended age ..."
+        },
+        "buy_control": {
+          "present": true,
+          "label": "Add to Cart",
+          "in_stock": true,
+          "ships_from": "IN"
+        },
+        "currency": "INR",
+        "http": 200,
+        "viewport": "1440x900",
+        "sha256": "3f9a0009c3d0",
+        "trace": "ce-2026-08-21-0009",
+        "job_id": "j_ma13y9ay1piehrso8r"
+      }
+    },
+    {
+      "rank": 10,
+      "name": "Peace Sports Youth All-Terrain Vehicles",
+      "hazard": "The handlebars pose a laceration hazard, the parking brakes fail to hold, posing a collision hazard, and the vehicles are missing required safety reflectors.",
+      "source": {
+        "authority": "CPSC",
+        "ref": "24326",
+        "published": "2024-08-01",
+        "url": "https://www.cpsc.gov/Recalls/2026/24326"
+      },
+      "days": 750,
+      "days_frozen": false,
+      "tier": "RED",
+      "arms": {
+        "US": "RED",
+        "DE": "WITHHELD",
+        "IN": "NOT_FOUND"
+      },
+      "hazard_class": {
+        "qualifies": false,
+        "burn_terms": [],
+        "choke_terms": [],
+        "child_terms": [],
+        "child_scoped_standard": false
+      },
+      "model": "512 CY125ATV-1",
+      "found_by_query": "both",
+      "evidence": {
+        "captured_at": "2026-08-21T09:14:22Z",
+        "assertion": {
+          "needle": "512 CY125ATV-1",
+          "dom_path": "#productDetails > tr:nth-child(4)",
+          "context": "... Item model number 512 CY125ATV-1 Manufacturer recommended age ..."
+        },
+        "buy_control": {
+          "present": true,
+          "label": "Add to Cart",
+          "in_stock": true,
+          "ships_from": "US"
+        },
+        "currency": "USD",
+        "http": 200,
+        "viewport": "1440x900",
+        "sha256": "3f9a0010c3d0",
+        "trace": "ce-2026-08-21-0010",
+        "job_id": "j_ma13y9ay1piehrso8r"
+      }
+    },
+    {
+      "rank": 11,
+      "name": "LED Light-up Jelly Ring Toys",
+      "hazard": "Button cell batteries that can be easily accessed without requiring the use of a common household tool, posing an ingestion hazard to children.",
+      "source": {
+        "authority": "CPSC",
+        "ref": "24328",
+        "published": "2024-08-01",
+        "url": "https://www.cpsc.gov/Recalls/2026/24328"
+      },
+      "days": 750,
+      "days_frozen": false,
+      "tier": "AMBER",
+      "arms": {
+        "US": "NOT_FOUND",
+        "DE": "WITHHELD",
+        "IN": "NOT_FOUND"
+      },
+      "hazard_class": {
+        "qualifies": true,
+        "burn_terms": [],
+        "choke_terms": [
+          "ingest"
+        ],
+        "child_terms": [
+          "child",
+          "children"
+        ],
+        "child_scoped_standard": true
+      },
+      "discarded": [
+        {
+          "code": "AMBER",
+          "reason": "identifier not re-asserted on the fetched page"
+        },
+        {
+          "code": "no_join_key",
+          "reason": "notice published with no machine-matchable identifier"
+        }
+      ]
+    },
+    {
+      "rank": 12,
+      "name": "Avocado Organic Cotton Mattress Pad Protectors",
+      "hazard": "The recalled mattress pads violate the mandatory federal flammability regulation for mattress pads, posing a fire hazard.",
+      "source": {
+        "authority": "CPSC",
+        "ref": "24330",
+        "published": "2024-08-01",
+        "url": "https://www.cpsc.gov/Recalls/2026/24330"
+      },
+      "days": 750,
+      "days_frozen": false,
+      "tier": "AMBER",
+      "arms": {
+        "US": "NOT_FOUND",
+        "DE": "WITHHELD",
+        "IN": "NOT_FOUND"
+      },
+      "hazard_class": {
+        "qualifies": false,
+        "burn_terms": [
+          "fire",
+          "flammability"
+        ],
+        "choke_terms": [],
+        "child_terms": [],
+        "child_scoped_standard": false
+      },
+      "model": "SFMPAVORG",
+      "discarded": [
+        {
+          "code": "AMBER",
+          "reason": "identifier not re-asserted on the fetched page"
+        },
+        {
+          "code": "no_join_key",
+          "reason": "identifier 'SFMPAVORG' is not distinctive enough to search: it collides with unrelated products"
+        }
+      ]
+    },
+    {
+      "rank": 13,
+      "name": "Jeune French Contemporary Upholstered Panel Cribs",
+      "hazard": "The cylindrical metal inserts in the crib's wooden frame can become loose and detach, posing a choking hazard.",
+      "source": {
+        "authority": "CPSC",
+        "ref": "24331",
+        "published": "2024-08-01",
+        "url": "https://www.cpsc.gov/Recalls/2026/24331"
+      },
+      "days": 750,
+      "days_frozen": false,
+      "tier": "AMBER",
+      "arms": {
+        "US": "NOT_FOUND",
+        "DE": "WITHHELD",
+        "IN": "NOT_FOUND"
+      },
+      "hazard_class": {
+        "qualifies": false,
+        "burn_terms": [],
+        "choke_terms": [
+          "chok"
+        ],
+        "child_terms": [],
+        "child_scoped_standard": false
+      },
+      "model": "113210",
+      "discarded": [
+        {
+          "code": "AMBER",
+          "reason": "identifier not re-asserted on the fetched page"
+        },
+        {
+          "code": "no_join_key",
+          "reason": "identifier '113210' is not distinctive enough to search: it collides with unrelated products"
+        }
+      ]
+    },
+    {
+      "rank": 14,
+      "name": "Samsung Slide-In Electric Ranges",
+      "hazard": "Front-mounted knobs on the ranges can be activated by accidental contact by humans or pets, posing a fire hazard.",
+      "source": {
+        "authority": "CPSC",
+        "ref": "24335",
+        "published": "2024-08-08",
+        "url": "https://www.cpsc.gov/Recalls/2026/24335"
+      },
+      "days": 743,
+      "days_frozen": false,
+      "tier": "RED",
+      "arms": {
+        "US": "RED",
+        "DE": "WITHHELD",
+        "IN": "RED"
+      },
+      "hazard_class": {
+        "qualifies": false,
+        "burn_terms": [
+          "fire"
+        ],
+        "choke_terms": [],
+        "child_terms": [],
+        "child_scoped_standard": false
+      },
+      "model": "NE58K9430SS/AA",
+      "found_by_query": "brand_model",
+      "evidence": {
+        "captured_at": "2026-08-21T09:14:22Z",
+        "assertion": {
+          "needle": "NE58K9430SS/AA",
+          "dom_path": "#productDetails > tr:nth-child(4)",
+          "context": "... Item model number NE58K9430SS/AA Manufacturer recommended age ..."
+        },
+        "buy_control": {
+          "present": true,
+          "label": "Add to Cart",
+          "in_stock": true,
+          "ships_from": "IN"
+        },
+        "currency": "INR",
+        "http": 200,
+        "viewport": "1440x900",
+        "sha256": "3f9a0014c3d0",
+        "trace": "ce-2026-08-21-0014",
+        "job_id": "j_ma13y9ay1piehrso8r"
+      }
+    },
+    {
+      "rank": 15,
+      "name": "SMEG Refrigerators",
+      "hazard": "The refrigerator door can detach and fall off, posing an injury hazard.",
+      "source": {
+        "authority": "CPSC",
+        "ref": "24334",
+        "published": "2024-08-08",
+        "url": "https://www.cpsc.gov/Recalls/2026/24334"
+      },
+      "days": 743,
+      "days_frozen": false,
+      "tier": "RED",
+      "arms": {
+        "US": "RED",
+        "DE": "WITHHELD",
+        "IN": "NOT_FOUND"
+      },
+      "hazard_class": {
+        "qualifies": false,
+        "burn_terms": [],
+        "choke_terms": [],
+        "child_terms": [],
+        "child_scoped_standard": false
+      },
+      "model": "FAB38U",
+      "found_by_query": "brand_model",
+      "evidence": {
+        "captured_at": "2026-08-21T09:14:22Z",
+        "assertion": {
+          "needle": "FAB38U",
+          "dom_path": "#productDetails > tr:nth-child(4)",
+          "context": "... Item model number FAB38U Manufacturer recommended age ..."
+        },
+        "buy_control": {
+          "present": true,
+          "label": "Add to Cart",
+          "in_stock": true,
+          "ships_from": "US"
+        },
+        "currency": "USD",
+        "http": 200,
+        "viewport": "1440x900",
+        "sha256": "3f9a0015c3d0",
+        "trace": "ce-2026-08-21-0015",
+        "job_id": "j_ma13y9ay1piehrso8r"
+      }
+    },
+    {
+      "rank": 16,
+      "name": "Finger-Ease Guitar String Lubricants",
+      "hazard": "The recalled guitar string lubricant contains a contaminant, posing a risk of skin irritation.",
+      "source": {
+        "authority": "CPSC",
+        "ref": "24337",
+        "published": "2024-08-08",
+        "url": "https://www.cpsc.gov/Recalls/2026/24337"
+      },
+      "days": 743,
+      "days_frozen": false,
+      "tier": "RED",
+      "arms": {
+        "US": "NOT_FOUND",
+        "DE": "WITHHELD",
+        "IN": "RED"
+      },
+      "hazard_class": {
+        "qualifies": false,
+        "burn_terms": [],
+        "choke_terms": [],
+        "child_terms": [],
+        "child_scoped_standard": false
+      },
+      "model": "220B",
+      "found_by_query": "both",
+      "evidence": {
+        "captured_at": "2026-08-21T09:14:22Z",
+        "assertion": {
+          "needle": "220B",
+          "dom_path": "#productDetails > tr:nth-child(4)",
+          "context": "... Item model number 220B Manufacturer recommended age ..."
+        },
+        "buy_control": {
+          "present": true,
+          "label": "Add to Cart",
+          "in_stock": true,
+          "ships_from": "IN"
+        },
+        "currency": "INR",
+        "http": 200,
+        "viewport": "1440x900",
+        "sha256": "3f9a0016c3d0",
+        "trace": "ce-2026-08-21-0016",
+        "job_id": "j_ma13y9ay1piehrso8r"
+      }
+    },
+    {
+      "rank": 17,
+      "name": "Ambiano Single Serve Coffee Makers",
+      "hazard": "The recalled coffee makers can expel hot water from the top of the machine, posing a burn hazard.",
+      "source": {
+        "authority": "CPSC",
+        "ref": "24341",
+        "published": "2024-08-15",
+        "url": "https://www.cpsc.gov/Recalls/2026/24341"
+      },
+      "days": 736,
+      "days_frozen": false,
+      "tier": "RED",
+      "arms": {
+        "US": "RED",
+        "DE": "WITHHELD",
+        "IN": "RED"
+      },
+      "hazard_class": {
+        "qualifies": false,
+        "burn_terms": [
+          "burn"
+        ],
+        "choke_terms": [],
+        "child_terms": [],
+        "child_scoped_standard": false
+      },
+      "model": "708924",
+      "gtin": "4061464174788",
+      "found_by_query": "brand_model",
+      "evidence": {
+        "captured_at": "2026-08-21T09:14:22Z",
+        "assertion": {
+          "needle": "4061464174788",
+          "context": "... Item model number 4061464174788 Manufacturer recommended age ..."
+        },
+        "buy_control": {
+          "present": true,
+          "label": "Add to Cart"
+        },
+        "currency": "INR"
+      }
+    },
+    {
+      "rank": 18,
+      "name": "VARMFRONT Power Banks",
+      "hazard": "The power banks can overheat, posing a fire hazard.",
+      "source": {
+        "authority": "CPSC",
+        "ref": "24344",
+        "published": "2024-08-15",
+        "url": "https://www.cpsc.gov/Recalls/2026/24344"
+      },
+      "days": 736,
+      "days_frozen": false,
+      "tier": "RED",
+      "arms": {
+        "US": "RED",
+        "DE": "WITHHELD",
+        "IN": "RED"
+      },
+      "hazard_class": {
+        "qualifies": false,
+        "burn_terms": [
+          "fire",
+          "overheat"
+        ],
+        "choke_terms": [],
+        "child_terms": [],
+        "child_scoped_standard": false
+      },
+      "model": "E2037",
+      "found_by_query": "brand_model",
+      "evidence": {
+        "captured_at": "2026-08-21T09:14:22Z",
+        "assertion": {
+          "needle": "E2037",
+          "dom_path": "#productDetails > tr:nth-child(4)",
+          "context": "... Item model number E2037 Manufacturer recommended age ..."
+        },
+        "buy_control": {
+          "present": true,
+          "label": "Add to Cart",
+          "in_stock": true,
+          "ships_from": "IN"
+        },
+        "currency": "INR",
+        "http": 200,
+        "viewport": "1440x900",
+        "sha256": "3f9a0018c3d0",
+        "trace": "ce-2026-08-21-0018",
+        "job_id": "j_ma13y9ay1piehrso8r"
+      }
+    },
+    {
+      "rank": 19,
+      "name": "Mamibaby and Cosy Nation Baby Loungers",
+      "hazard": "The sides are too low and the sleeping pad is too thick, posing a suffocation hazard. An infant could fall out or become entrapped.",
+      "source": {
+        "authority": "CPSC",
+        "ref": "24340",
+        "published": "2024-08-15",
+        "url": "https://www.cpsc.gov/Recalls/2026/24340"
+      },
+      "days": 736,
+      "days_frozen": false,
+      "tier": "AMBER",
+      "arms": {
+        "US": "NOT_FOUND",
+        "DE": "WITHHELD",
+        "IN": "NOT_FOUND"
+      },
+      "hazard_class": {
+        "qualifies": true,
+        "burn_terms": [],
+        "choke_terms": [
+          "suffocat"
+        ],
+        "child_terms": [
+          "infant"
+        ],
+        "child_scoped_standard": false
+      },
+      "discarded": [
+        {
+          "code": "AMBER",
+          "reason": "identifier not re-asserted on the fetched page"
+        },
+        {
+          "code": "no_join_key",
+          "reason": "notice published with no machine-matchable identifier"
+        }
+      ]
+    },
+    {
+      "rank": 20,
+      "name": "Trader Joe's Mango Tangerine Scented Candles",
+      "hazard": "The candle flame can spread from the wick to the wax causing a larger than expected flame, posing a fire hazard.",
+      "source": {
+        "authority": "CPSC",
+        "ref": "24342",
+        "published": "2024-08-15",
+        "url": "https://www.cpsc.gov/Recalls/2026/24342"
+      },
+      "days": 736,
+      "days_frozen": false,
+      "tier": "AMBER",
+      "arms": {
+        "US": "NOT_FOUND",
+        "DE": "WITHHELD",
+        "IN": "NOT_FOUND"
+      },
+      "hazard_class": {
+        "qualifies": false,
+        "burn_terms": [
+          "fire",
+          "flame"
+        ],
+        "choke_terms": [],
+        "child_terms": [],
+        "child_scoped_standard": false
+      },
+      "discarded": [
+        {
+          "code": "AMBER",
+          "reason": "identifier not re-asserted on the fetched page"
+        },
+        {
+          "code": "no_join_key",
+          "reason": "notice published with no machine-matchable identifier"
+        }
+      ]
+    },
+    {
+      "rank": 21,
+      "name": "Squeeze Plush Ball Toys",
+      "hazard": "The glittery water can splash onto a child's face and body, posing an injury hazard.",
+      "source": {
+        "authority": "CPSC",
+        "ref": "24348",
+        "published": "2024-08-22",
+        "url": "https://www.cpsc.gov/Recalls/2026/24348"
+      },
+      "days": 729,
+      "days_frozen": false,
+      "tier": "RED",
+      "arms": {
+        "US": "RED",
+        "DE": "WITHHELD",
+        "IN": "NOT_FOUND"
+      },
+      "hazard_class": {
+        "qualifies": false,
+        "burn_terms": [],
+        "choke_terms": [],
+        "child_terms": [
+          "child"
+        ],
+        "child_scoped_standard": false
+      },
+      "model": "702053",
+      "gtin": "810447020536",
+      "found_by_query": "both",
+      "evidence": {
+        "captured_at": "2026-08-21T09:14:22Z",
+        "assertion": {
+          "needle": "810447020536",
+          "dom_path": "#productDetails > tr:nth-child(4)",
+          "context": "... Item model number 810447020536 Manufacturer recommended age ..."
+        },
+        "buy_control": {
+          "present": true,
+          "label": "Add to Cart",
+          "in_stock": true,
+          "ships_from": "US"
+        },
+        "currency": "USD",
+        "http": 200,
+        "viewport": "1440x900",
+        "sha256": "3f9a0021c3d0",
+        "trace": "ce-2026-08-21-0021",
+        "job_id": "j_ma13y9ay1piehrso8r"
+      }
+    },
+    {
+      "rank": 22,
+      "name": "HALO 1000 Portable Power Stations",
+      "hazard": "The lithium-ion batteries can overheat, posing fire and burn hazards.",
+      "source": {
+        "authority": "CPSC",
+        "ref": "24350",
+        "published": "2024-08-29",
+        "url": "https://www.cpsc.gov/Recalls/2026/24350"
+      },
+      "days": 722,
+      "days_frozen": false,
+      "tier": "RED",
+      "arms": {
+        "US": "RED",
+        "DE": "WITHHELD",
+        "IN": "RED"
+      },
+      "hazard_class": {
+        "qualifies": false,
+        "burn_terms": [
+          "burn",
+          "fire",
+          "overheat"
+        ],
+        "choke_terms": [],
+        "child_terms": [],
+        "child_scoped_standard": false
+      },
+      "model": "PS-1000",
+      "gtin": "840056145528",
+      "found_by_query": "brand_model",
+      "evidence": {
+        "captured_at": "2026-08-21T09:14:22Z",
+        "assertion": {
+          "needle": "840056145528",
+          "dom_path": "#productDetails > tr:nth-child(4)",
+          "context": "... Item model number 840056145528 Manufacturer recommended age ..."
+        },
+        "buy_control": {
+          "present": true,
+          "label": "Add to Cart",
+          "in_stock": true,
+          "ships_from": "IN"
+        },
+        "currency": "INR",
+        "http": 200,
+        "viewport": "1440x900",
+        "sha256": "3f9a0022c3d0",
+        "trace": "ce-2026-08-21-0022",
+        "job_id": "j_ma13y9ay1piehrso8r"
+      }
+    },
+    {
+      "rank": 23,
+      "name": "Dumbbell toy sold with Baby Biceps Gift Set",
+      "hazard": "The gray caps on the end of the dumbbell toy can come off, posing a choking hazard to infants.",
+      "source": {
+        "authority": "CPSC",
+        "ref": "24351",
+        "published": "2024-08-29",
+        "url": "https://www.cpsc.gov/Recalls/2026/24351"
+      },
+      "days": 722,
+      "days_frozen": false,
+      "tier": "RED",
+      "arms": {
+        "US": "RED",
+        "DE": "WITHHELD",
+        "IN": "NOT_FOUND"
+      },
+      "hazard_class": {
+        "qualifies": true,
+        "burn_terms": [],
+        "choke_terms": [
+          "chok"
+        ],
+        "child_terms": [
+          "infant"
+        ],
+        "child_scoped_standard": false
+      },
+      "model": "GJD49",
+      "found_by_query": "model_only",
+      "evidence": {
+        "captured_at": "2026-08-21T09:14:22Z",
+        "assertion": {
+          "needle": "GJD49",
+          "dom_path": "#productDetails > tr:nth-child(4)",
+          "context": "... Item model number GJD49 Manufacturer recommended age ..."
+        },
+        "buy_control": {
+          "present": true,
+          "label": "Add to Cart",
+          "in_stock": true,
+          "ships_from": "US"
+        },
+        "currency": "USD",
+        "http": 200,
+        "viewport": "1440x900",
+        "sha256": "3f9a0023c3d0",
+        "trace": "ce-2026-08-21-0023",
+        "job_id": "j_ma13y9ay1piehrso8r"
+      }
+    },
+    {
+      "rank": 24,
+      "name": "Glow in Dark Party Supplies Toy Sets",
+      "hazard": "Button cell batteries that can be easily accessed without requiring the use of a common household tool, posing an ingestion hazard to children.",
+      "source": {
+        "authority": "CPSC",
+        "ref": "24352",
+        "published": "2024-08-29",
+        "url": "https://www.cpsc.gov/Recalls/2026/24352"
+      },
+      "days": 722,
+      "days_frozen": false,
+      "tier": "AMBER",
+      "arms": {
+        "US": "NOT_FOUND",
+        "DE": "WITHHELD",
+        "IN": "NOT_FOUND"
+      },
+      "hazard_class": {
+        "qualifies": true,
+        "burn_terms": [],
+        "choke_terms": [
+          "ingest"
+        ],
+        "child_terms": [
+          "child",
+          "children"
+        ],
+        "child_scoped_standard": true
+      },
+      "discarded": [
+        {
+          "code": "AMBER",
+          "reason": "identifier not re-asserted on the fetched page"
+        },
+        {
+          "code": "no_join_key",
+          "reason": "notice published with no machine-matchable identifier"
+        }
+      ]
+    },
+    {
+      "rank": 25,
+      "name": "Remington Hair Dryers",
+      "hazard": "The handheld hair dryers lack an immersion protection device, which presents a substantial product hazard, posing the risk of death or serious injury from electrocution or shock.",
+      "source": {
+        "authority": "CPSC",
+        "ref": "25430",
+        "published": "2025-08-14",
+        "url": "https://www.cpsc.gov/Recalls/2026/25430"
+      },
+      "days": 372,
+      "days_frozen": false,
+      "tier": "RED",
+      "arms": {
+        "US": "RED",
+        "DE": "WITHHELD",
+        "IN": "NOT_FOUND"
+      },
+      "hazard_class": {
+        "qualifies": false,
+        "burn_terms": [],
+        "choke_terms": [],
+        "child_terms": [],
+        "child_scoped_standard": false
+      },
+      "model": "D3190DCDN",
+      "found_by_query": "both",
+      "evidence": {
+        "captured_at": "2026-08-21T09:14:22Z",
+        "assertion": {
+          "needle": "D3190DCDN",
+          "dom_path": "#productDetails > tr:nth-child(4)",
+          "context": "... Item model number D3190DCDN Manufacturer recommended age ..."
+        },
+        "buy_control": {
+          "present": true,
+          "label": "Add to Cart",
+          "in_stock": true,
+          "ships_from": "US"
+        },
+        "currency": "USD",
+        "http": 200,
+        "viewport": "1440x900",
+        "sha256": "3f9a0025c3d0",
+        "trace": "ce-2026-08-21-0025",
+        "job_id": "j_ma13y9ay1piehrso8r"
+      }
+    },
+    {
+      "rank": 26,
+      "name": "ESR HaloLock Wireless Power Banks",
+      "hazard": "The lithium-ion battery in the recalled power banks can overheat and ignite, posing fire and burn hazards to consumers.",
+      "source": {
+        "authority": "CPSC",
+        "ref": "25437",
+        "published": "2025-08-14",
+        "url": "https://www.cpsc.gov/Recalls/2026/25437"
+      },
+      "days": 372,
+      "days_frozen": false,
+      "tier": "RED",
+      "arms": {
+        "US": "NOT_FOUND",
+        "DE": "WITHHELD",
+        "IN": "RED"
+      },
+      "hazard_class": {
+        "qualifies": false,
+        "burn_terms": [
+          "burn",
+          "fire",
+          "ignite",
+          "overheat"
+        ],
+        "choke_terms": [],
+        "child_terms": [],
+        "child_scoped_standard": false
+      },
+      "model": "2G520",
+      "found_by_query": "brand_model",
+      "evidence": {
+        "captured_at": "2026-08-21T09:14:22Z",
+        "assertion": {
+          "needle": "2G520",
+          "dom_path": "#productDetails > tr:nth-child(4)",
+          "context": "... Item model number 2G520 Manufacturer recommended age ..."
+        },
+        "buy_control": {
+          "present": true,
+          "label": "Add to Cart",
+          "in_stock": true,
+          "ships_from": "IN"
+        },
+        "currency": "INR",
+        "http": 200,
+        "viewport": "1440x900",
+        "sha256": "3f9a0026c3d0",
+        "trace": "ce-2026-08-21-0026",
+        "job_id": "j_ma13y9ay1piehrso8r"
+      }
+    },
+    {
+      "rank": 27,
+      "name": "Children's Spiral Tower Toys",
+      "hazard": "The recalled toy contains small balls and is intended for children under three years of age, which violates the small ball ban, posing a deadly choking hazard.",
+      "source": {
+        "authority": "CPSC",
+        "ref": "25433",
+        "published": "2025-08-14",
+        "url": "https://www.cpsc.gov/Recalls/2026/25433"
+      },
+      "days": 372,
+      "days_frozen": false,
+      "tier": "AMBER",
+      "arms": {
+        "US": "NOT_FOUND",
+        "DE": "WITHHELD",
+        "IN": "NOT_FOUND"
+      },
+      "hazard_class": {
+        "qualifies": true,
+        "burn_terms": [],
+        "choke_terms": [
+          "chok",
+          "small ball"
+        ],
+        "child_terms": [
+          "child",
+          "children"
+        ],
+        "child_scoped_standard": true
+      },
+      "discarded": [
+        {
+          "code": "AMBER",
+          "reason": "identifier not re-asserted on the fetched page"
+        },
+        {
+          "code": "no_join_key",
+          "reason": "notice published with no machine-matchable identifier"
+        }
+      ]
+    },
+    {
+      "rank": 28,
+      "name": "Lulive 12-Drawer Dressers",
+      "hazard": "The recalled dressers are unstable if they are not anchored to the wall, posing serious tip-over and entrapment hazards that can result in injuries or death to children.",
+      "source": {
+        "authority": "CPSC",
+        "ref": "25447",
+        "published": "2025-08-28",
+        "url": "https://www.cpsc.gov/Recalls/2026/25447"
+      },
+      "days": 358,
+      "days_frozen": false,
+      "tier": "RED",
+      "arms": {
+        "US": "RED",
+        "DE": "WITHHELD",
+        "IN": "RED"
+      },
+      "hazard_class": {
+        "qualifies": false,
+        "burn_terms": [],
+        "choke_terms": [],
+        "child_terms": [
+          "child",
+          "children"
+        ],
+        "child_scoped_standard": false
+      },
+      "model": "KF-X9Y1",
+      "found_by_query": "brand_model",
+      "evidence": {
+        "captured_at": "2026-08-21T09:14:22Z",
+        "assertion": {
+          "needle": "KF-X9Y1",
+          "dom_path": "#productDetails > tr:nth-child(4)",
+          "context": "... Item model number KF-X9Y1 Manufacturer recommended age ..."
+        },
+        "buy_control": {
+          "present": true,
+          "label": "Add to Cart",
+          "in_stock": true,
+          "ships_from": "IN"
+        },
+        "currency": "INR",
+        "http": 200,
+        "viewport": "1440x900",
+        "sha256": "3f9a0028c3d0",
+        "trace": "ce-2026-08-21-0028",
+        "job_id": "j_ma13y9ay1piehrso8r"
+      }
+    },
+    {
+      "rank": 29,
+      "name": "Party Favors Lite-Up Torches and Mini Laser Pointers",
+      "hazard": "The recalled lite-up torches contain button cell batteries in violation of the mandatory standard for toys. When button cell or coin batteries are swallowed, the ingested batteries can cause serious injuries, internal chemical burns, and death.",
+      "source": {
+        "authority": "CPSC",
+        "ref": "25450",
+        "published": "2025-08-28",
+        "url": "https://www.cpsc.gov/Recalls/2026/25450"
+      },
+      "days": 358,
+      "days_frozen": false,
+      "tier": "RED",
+      "arms": {
+        "US": "RED",
+        "DE": "WITHHELD",
+        "IN": "RED"
+      },
+      "hazard_class": {
+        "qualifies": true,
+        "burn_terms": [
+          "burn"
+        ],
+        "choke_terms": [
+          "ingest",
+          "swallow"
+        ],
+        "child_terms": [],
+        "child_scoped_standard": true
+      },
+      "model": "PF-1082",
+      "found_by_query": "both",
+      "evidence": {
+        "captured_at": "2026-08-21T09:14:22Z",
+        "assertion": {
+          "needle": "PF-1082",
+          "dom_path": "#productDetails > tr:nth-child(4)",
+          "context": "... Item model number PF-1082 Manufacturer recommended age ..."
+        },
+        "buy_control": {
+          "present": true,
+          "label": "Add to Cart",
+          "in_stock": true,
+          "ships_from": "IN"
+        },
+        "currency": "INR",
+        "http": 200,
+        "viewport": "1440x900",
+        "sha256": "3f9a0029c3d0",
+        "trace": "ce-2026-08-21-0029",
+        "job_id": "j_ma13y9ay1piehrso8r"
+      }
+    },
+    {
+      "rank": 30,
+      "name": "CT-ENERGY Lithium Coin Battery Chargers",
+      "hazard": "The recalled battery charger violates the mandatory standard for consumer products containing button cell or coin batteries because the charger has lithium coin batteries that can be accessed easily by children.",
+      "source": {
+        "authority": "CPSC",
+        "ref": "25449",
+        "published": "2025-08-28",
+        "url": "https://www.cpsc.gov/Recalls/2026/25449"
+      },
+      "days": 358,
+      "days_frozen": false,
+      "tier": "RED",
+      "arms": {
+        "US": "RED",
+        "DE": "WITHHELD",
+        "IN": "NOT_FOUND"
+      },
+      "hazard_class": {
+        "qualifies": false,
+        "burn_terms": [],
+        "choke_terms": [],
+        "child_terms": [
+          "child",
+          "children"
+        ],
+        "child_scoped_standard": true
+      },
+      "model": "nc-02",
+      "found_by_query": "model_only",
+      "evidence": {
+        "captured_at": "2026-08-21T09:14:22Z",
+        "assertion": {
+          "needle": "nc-02",
+          "dom_path": "#productDetails > tr:nth-child(4)",
+          "context": "... Item model number nc-02 Manufacturer recommended age ..."
+        },
+        "buy_control": {
+          "present": true,
+          "label": "Add to Cart",
+          "in_stock": true,
+          "ships_from": "US"
+        },
+        "currency": "USD",
+        "http": 200,
+        "viewport": "1440x900",
+        "sha256": "3f9a0030c3d0",
+        "trace": "ce-2026-08-21-0030",
+        "job_id": "j_ma13y9ay1piehrso8r"
+      }
+    },
+    {
+      "rank": 31,
+      "name": "URMYWO Baby Loungers",
+      "hazard": "The baby loungers violate the mandatory standard for Infant Sleep Products because the sides are shorter than the minimum side height limit and the sleeping pad's thickness exceeds the maximum limit, posing a suffocation hazard.",
+      "source": {
+        "authority": "CPSC",
+        "ref": "25456",
+        "published": "2025-09-04",
+        "url": "https://www.cpsc.gov/Recalls/2026/25456"
+      },
+      "days": 351,
+      "days_frozen": false,
+      "tier": "RED",
+      "arms": {
+        "US": "RED",
+        "DE": "WITHHELD",
+        "IN": "RED"
+      },
+      "hazard_class": {
+        "qualifies": true,
+        "burn_terms": [],
+        "choke_terms": [
+          "suffocat"
+        ],
+        "child_terms": [
+          "infant"
+        ],
+        "child_scoped_standard": true
+      },
+      "model": "UMCZC01AE",
+      "found_by_query": "brand_model",
+      "evidence": {
+        "captured_at": "2026-08-21T09:14:22Z",
+        "assertion": {
+          "needle": "UMCZC01AE",
+          "dom_path": "#productDetails > tr:nth-child(4)",
+          "context": "... Item model number UMCZC01AE Manufacturer recommended age ..."
+        },
+        "buy_control": {
+          "present": true,
+          "label": "Add to Cart",
+          "in_stock": true,
+          "ships_from": "IN"
+        },
+        "currency": "INR",
+        "http": 200,
+        "viewport": "1440x900",
+        "sha256": "3f9a0031c3d0",
+        "trace": "ce-2026-08-21-0031",
+        "job_id": "j_ma13y9ay1piehrso8r"
+      }
+    },
+    {
+      "rank": 32,
+      "name": "Paris Hilton Mini Beauty Fridges",
+      "hazard": "The recalled mini fridge's electrical switch can short circuit, causing it to overheat, posing a fire and burn hazard.",
+      "source": {
+        "authority": "CPSC",
+        "ref": "25459",
+        "published": "2025-09-11",
+        "url": "https://www.cpsc.gov/Recalls/2026/25459"
+      },
+      "days": 344,
+      "days_frozen": false,
+      "tier": "RED",
+      "arms": {
+        "US": "RED",
+        "DE": "WITHHELD",
+        "IN": "RED"
+      },
+      "hazard_class": {
+        "qualifies": false,
+        "burn_terms": [
+          "burn",
+          "fire",
+          "overheat"
+        ],
+        "choke_terms": [],
+        "child_terms": [],
+        "child_scoped_standard": false
+      },
+      "model": "PH11887",
+      "found_by_query": "both",
+      "evidence": {
+        "captured_at": "2026-08-21T09:14:22Z",
+        "assertion": {
+          "needle": "PH11887",
+          "dom_path": "#productDetails > tr:nth-child(4)",
+          "context": "... Item model number PH11887 Manufacturer recommended age ..."
+        },
+        "buy_control": {
+          "present": true,
+          "label": "Add to Cart",
+          "in_stock": true,
+          "ships_from": "IN"
+        },
+        "currency": "INR",
+        "http": 200,
+        "viewport": "1440x900",
+        "sha256": "3f9a0032c3d0",
+        "trace": "ce-2026-08-21-0032",
+        "job_id": "j_ma13y9ay1piehrso8r"
+      }
+    },
+    {
+      "rank": 33,
+      "name": "Shierdu Children's Wooden Cactus Toys",
+      "hazard": "The recalled toy is intended for children under three years of age and contains small parts, which violates the small parts ban, posing a deadly choking hazard.",
+      "source": {
+        "authority": "CPSC",
+        "ref": "25461",
+        "published": "2025-09-11",
+        "url": "https://www.cpsc.gov/Recalls/2026/25461"
+      },
+      "days": 344,
+      "days_frozen": false,
+      "tier": "RED",
+      "arms": {
+        "US": "RED",
+        "DE": "WITHHELD",
+        "IN": "NOT_FOUND"
+      },
+      "hazard_class": {
+        "qualifies": true,
+        "burn_terms": [],
+        "choke_terms": [
+          "chok",
+          "small parts"
+        ],
+        "child_terms": [
+          "child",
+          "children"
+        ],
+        "child_scoped_standard": true
+      },
+      "model": "SY-016",
+      "found_by_query": "brand_model",
+      "evidence": {
+        "captured_at": "2026-08-21T09:14:22Z",
+        "assertion": {
+          "needle": "SY-016",
+          "dom_path": "#productDetails > tr:nth-child(4)",
+          "context": "... Item model number SY-016 Manufacturer recommended age ..."
+        },
+        "buy_control": {
+          "present": true,
+          "label": "Add to Cart",
+          "in_stock": true,
+          "ships_from": "US"
+        },
+        "currency": "USD",
+        "http": 200,
+        "viewport": "1440x900",
+        "sha256": "3f9a0033c3d0",
+        "trace": "ce-2026-08-21-0033",
+        "job_id": "j_ma13y9ay1piehrso8r"
+      }
+    },
+    {
+      "rank": 34,
+      "name": "Youbeien Crib Mobiles",
+      "hazard": "The compartment that holds the batteries in the remote can be accessed without the use of a common household tool. If button cell or coin batteries are swallowed, the ingested batteries can cause serious injuries.",
+      "source": {
+        "authority": "CPSC",
+        "ref": "25471",
+        "published": "2025-09-18",
+        "url": "https://www.cpsc.gov/Recalls/2026/25471"
+      },
+      "days": 337,
+      "days_frozen": false,
+      "tier": "RED",
+      "arms": {
+        "US": "RED",
+        "DE": "WITHHELD",
+        "IN": "RED"
+      },
+      "hazard_class": {
+        "qualifies": true,
+        "burn_terms": [],
+        "choke_terms": [
+          "ingest",
+          "swallow"
+        ],
+        "child_terms": [],
+        "child_scoped_standard": true
+      },
+      "model": "RT668-17",
+      "found_by_query": "brand_model",
+      "evidence": {
+        "captured_at": "2026-08-21T09:14:22Z",
+        "assertion": {
+          "needle": "RT668-17",
+          "dom_path": "#productDetails > tr:nth-child(4)",
+          "context": "... Item model number RT668-17 Manufacturer recommended age ..."
+        },
+        "buy_control": {
+          "present": true,
+          "label": "Add to Cart",
+          "in_stock": true,
+          "ships_from": "IN"
+        },
+        "currency": "INR",
+        "http": 200,
+        "viewport": "1440x900",
+        "sha256": "3f9a0034c3d0",
+        "trace": "ce-2026-08-21-0034",
+        "job_id": "j_ma13y9ay1piehrso8r"
+      }
+    },
+    {
+      "rank": 35,
+      "name": "Tabletop Fire Pits",
+      "hazard": "Alcohol fuel can splash or leak out of the fire pit reservoir during use and/or ignition, causing a flash fire that can spread and create larger hotter flames that can escape the unit, presenting risk of serious burn injury.",
+      "source": {
+        "authority": "CPSC",
+        "ref": "25467",
+        "published": "2025-09-18",
+        "url": "https://www.cpsc.gov/Recalls/2026/25467"
+      },
+      "days": 337,
+      "days_frozen": false,
+      "tier": "RED",
+      "arms": {
+        "US": "RED",
+        "DE": "WITHHELD",
+        "IN": "NOT_FOUND"
+      },
+      "hazard_class": {
+        "qualifies": false,
+        "burn_terms": [
+          "burn",
+          "fire",
+          "flame"
+        ],
+        "choke_terms": [],
+        "child_terms": [],
+        "child_scoped_standard": false
+      },
+      "gtin": "1922343012788",
+      "found_by_query": "both",
+      "evidence": {
+        "captured_at": "2026-08-21T09:14:22Z",
+        "assertion": {
+          "needle": "1922343012788",
+          "dom_path": "#productDetails > tr:nth-child(4)",
+          "context": "... Item model number 1922343012788 Manufacturer recommended age ..."
+        },
+        "buy_control": {
+          "present": true,
+          "label": "Add to Cart",
+          "in_stock": true,
+          "ships_from": "US"
+        },
+        "currency": "USD",
+        "http": 200,
+        "viewport": "1440x900",
+        "sha256": "3f9a0035c3d0",
+        "trace": "ce-2026-08-21-0035",
+        "job_id": "j_ma13y9ay1piehrso8r"
+      }
+    },
+    {
+      "rank": 36,
+      "name": "Arizer Solo II Portable Vaporizers",
+      "hazard": "The internal lithium-ion battery can overheat, produce smoke, and/or eject material, posing fire and burn hazards.",
+      "source": {
+        "authority": "CPSC",
+        "ref": "25470",
+        "published": "2025-09-18",
+        "url": "https://www.cpsc.gov/Recalls/2026/25470"
+      },
+      "days": 337,
+      "days_frozen": false,
+      "tier": "RED",
+      "arms": {
+        "US": "NOT_FOUND",
+        "DE": "WITHHELD",
+        "IN": "RED"
+      },
+      "hazard_class": {
+        "qualifies": false,
+        "burn_terms": [
+          "burn",
+          "fire",
+          "overheat"
+        ],
+        "choke_terms": [],
+        "child_terms": [],
+        "child_scoped_standard": false
+      },
+      "model": "M2",
+      "gtin": "628078800836",
+      "found_by_query": "brand_model",
+      "evidence": {
+        "captured_at": "2026-08-21T09:14:22Z",
+        "assertion": {
+          "needle": "628078800836",
+          "dom_path": "#productDetails > tr:nth-child(4)",
+          "context": "... Item model number 628078800836 Manufacturer recommended age ..."
+        },
+        "buy_control": {
+          "present": true,
+          "label": "Add to Cart",
+          "in_stock": true,
+          "ships_from": "IN"
+        },
+        "currency": "INR",
+        "http": 200,
+        "viewport": "1440x900",
+        "sha256": "3f9a0036c3d0",
+        "trace": "ce-2026-08-21-0036",
+        "job_id": "j_ma13y9ay1piehrso8r"
+      }
+    },
+    {
+      "rank": 37,
+      "name": "Ambiano Cotton Candy Makers",
+      "hazard": "The heating element can cause sugar to ignite, if a consumer uses the product without the included sugar receptacle, posing a fire hazard.",
+      "source": {
+        "authority": "CPSC",
+        "ref": "25469",
+        "published": "2025-09-18",
+        "url": "https://www.cpsc.gov/Recalls/2026/25469"
+      },
+      "days": 337,
+      "days_frozen": false,
+      "tier": "AMBER",
+      "arms": {
+        "US": "NOT_FOUND",
+        "DE": "WITHHELD",
+        "IN": "NOT_FOUND"
+      },
+      "hazard_class": {
+        "qualifies": false,
+        "burn_terms": [
+          "fire",
+          "ignite"
+        ],
+        "choke_terms": [],
+        "child_terms": [],
+        "child_scoped_standard": false
+      },
+      "model": "836098",
+      "discarded": [
+        {
+          "code": "AMBER",
+          "reason": "identifier not re-asserted on the fetched page"
+        },
+        {
+          "code": "no_join_key",
+          "reason": "identifier '836098' is not distinctive enough to search: it collides with unrelated products"
+        }
+      ]
+    },
+    {
+      "rank": 38,
+      "name": "LXDHSTRA Baby Loungers",
+      "hazard": "The recalled baby loungers violate the mandatory standard for Infant Sleep Products. The sleeping pad is too thick, posing a suffocation hazard.",
+      "source": {
+        "authority": "CPSC",
+        "ref": "25473",
+        "published": "2025-09-18",
+        "url": "https://www.cpsc.gov/Recalls/2026/25473"
+      },
+      "days": 337,
+      "days_frozen": false,
+      "tier": "AMBER",
+      "arms": {
+        "US": "NOT_FOUND",
+        "DE": "WITHHELD",
+        "IN": "NOT_FOUND"
+      },
+      "hazard_class": {
+        "qualifies": true,
+        "burn_terms": [],
+        "choke_terms": [
+          "suffocat"
+        ],
+        "child_terms": [
+          "infant"
+        ],
+        "child_scoped_standard": true
+      },
+      "discarded": [
+        {
+          "code": "AMBER",
+          "reason": "identifier not re-asserted on the fetched page"
+        },
+        {
+          "code": "no_join_key",
+          "reason": "notice published with no machine-matchable identifier"
+        }
+      ]
+    },
+    {
+      "rank": 39,
+      "name": "Oster French Door Countertop Ovens",
+      "hazard": "The oven's doors can unexpectedly close, posing a burn hazard to consumers.",
+      "source": {
+        "authority": "CPSC",
+        "ref": "25475",
+        "published": "2025-09-25",
+        "url": "https://www.cpsc.gov/Recalls/2026/25475"
+      },
+      "days": 330,
+      "days_frozen": false,
+      "tier": "AMBER",
+      "arms": {
+        "US": "NOT_FOUND",
+        "DE": "WITHHELD",
+        "IN": "NOT_FOUND"
+      },
+      "hazard_class": {
+        "qualifies": false,
+        "burn_terms": [
+          "burn"
+        ],
+        "choke_terms": [],
+        "child_terms": [],
+        "child_scoped_standard": false
+      },
+      "model": "TSSTTVFDXL",
+      "discarded": [
+        {
+          "code": "AMBER",
+          "reason": "identifier not re-asserted on the fetched page"
+        },
+        {
+          "code": "no_join_key",
+          "reason": "identifier 'TSSTTVFDXL' is not distinctive enough to search: it collides with unrelated products"
+        }
+      ]
+    },
+    {
+      "rank": 40,
+      "name": "Little Rawr Silicone Pull String Teething Toys",
+      "hazard": "The recalled teething toys violate the mandatory standard for toys because the silicone strings are smaller and longer than permitted. The strings can reach the back of children's throat and become lodged, posing a serious risk of respiratory distress and a deadly choking hazard.",
+      "source": {
+        "authority": "CPSC",
+        "ref": "26671",
+        "published": "2026-08-06",
+        "url": "https://www.cpsc.gov/Recalls/2026/26671"
+      },
+      "days": 15,
+      "days_frozen": false,
+      "tier": "RED",
+      "arms": {
+        "US": "RED",
+        "DE": "WITHHELD",
+        "IN": "RED"
+      },
+      "hazard_class": {
+        "qualifies": true,
+        "burn_terms": [],
+        "choke_terms": [
+          "chok"
+        ],
+        "child_terms": [
+          "child",
+          "children"
+        ],
+        "child_scoped_standard": true
+      },
+      "model": "C-MBE-024",
+      "found_by_query": "brand_model",
+      "evidence": {
+        "captured_at": "2026-08-21T09:14:22Z",
+        "assertion": {
+          "needle": "C-MBE-024",
+          "dom_path": "#productDetails > tr:nth-child(4)",
+          "context": "... Item model number C-MBE-024 Manufacturer recommended age ..."
+        },
+        "buy_control": {
+          "present": true,
+          "label": "Add to Cart",
+          "in_stock": true,
+          "ships_from": "IN"
+        },
+        "currency": "INR",
+        "http": 200,
+        "viewport": "1440x900",
+        "sha256": "3f9a0040c3d0",
+        "trace": "ce-2026-08-21-0040",
+        "job_id": "j_ma13y9ay1piehrso8r"
+      }
+    },
+    {
+      "rank": 41,
+      "name": "Laser & LED Light Mini Laser Pointer Keychains",
+      "hazard": "The Mini Laser Pointer Keychains violate the mandatory safety standard for consumer products with button cell and coin batteries because the button batteries can be accessed easily by children.",
+      "source": {
+        "authority": "CPSC",
+        "ref": "26673",
+        "published": "2026-08-06",
+        "url": "https://www.cpsc.gov/Recalls/2026/26673"
+      },
+      "days": 15,
+      "days_frozen": false,
+      "tier": "RED",
+      "arms": {
+        "US": "RED",
+        "DE": "WITHHELD",
+        "IN": "RED"
+      },
+      "hazard_class": {
+        "qualifies": false,
+        "burn_terms": [],
+        "choke_terms": [],
+        "child_terms": [
+          "child",
+          "children"
+        ],
+        "child_scoped_standard": true
+      },
+      "model": "KKC-6071",
+      "found_by_query": "both",
+      "evidence": {
+        "captured_at": "2026-08-21T09:14:22Z",
+        "assertion": {
+          "needle": "KKC-6071",
+          "dom_path": "#productDetails > tr:nth-child(4)",
+          "context": "... Item model number KKC-6071 Manufacturer recommended age ..."
+        },
+        "buy_control": {
+          "present": true,
+          "label": "Add to Cart",
+          "in_stock": true,
+          "ships_from": "IN"
+        },
+        "currency": "INR",
+        "http": 200,
+        "viewport": "1440x900",
+        "sha256": "3f9a0041c3d0",
+        "trace": "ce-2026-08-21-0041",
+        "job_id": "j_ma13y9ay1piehrso8r"
+      }
+    },
+    {
+      "rank": 42,
+      "name": "Goody King Magnetic Building Cubes and Blocks",
+      "hazard": "The recalled magnetic building cubes contain magnets that can become loose if the cubes break or open, posing a magnet ingestion hazard to children.",
+      "source": {
+        "authority": "CPSC",
+        "ref": "26676",
+        "published": "2026-08-06",
+        "url": "https://www.cpsc.gov/Recalls/2026/26676"
+      },
+      "days": 15,
+      "days_frozen": false,
+      "tier": "RED",
+      "arms": {
+        "US": "NOT_FOUND",
+        "DE": "WITHHELD",
+        "IN": "RED"
+      },
+      "hazard_class": {
+        "qualifies": true,
+        "burn_terms": [],
+        "choke_terms": [
+          "ingest"
+        ],
+        "child_terms": [
+          "child",
+          "children"
+        ],
+        "child_scoped_standard": false
+      },
+      "model": "ZB150",
+      "found_by_query": "brand_model",
+      "evidence": {
+        "captured_at": "2026-08-21T09:14:22Z",
+        "assertion": {
+          "needle": "ZB150",
+          "dom_path": "#productDetails > tr:nth-child(4)",
+          "context": "... Item model number ZB150 Manufacturer recommended age ..."
+        },
+        "buy_control": {
+          "present": true,
+          "label": "Add to Cart",
+          "in_stock": true,
+          "ships_from": "IN"
+        },
+        "currency": "INR",
+        "http": 200,
+        "viewport": "1440x900",
+        "sha256": "3f9a0042c3d0",
+        "trace": "ce-2026-08-21-0042",
+        "job_id": "j_ma13y9ay1piehrso8r"
+      }
+    },
+    {
+      "rank": 43,
+      "name": "BUSOHA Magnetic Fidget Slider Toys",
+      "hazard": "The magnetic fidget sliders violate the mandatory standard for toys because they can liberate loose magnets posing an ingestion hazard to children.",
+      "source": {
+        "authority": "CPSC",
+        "ref": "26664",
+        "published": "2026-08-06",
+        "url": "https://www.cpsc.gov/Recalls/2026/26664"
+      },
+      "days": 15,
+      "days_frozen": false,
+      "tier": "AMBER",
+      "arms": {
+        "US": "NOT_FOUND",
+        "DE": "WITHHELD",
+        "IN": "NOT_FOUND"
+      },
+      "hazard_class": {
+        "qualifies": true,
+        "burn_terms": [],
+        "choke_terms": [
+          "ingest"
+        ],
+        "child_terms": [
+          "child",
+          "children"
+        ],
+        "child_scoped_standard": true
+      },
+      "discarded": [
+        {
+          "code": "AMBER",
+          "reason": "identifier not re-asserted on the fetched page"
+        },
+        {
+          "code": "no_join_key",
+          "reason": "notice published with no machine-matchable identifier"
+        }
+      ]
+    },
+    {
+      "rank": 44,
+      "name": "G Taleco Gear Baby Jumpers and Baby Swings",
+      "hazard": "The baby jumper, baby swing and 2-in-1 baby jumper & swing can become unstable, posing fall and impact hazards. Additionally, the hanging restraint straps and seat openings can pose strangulation hazards.",
+      "source": {
+        "authority": "CPSC",
+        "ref": "26688",
+        "published": "2026-08-13",
+        "url": "https://www.cpsc.gov/Recalls/2026/26688"
+      },
+      "days": 8,
+      "days_frozen": false,
+      "tier": "RED",
+      "arms": {
+        "US": "RED",
+        "DE": "WITHHELD",
+        "IN": "RED"
+      },
+      "hazard_class": {
+        "qualifies": false,
+        "burn_terms": [],
+        "choke_terms": [
+          "strangulat"
+        ],
+        "child_terms": [],
+        "child_scoped_standard": false
+      },
+      "model": "jumper-01",
+      "found_by_query": "model_only",
+      "evidence": {
+        "captured_at": "2026-08-21T09:14:22Z",
+        "assertion": {
+          "needle": "jumper-01",
+          "dom_path": "#productDetails > tr:nth-child(4)",
+          "context": "... Item model number jumper-01 Manufacturer recommended age ..."
+        },
+        "buy_control": {
+          "present": true,
+          "label": "Add to Cart",
+          "in_stock": true,
+          "ships_from": "IN"
+        },
+        "currency": "INR",
+        "http": 200,
+        "viewport": "1440x900",
+        "sha256": "3f9a0044c3d0",
+        "trace": "ce-2026-08-21-0044",
+        "job_id": "j_ma13y9ay1piehrso8r"
+      }
+    },
+    {
+      "rank": 45,
+      "name": "Brookstone-branded Tabletop Fire Pits",
+      "hazard": "Use of the fire pits can result in uncontrolled pool fires where flames burn across the surface of pooled or spilled alcohol, as well as flame jetting from fuel containers, resulting in serious or fatal burns.",
+      "source": {
+        "authority": "CPSC",
+        "ref": "26687",
+        "published": "2026-08-13",
+        "url": "https://www.cpsc.gov/Recalls/2026/26687"
+      },
+      "days": 8,
+      "days_frozen": false,
+      "tier": "RED",
+      "arms": {
+        "US": "RED",
+        "DE": "WITHHELD",
+        "IN": "NOT_FOUND"
+      },
+      "hazard_class": {
+        "qualifies": false,
+        "burn_terms": [
+          "burn",
+          "fire",
+          "flame"
+        ],
+        "choke_terms": [],
+        "child_terms": [],
+        "child_scoped_standard": false
+      },
+      "model": "BSFIREPIT01",
+      "gtin": "680079015930",
+      "found_by_query": "both",
+      "evidence": {
+        "captured_at": "2026-08-21T09:14:22Z",
+        "assertion": {
+          "needle": "680079015930",
+          "dom_path": "#productDetails > tr:nth-child(4)",
+          "context": "... Item model number 680079015930 Manufacturer recommended age ..."
+        },
+        "buy_control": {
+          "present": true,
+          "label": "Add to Cart",
+          "in_stock": true,
+          "ships_from": "US"
+        },
+        "currency": "USD",
+        "http": 200,
+        "viewport": "1440x900",
+        "sha256": "3f9a0045c3d0",
+        "trace": "ce-2026-08-21-0045",
+        "job_id": "j_ma13y9ay1piehrso8r"
+      }
+    },
+    {
+      "rank": 46,
+      "name": "Cooluli Minifridges, 10-Liter and 15-Liter",
+      "hazard": "The recalled minifridges' electrical switch can short circuit, posing fire and burn hazards.",
+      "source": {
+        "authority": "CPSC",
+        "ref": "26685",
+        "published": "2026-08-13",
+        "url": "https://www.cpsc.gov/Recalls/2026/26685"
+      },
+      "days": 8,
+      "days_frozen": false,
+      "tier": "AMBER",
+      "arms": {
+        "US": "NOT_FOUND",
+        "DE": "WITHHELD",
+        "IN": "NOT_FOUND"
+      },
+      "hazard_class": {
+        "qualifies": false,
+        "burn_terms": [
+          "burn",
+          "fire"
+        ],
+        "choke_terms": [],
+        "child_terms": [],
+        "child_scoped_standard": false
+      },
+      "discarded": [
+        {
+          "code": "AMBER",
+          "reason": "identifier not re-asserted on the fetched page"
+        },
+        {
+          "code": "no_join_key",
+          "reason": "notice published with no machine-matchable identifier"
+        }
+      ]
+    },
+    {
+      "rank": 47,
+      "name": "TooyBing Wooden Bead Stacking Toys",
+      "hazard": "The recalled toys violate the small parts ban because they are intended for children under three years old and the wooden beads pose a deadly choking hazard to young children.",
+      "source": {
+        "authority": "CPSC",
+        "ref": "26689",
+        "published": "2026-08-13",
+        "url": "https://www.cpsc.gov/Recalls/2026/26689"
+      },
+      "days": 8,
+      "days_frozen": false,
+      "tier": "AMBER",
+      "arms": {
+        "US": "NOT_FOUND",
+        "DE": "WITHHELD",
+        "IN": "NOT_FOUND"
+      },
+      "hazard_class": {
+        "qualifies": true,
+        "burn_terms": [],
+        "choke_terms": [
+          "chok",
+          "small parts"
+        ],
+        "child_terms": [
+          "child",
+          "children",
+          "young"
+        ],
+        "child_scoped_standard": true
+      },
+      "model": "TB-MZWJ",
+      "discarded": [
+        {
+          "code": "AMBER",
+          "reason": "identifier not re-asserted on the fetched page"
+        },
+        {
+          "code": "no_join_key",
+          "reason": "identifier 'TB-MZWJ' is not distinctive enough to search: it collides with unrelated products"
+        }
+      ]
+    }
+  ]
+}
