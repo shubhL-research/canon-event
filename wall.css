@@ -842,3 +842,27 @@ body.rail-on .rail { opacity: 1; pointer-events: auto; }
 .rail a:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
 
 @media (max-width: 1279px) { .rail { display: none } }
+
+/* --- the finding fills the screen exactly ------------------------------- */
+
+/* 92vh left an eighth of paper showing under the black, which reads as a layout
+   fault rather than as a hint that there is more below. The scroll cue does that
+   job, so the section takes the whole viewport and nothing else.
+
+   svh rather than vh because on a phone vh is measured against the largest
+   possible viewport, so the section sits taller than the screen it is on and the
+   cue is pushed under the browser chrome — the exact problem in reverse. */
+.act-finding {
+  min-height: 100vh;
+  min-height: 100svh;
+  /* The sentence is optically centred; the cue is pinned to the bottom edge. That
+     is what the leftover space is for, rather than trailing under the text. */
+  grid-template-rows: 1fr auto;
+  align-content: stretch;
+  padding-bottom: 40px;
+}
+.act-finding > .finding-inner { align-self: center; }
+.act-finding > .scroll-cue {
+  align-self: end; margin: 0 auto; padding: 0 40px; width: 100%;
+  max-width: 1380px;
+}

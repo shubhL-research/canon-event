@@ -119,8 +119,8 @@
     }
 
     node.className = "act act-finding" + (blackout || withheld.length ? " is-withheld" : "");
-    node.innerHTML = '<div class="finding-inner">' + body +
-      '<p class="scroll-cue">What the sweep found</p></div>';
+    node.innerHTML = '<div class="finding-inner">' + body + "</div>" +
+      '<p class="scroll-cue">What the sweep found</p>';
   }
 
   /* ------------------------------------------------------ ACT II: the figures
