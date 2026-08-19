@@ -4,25 +4,25 @@
   "_contract": "contract/row.schema.json",
   "_validate": "python validate.py",
   "headline": {
-    "n": 17,
+    "n": 16,
     "oldest_days": 714,
     "oldest": {
       "name": "Toy slime",
       "ref": "A12/02545/24",
       "authority": "SAFETY_GATE",
       "hazard": "The migration of boron from the toy slime is too high (measured value: 590 mg/kg). Ingestion or contact with an excessive quantity of boron may harm the health of children by damaging their reproductive system.",
-      "rank_on_wall": 30
+      "rank_on_wall": 29
     },
-    "sentence": "17 products recalled for burning or choking children are in a cart right now. The oldest has been buyable for 714 days.",
+    "sentence": "16 products recalled for burning or choking children are in a cart right now. The oldest has been buyable for 714 days.",
     "method": "Transparent keyword rule over the regulator's verbatim hazard sentence. Matched terms are recorded per row so the classification is auditable. See hazard_class()."
   },
   "survival": {
-    "v": 0.2995,
-    "n": 62,
+    "v": 0.2754,
+    "n": 57,
     "d": 207,
     "ci95": [
-      0.2412,
-      0.3651
+      0.219,
+      0.3399
     ],
     "contaminated": true
   },
@@ -31,7 +31,7 @@
     "assumption": "survival is monotone non-increasing in days since recall",
     "confound": "Age is confounded with cohort: a 2024 recall is not exchangeable with a 2026 one. This is a cross-sectional age profile, not a within-product survival trajectory.",
     "n": 111,
-    "n_still_buyable": 62,
+    "n_still_buyable": 57,
     "blocks": [
       {
         "from_day": 21,
@@ -161,21 +161,39 @@
       },
       {
         "from_day": 35,
-        "to_day": 35,
-        "survival": 1.0,
-        "n": 1
-      },
-      {
-        "from_day": 35,
         "to_day": 70,
-        "survival": 0.9231,
-        "n": 26
+        "survival": 0.8889,
+        "n": 27
       },
       {
         "from_day": 70,
+        "to_day": 85,
+        "survival": 0.3333,
+        "n": 9
+      },
+      {
+        "from_day": 113,
         "to_day": 714,
-        "survival": 0.3556,
-        "n": 45
+        "survival": 0.2727,
+        "n": 33
+      },
+      {
+        "from_day": 714,
+        "to_day": 714,
+        "survival": 0.0,
+        "n": 1
+      },
+      {
+        "from_day": 714,
+        "to_day": 714,
+        "survival": 0.0,
+        "n": 1
+      },
+      {
+        "from_day": 714,
+        "to_day": 714,
+        "survival": 0.0,
+        "n": 1
       },
       {
         "from_day": 714,
@@ -313,25 +331,25 @@
       },
       {
         "day": 90,
-        "survival": 0.3556,
+        "survival": 0.3333,
         "ci95": [
-          0.2322,
-          0.5016
+          0.1206,
+          0.6458
         ],
         "support": 54,
-        "block_n": 45,
+        "block_n": 9,
         "thin": false,
         "publishable": true
       },
       {
         "day": 365,
-        "survival": 0.3556,
+        "survival": 0.2727,
         "ci95": [
-          0.2322,
-          0.5016
+          0.1507,
+          0.4422
         ],
         "support": 27,
-        "block_n": 45,
+        "block_n": 33,
         "thin": false,
         "publishable": true
       },
@@ -381,12 +399,12 @@
     ],
     "contaminated": false,
     "recall": {
-      "n1_brand_model": 54,
-      "n2_model_only": 29,
-      "m_both": 21,
-      "observed": 62,
-      "n_hat": 74.0,
-      "missed_floor": 12.0,
+      "n1_brand_model": 50,
+      "n2_model_only": 26,
+      "m_both": 19,
+      "observed": 57,
+      "n_hat": 67.85,
+      "missed_floor": 10.85,
       "estimator": "Chapman (bias-corrected Lincoln-Petersen)",
       "independence_violated": true,
       "note": "The two query strategies share the model token and are positively correlated. N-hat is therefore biased downward, so missed_floor is a LOWER bound on what we failed to see."
@@ -394,13 +412,13 @@
   },
   "recall_floor": {
     "estimator": "Chapman (bias-corrected Lincoln-Petersen)",
-    "n1_brand_model": 54,
-    "n2_model_only": 29,
-    "m_both": 21,
-    "observed": 62,
-    "n_hat": 74.0,
-    "se": 6.26,
-    "missed_floor": 12.0,
+    "n1_brand_model": 50,
+    "n2_model_only": 26,
+    "m_both": 19,
+    "observed": 57,
+    "n_hat": 67.85,
+    "se": 5.96,
+    "missed_floor": 10.85,
     "independence_violated": true,
     "bias_direction": "downward",
     "note": "The two query strategies share the model token and are positively correlated, which inflates the overlap and deflates N-hat. The miss count is therefore a LOWER bound on what we failed to see, not an estimate of it. Always print it as 'at least'.",
@@ -468,9 +486,9 @@
     "queries_per_seed_per_arm": 2,
     "arms": 3,
     "search_page_loads": 1242,
-    "pdp_promotions": 62,
-    "total_page_loads": 1304,
-    "working": "207 seeds x 2 queries x 3 arms = 1242 search loads, + 62 product-page promotions = 1304 page loads at 1 credit each.",
+    "pdp_promotions": 57,
+    "total_page_loads": 1299,
+    "working": "207 seeds x 2 queries x 3 arms = 1242 search loads, + 57 product-page promotions = 1299 page loads at 1 credit each.",
     "note": "Promotion to a product page is decided outside Scraper Studio by the matcher, so only RED candidates cost a browser load. Chaining with next_stage would have promoted every discovered listing and multiplied this by roughly forty."
   }
 }

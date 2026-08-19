@@ -4,13 +4,13 @@
   "_contract": "contract/row.schema.json",
   "_validate": "python validate.py",
   "rank": 29,
-  "name": "Lava lamp",
-  "hazard": "The electrical strength is insufficient and a user could receive an electric shock from accessible live parts.",
+  "name": "Toy slime",
+  "hazard": "The migration of boron from the toy slime is too high (measured value: 590 mg/kg). Ingestion or contact with an excessive quantity of boron may harm the health of children by damaging their reproductive system.",
   "source": {
     "authority": "SAFETY_GATE",
-    "ref": "A12/02490/24",
+    "ref": "A12/02545/24",
     "published": "2024-09-06",
-    "url": "https://ec.europa.eu/safety-gate-alerts/screen/search?reference=A12/02490/24"
+    "url": "https://ec.europa.eu/safety-gate-alerts/screen/search?reference=A12/02545/24"
   },
   "days": 714,
   "days_frozen": false,
@@ -21,21 +21,26 @@
     "IN": "RED"
   },
   "hazard_class": {
-    "qualifies": false,
+    "qualifies": true,
     "burn_terms": [],
-    "choke_terms": [],
-    "child_terms": [],
+    "choke_terms": [
+      "ingest"
+    ],
+    "child_terms": [
+      "child",
+      "children"
+    ],
     "child_scoped_standard": false
   },
-  "model": "3973500298,",
-  "gtin": "3973500298",
+  "model": "783476",
+  "gtin": "5101667834764",
   "found_by_query": "both",
   "evidence": {
     "captured_at": "2026-08-21T09:14:22Z",
     "assertion": {
-      "needle": "3973500298",
+      "needle": "5101667834764",
       "dom_path": "#productDetails > tr:nth-child(4)",
-      "context": "... Item model number 3973500298 Manufacturer recommended age ..."
+      "context": "... Item model number 5101667834764 Manufacturer recommended age ..."
     },
     "buy_control": {
       "present": true,

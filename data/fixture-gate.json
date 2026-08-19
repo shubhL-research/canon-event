@@ -133,18 +133,18 @@
       "queries_per_seed_per_arm": 2,
       "arms": 3,
       "search_page_loads": 1242,
-      "pdp_promotions": 62,
-      "total_page_loads": 1304,
-      "working": "207 seeds x 2 queries x 3 arms = 1242 search loads, + 62 product-page promotions = 1304 page loads at 1 credit each.",
+      "pdp_promotions": 57,
+      "total_page_loads": 1299,
+      "working": "207 seeds x 2 queries x 3 arms = 1242 search loads, + 57 product-page promotions = 1299 page loads at 1 credit each.",
       "note": "Promotion to a product page is decided outside Scraper Studio by the matcher, so only RED candidates cost a browser load. Chaining with next_stage would have promoted every discovered listing and multiplied this by roughly forty."
     },
     "survival": {
-      "v": 0.2995,
-      "n": 62,
+      "v": 0.2754,
+      "n": 57,
       "d": 207,
       "ci95": [
-        0.2412,
-        0.3651
+        0.219,
+        0.3399
       ],
       "contaminated": true
     },
@@ -178,12 +178,12 @@
       ],
       "contaminated": false,
       "recall": {
-        "n1_brand_model": 54,
-        "n2_model_only": 29,
-        "m_both": 21,
-        "observed": 62,
-        "n_hat": 74.0,
-        "missed_floor": 12.0,
+        "n1_brand_model": 50,
+        "n2_model_only": 26,
+        "m_both": 19,
+        "observed": 57,
+        "n_hat": 67.85,
+        "missed_floor": 10.85,
         "estimator": "Chapman (bias-corrected Lincoln-Petersen)",
         "independence_violated": true,
         "note": "The two query strategies share the model token and are positively correlated. N-hat is therefore biased downward, so missed_floor is a LOWER bound on what we failed to see."
@@ -203,16 +203,16 @@
       "contaminated": true
     },
     "hero": {
-      "n": 17,
+      "n": 16,
       "oldest_days": 714,
       "oldest": {
         "name": "Toy slime",
         "ref": "A12/02545/24",
         "authority": "SAFETY_GATE",
         "hazard": "The migration of boron from the toy slime is too high (measured value: 590 mg/kg). Ingestion or contact with an excessive quantity of boron may harm the health of children by damaging their reproductive system.",
-        "rank_on_wall": 30
+        "rank_on_wall": 29
       },
-      "sentence": "17 products recalled for burning or choking children are in a cart right now. The oldest has been buyable for 714 days.",
+      "sentence": "16 products recalled for burning or choking children are in a cart right now. The oldest has been buyable for 714 days.",
       "method": "Transparent keyword rule over the regulator's verbatim hazard sentence. Matched terms are recorded per row so the classification is auditable. See hazard_class()."
     },
     "survival_curve": {
@@ -220,7 +220,7 @@
       "assumption": "survival is monotone non-increasing in days since recall",
       "confound": "Age is confounded with cohort: a 2024 recall is not exchangeable with a 2026 one. This is a cross-sectional age profile, not a within-product survival trajectory.",
       "n": 111,
-      "n_still_buyable": 62,
+      "n_still_buyable": 57,
       "blocks": [
         {
           "from_day": 21,
@@ -350,21 +350,39 @@
         },
         {
           "from_day": 35,
-          "to_day": 35,
-          "survival": 1.0,
-          "n": 1
-        },
-        {
-          "from_day": 35,
           "to_day": 70,
-          "survival": 0.9231,
-          "n": 26
+          "survival": 0.8889,
+          "n": 27
         },
         {
           "from_day": 70,
+          "to_day": 85,
+          "survival": 0.3333,
+          "n": 9
+        },
+        {
+          "from_day": 113,
           "to_day": 714,
-          "survival": 0.3556,
-          "n": 45
+          "survival": 0.2727,
+          "n": 33
+        },
+        {
+          "from_day": 714,
+          "to_day": 714,
+          "survival": 0.0,
+          "n": 1
+        },
+        {
+          "from_day": 714,
+          "to_day": 714,
+          "survival": 0.0,
+          "n": 1
+        },
+        {
+          "from_day": 714,
+          "to_day": 714,
+          "survival": 0.0,
+          "n": 1
         },
         {
           "from_day": 714,
@@ -502,25 +520,25 @@
         },
         {
           "day": 90,
-          "survival": 0.3556,
+          "survival": 0.3333,
           "ci95": [
-            0.2322,
-            0.5016
+            0.1206,
+            0.6458
           ],
           "support": 54,
-          "block_n": 45,
+          "block_n": 9,
           "thin": false,
           "publishable": true
         },
         {
           "day": 365,
-          "survival": 0.3556,
+          "survival": 0.2727,
           "ci95": [
-            0.2322,
-            0.5016
+            0.1507,
+            0.4422
           ],
           "support": 27,
-          "block_n": 45,
+          "block_n": 33,
           "thin": false,
           "publishable": true
         },
@@ -541,8 +559,8 @@
       "interval_method": "Wilson score interval on the isotonic block supporting each grid point. A percentile bootstrap is deliberately NOT used: it is known to be inconsistent for Grenander-type monotone estimators at a fixed point, and on this corpus it returned intervals that excluded their own point estimate. These intervals condition on the fitted block structure, so they describe uncertainty in the level within a block, not uncertainty in where the block boundaries fall."
     },
     "findings": {
-      "red": 62,
-      "amber": 145,
+      "red": 57,
+      "amber": 150,
       "total": 207,
       "shown": 40,
       "footer": "40 of 207 shown, full set in examples/"
@@ -552,10 +570,10 @@
       "d": 3
     },
     "credits": {
-      "used": 1304,
+      "used": 1299,
       "cap": 5000,
       "code": 1242,
-      "browser": 62
+      "browser": 57
     },
     "adversarial_precision_set": {
       "n": 6,
@@ -1677,55 +1695,6 @@
     },
     {
       "rank": 29,
-      "name": "Lava lamp",
-      "hazard": "The electrical strength is insufficient and a user could receive an electric shock from accessible live parts.",
-      "source": {
-        "authority": "SAFETY_GATE",
-        "ref": "A12/02490/24",
-        "published": "2024-09-06",
-        "url": "https://ec.europa.eu/safety-gate-alerts/screen/search?reference=A12/02490/24"
-      },
-      "days": 714,
-      "days_frozen": false,
-      "tier": "RED",
-      "arms": {
-        "US": "RED",
-        "DE": "WITHHELD",
-        "IN": "RED"
-      },
-      "hazard_class": {
-        "qualifies": false,
-        "burn_terms": [],
-        "choke_terms": [],
-        "child_terms": [],
-        "child_scoped_standard": false
-      },
-      "model": "3973500298,",
-      "gtin": "3973500298",
-      "found_by_query": "both",
-      "evidence": {
-        "captured_at": "2026-08-21T09:14:22Z",
-        "assertion": {
-          "needle": "3973500298",
-          "dom_path": "#productDetails > tr:nth-child(4)",
-          "context": "... Item model number 3973500298 Manufacturer recommended age ..."
-        },
-        "buy_control": {
-          "present": true,
-          "label": "Add to Cart",
-          "in_stock": true,
-          "ships_from": "IN"
-        },
-        "currency": "INR",
-        "http": 200,
-        "viewport": "1440x900",
-        "sha256": "3f9a0029c3d0",
-        "trace": "ce-2026-08-21-0029",
-        "job_id": "j_ma13y9ay1piehrso8r"
-      }
-    },
-    {
-      "rank": 30,
       "name": "Toy slime",
       "hazard": "The migration of boron from the toy slime is too high (measured value: 590 mg/kg). Ingestion or contact with an excessive quantity of boron may harm the health of children by damaging their reproductive system.",
       "source": {
@@ -1756,7 +1725,7 @@
       },
       "model": "783476",
       "gtin": "5101667834764",
-      "found_by_query": "brand_model",
+      "found_by_query": "both",
       "evidence": {
         "captured_at": "2026-08-21T09:14:22Z",
         "assertion": {
@@ -1773,60 +1742,13 @@
         "currency": "INR",
         "http": 200,
         "viewport": "1440x900",
-        "sha256": "3f9a0030c3d0",
-        "trace": "ce-2026-08-21-0030",
+        "sha256": "3f9a0029c3d0",
+        "trace": "ce-2026-08-21-0029",
         "job_id": "j_ma13y9ay1piehrso8r"
       }
     },
     {
-      "rank": 31,
-      "name": "Plush Toy",
-      "hazard": "The toy contains small parts (eye and suction cup) which can easily detach. A small child may put them in the mouth and choke. Moreover, the fibrous stuffing material of the toy is easily accessible due to the weakness of certain seams. A small child may put the filling material in the mouth and choke.",
-      "source": {
-        "authority": "SAFETY_GATE",
-        "ref": "A12/02546/24",
-        "published": "2024-09-06",
-        "url": "https://ec.europa.eu/safety-gate-alerts/screen/search?reference=A12/02546/24"
-      },
-      "days": 714,
-      "days_frozen": false,
-      "tier": "RED",
-      "arms": {
-        "US": "RED",
-        "DE": "WITHHELD",
-        "IN": "RED"
-      },
-      "hazard_class": {
-        "qualifies": true,
-        "burn_terms": [],
-        "choke_terms": [
-          "chok",
-          "small parts"
-        ],
-        "child_terms": [
-          "child"
-        ],
-        "child_scoped_standard": false
-      },
-      "model": "1138164123",
-      "gtin": "6932931853",
-      "found_by_query": "brand_model",
-      "evidence": {
-        "captured_at": "2026-08-21T09:14:22Z",
-        "assertion": {
-          "needle": "6932931853",
-          "context": "... Item model number 6932931853 Manufacturer recommended age ..."
-        },
-        "buy_control": {
-          "present": true,
-          "label": "Add to Cart",
-          "in_stock": true
-        },
-        "currency": "INR"
-      }
-    },
-    {
-      "rank": 32,
+      "rank": 30,
       "name": "Amore Di Mamma / Baby Toys FUN AND PUZZLE",
       "hazard": "The plastic material of the doll contains an amount of bis(2-ethylhexyl) phthalate (DEHP) and dibutyl phthalate (DBP) (measured values: 21% and 0.8% by weight, respectively). These phthalates may harm the health of children, causing possible damage to their reproductive system.",
       "source": {
@@ -1855,7 +1777,7 @@
       },
       "model": "1739-1",
       "gtin": "6845789988682",
-      "found_by_query": "both",
+      "found_by_query": "brand_model",
       "evidence": {
         "captured_at": "2026-08-21T09:14:22Z",
         "assertion": {
@@ -1872,13 +1794,13 @@
         "currency": "INR",
         "http": 200,
         "viewport": "1440x900",
-        "sha256": "3f9a0032c3d0",
-        "trace": "ce-2026-08-21-0032",
+        "sha256": "3f9a0030c3d0",
+        "trace": "ce-2026-08-21-0030",
         "job_id": "j_ma13y9ay1piehrso8r"
       }
     },
     {
-      "rank": 33,
+      "rank": 31,
       "name": "COOL COLORS!",
       "hazard": "According to the list of ingredients, the product contains 2-(4-tert-butylbenzyl) propionaldehyde (BMHCA), which is prohibited in cosmetic products. BMHCA may harm the reproductive system, may harm the health of the unborn child and may cause skin sensitisation.",
       "source": {
@@ -1906,30 +1828,23 @@
       },
       "model": "47 copper",
       "gtin": "5907813184475",
-      "found_by_query": "model_only",
+      "found_by_query": "brand_model",
       "evidence": {
         "captured_at": "2026-08-21T09:14:22Z",
         "assertion": {
           "needle": "5907813184475",
-          "dom_path": "#productDetails > tr:nth-child(4)",
           "context": "... Item model number 5907813184475 Manufacturer recommended age ..."
         },
         "buy_control": {
           "present": true,
           "label": "Add to Cart",
-          "in_stock": true,
-          "ships_from": "IN"
+          "in_stock": true
         },
-        "currency": "INR",
-        "http": 200,
-        "viewport": "1440x900",
-        "sha256": "3f9a0033c3d0",
-        "trace": "ce-2026-08-21-0033",
-        "job_id": "j_ma13y9ay1piehrso8r"
+        "currency": "INR"
       }
     },
     {
-      "rank": 34,
+      "rank": 32,
       "name": "Toy slime",
       "hazard": "The migration of boron from the toy slime is too high (measured value: 619 mg/kg). Ingestion or contact with an excessive quantity of boron may harm the health of children by damaging their reproductive system.",
       "source": {
@@ -1960,7 +1875,7 @@
       },
       "model": "783180",
       "gtin": "5101667831800",
-      "found_by_query": "brand_model",
+      "found_by_query": "both",
       "evidence": {
         "captured_at": "2026-08-21T09:14:22Z",
         "assertion": {
@@ -1977,13 +1892,13 @@
         "currency": "INR",
         "http": 200,
         "viewport": "1440x900",
-        "sha256": "3f9a0034c3d0",
-        "trace": "ce-2026-08-21-0034",
+        "sha256": "3f9a0032c3d0",
+        "trace": "ce-2026-08-21-0032",
         "job_id": "j_ma13y9ay1piehrso8r"
       }
     },
     {
-      "rank": 35,
+      "rank": 33,
       "name": "BLACK OPIUM NUIT",
       "hazard": "The perfume contains allergenic fragrances linalool, hydroxycitronellal, cinnamyl alcohol, hexyl cinnamal and benzyl salicylate. These substances, which can induce allergic reactions and sensitisation, are not indicated in the list of ingredients so consumers are not aware of their presence.",
       "source": {
@@ -2009,7 +1924,7 @@
       },
       "model": "B886-1",
       "gtin": "6937372281338",
-      "found_by_query": "both",
+      "found_by_query": "model_only",
       "evidence": {
         "captured_at": "2026-08-21T09:14:22Z",
         "assertion": {
@@ -2026,64 +1941,13 @@
         "currency": "USD",
         "http": 200,
         "viewport": "1440x900",
-        "sha256": "3f9a0035c3d0",
-        "trace": "ce-2026-08-21-0035",
+        "sha256": "3f9a0033c3d0",
+        "trace": "ce-2026-08-21-0033",
         "job_id": "j_ma13y9ay1piehrso8r"
       }
     },
     {
-      "rank": 36,
-      "name": "GEL POLISH",
-      "hazard": "The product contains 2-hydroxyethyl methacrylate (HEMA) (measured value: 51.2% by weight) and hydroquinone methylether (mequinol), which are prohibited in nail products for consumer use. HEMA causes serious eye irritation, skin irritation and may cause allergic skin reaction. Mequinol is harmful if swallowed, causes serious eye irritation and may cause allergic skin reaction.",
-      "source": {
-        "authority": "SAFETY_GATE",
-        "ref": "A12/02550/24",
-        "published": "2024-09-06",
-        "url": "https://ec.europa.eu/safety-gate-alerts/screen/search?reference=A12/02550/24"
-      },
-      "days": 714,
-      "days_frozen": false,
-      "tier": "RED",
-      "arms": {
-        "US": "RED",
-        "DE": "WITHHELD",
-        "IN": "NOT_FOUND"
-      },
-      "hazard_class": {
-        "qualifies": false,
-        "burn_terms": [],
-        "choke_terms": [
-          "swallow"
-        ],
-        "child_terms": [],
-        "child_scoped_standard": false
-      },
-      "model": "SZEC",
-      "gtin": "7192511194",
-      "found_by_query": "brand_model",
-      "evidence": {
-        "captured_at": "2026-08-21T09:14:22Z",
-        "assertion": {
-          "needle": "7192511194",
-          "dom_path": "#productDetails > tr:nth-child(4)",
-          "context": "... Item model number 7192511194 Manufacturer recommended age ..."
-        },
-        "buy_control": {
-          "present": true,
-          "label": "Add to Cart",
-          "in_stock": true,
-          "ships_from": "US"
-        },
-        "currency": "USD",
-        "http": 200,
-        "viewport": "1440x900",
-        "sha256": "3f9a0036c3d0",
-        "trace": "ce-2026-08-21-0036",
-        "job_id": "j_ma13y9ay1piehrso8r"
-      }
-    },
-    {
-      "rank": 37,
+      "rank": 34,
       "name": "Wi-Fi Smart Power Strip",
       "hazard": "The shuttered socket-outlets are so constructed that live parts are accessible. This can cause electric shock to end users.",
       "source": {
@@ -2113,11 +1977,53 @@
         {
           "code": "AMBER",
           "reason": "identifier not re-asserted on the fetched page"
+        },
+        {
+          "code": "no_join_key",
+          "reason": "identifier 'P1' is not distinctive enough to search: it collides with unrelated products"
         }
       ]
     },
     {
-      "rank": 38,
+      "rank": 35,
+      "name": "Lava lamp",
+      "hazard": "The electrical strength is insufficient and a user could receive an electric shock from accessible live parts.",
+      "source": {
+        "authority": "SAFETY_GATE",
+        "ref": "A12/02490/24",
+        "published": "2024-09-06",
+        "url": "https://ec.europa.eu/safety-gate-alerts/screen/search?reference=A12/02490/24"
+      },
+      "days": 714,
+      "days_frozen": false,
+      "tier": "AMBER",
+      "arms": {
+        "US": "NOT_FOUND",
+        "DE": "WITHHELD",
+        "IN": "NOT_FOUND"
+      },
+      "hazard_class": {
+        "qualifies": false,
+        "burn_terms": [],
+        "choke_terms": [],
+        "child_terms": [],
+        "child_scoped_standard": false
+      },
+      "model": "3973500298,",
+      "gtin": "3973500298",
+      "discarded": [
+        {
+          "code": "AMBER",
+          "reason": "identifier not re-asserted on the fetched page"
+        },
+        {
+          "code": "no_join_key",
+          "reason": "identifier '3973500298,' is not distinctive enough to search: it collides with unrelated products"
+        }
+      ]
+    },
+    {
+      "rank": 36,
       "name": "HAIR COLOR MOUSSE COOL COLORS!",
       "hazard": "According to the list of ingredients, the product contains 2-(4-tert-butylbenzyl)propionaldehyde (BMHCA), which is prohibited in cosmetic products. BMHCA may harm the reproductive system, may harm the health of the unborn child and may cause skin sensitisation.",
       "source": {
@@ -2153,7 +2059,7 @@
       ]
     },
     {
-      "rank": 39,
+      "rank": 37,
       "name": "Superfire",
       "hazard": "The solders in the product have an excessive concentration of lead (measured value up to 85%). It also contains DBP and DEHP in plastic parts (measured value up to 1,4 and 2,1% respectively). The product contains excessive concentrations of SCCP in plastic (measured value up to 3,4%). Lead poses a risk to the environment. Phthalates poses a risk to human health and the environment. SCCPs persist in the environment, are toxic to aquatic organisms at low concentrations and bio-accumulate in wildlife and humans, posing a risk to human health and the environment. Prolonged exposure to them through the skin may cause cancer.",
       "source": {
@@ -2187,7 +2093,7 @@
       ]
     },
     {
-      "rank": 40,
+      "rank": 38,
       "name": "Pailetten Lama",
       "hazard": "The sequins detach easily, creating small parts. Additionally, due to the weakness of the seams, the fibrous stuffing may also be accessible. A small child may put the sequins or the stuffing in the mouth and choke.",
       "source": {
@@ -2226,7 +2132,7 @@
       ]
     },
     {
-      "rank": 41,
+      "rank": 39,
       "name": "SNOW AND ICE COLORS",
       "hazard": "The plastic material of the product has an excessive concentration of bis(2-ethylhexyl) phthalate (DEHP) (measured value up to: 33.6% by weight). This phthalate may harm the health of children by causing possible damage to their reproductive system.",
       "source": {
@@ -2263,7 +2169,7 @@
       ]
     },
     {
-      "rank": 42,
+      "rank": 40,
       "name": "Select 30W",
       "hazard": "The solders of the product contains excessive concentrations of lead(measured value up to 55.8% by weight). Lead poses a risk to the environment.",
       "source": {
@@ -2297,7 +2203,7 @@
       ]
     },
     {
-      "rank": 43,
+      "rank": 41,
       "name": "Pipande kyckling",
       "hazard": "The solders in the product have an excessive concentration of lead (measured value up to 70.5% by weight). Lead poses a risk to the environment.",
       "source": {
@@ -2331,7 +2237,7 @@
       ]
     },
     {
-      "rank": 44,
+      "rank": 42,
       "name": "Hängslen",
       "hazard": "The red artificial leather detail has excessive concentrations of bis(2-ethylhexyl) phthalate (DEHP), cadmium and short-chain chlorinated paraffins (SCCPs) (measured values up to 5.4%, 0.026% and 2.67% by weight, respectively). DEHP may harm the health by causing possible damage to the reproductive system. Cadmium is harmful to human health because it accumulates in the body, can damage the kidneys and bones and it may cause cancer. SCCPs persist in the environment, are toxic to aquatic organisms at low concentrations and bio-accumulate in wildlife and humans, posing a risk to human health and the environment. Prolonged exposure to them through the skin may cause cancer.",
       "source": {
@@ -2365,7 +2271,7 @@
       ]
     },
     {
-      "rank": 45,
+      "rank": 43,
       "name": "Inflatable toy",
       "hazard": "The plastic material of the toy contains an amount of bis(2-ethylhexyl) phthalate (DEHP) (measured value: 6 % by weight). This phthalate may harm the health by causing possible damage to the reproductive system.",
       "source": {
@@ -2399,7 +2305,7 @@
       ]
     },
     {
-      "rank": 46,
+      "rank": 44,
       "name": "Perfume",
       "hazard": "The perfume contains allergenic fragrances d-limonene, linalool, benzyl alcohol, citronellol, geraniol, hydroxycitronellal, cinnamyl alcohol, hexyl cinnamal and benzyl salicylate. These substances, which can induce allergic reactions and sensitisation, are not indicated in the list of ingredients so consumers are not aware of their presence.",
       "source": {
@@ -2433,7 +2339,7 @@
       ]
     },
     {
-      "rank": 47,
+      "rank": 45,
       "name": "FLORAL SHOCK",
       "hazard": "The perfume contains allergenic fragrances d-limonene, linalool, benzyl alcohol, citronellol, geraniol, hydroxycitronellal, cinnamyl alcohol, hexyl cinnamal and benzyl salicylate. These substances, which can induce allergic reactions and sensitisation, are not indicated in the list of ingredients so consumers are not aware of their presence.",
       "source": {
@@ -2467,7 +2373,7 @@
       ]
     },
     {
-      "rank": 48,
+      "rank": 46,
       "name": "HAIR COLOR MOUSSE COOL COLORS!",
       "hazard": "According to the list of ingredients, the product contains 2-(4-tert-butylbenzyl) propionaldehyde (BMHCA), which is prohibited in cosmetic products. BMHCA may harm the reproductive system, may harm the health of the unborn child and may cause skin sensitisation.",
       "source": {
@@ -2503,7 +2409,7 @@
       ]
     },
     {
-      "rank": 49,
+      "rank": 47,
       "name": "HAIR COLOR MOUSSE COOL COLORS!",
       "hazard": "According to the list of ingredients, the product contains 2-(4-tert-butylbenzyl) propionaldehyde (BMHCA), which is prohibited in cosmetic products. BMHCA may harm the reproductive system, may harm the health of the unborn child and may cause skin sensitisation.",
       "source": {
@@ -2539,7 +2445,7 @@
       ]
     },
     {
-      "rank": 50,
+      "rank": 48,
       "name": "HAIR COLOR MOUSSE COOL COLORS!",
       "hazard": "According to the list of ingredients, the product contains 2-(4-tert-butylbenzyl) propionaldehyde (BMHCA), which is prohibited in cosmetic products. BMHCA may harm the reproductive system, may harm the health of the unborn child and may cause skin sensitisation.",
       "source": {
@@ -2571,6 +2477,89 @@
         {
           "code": "AMBER",
           "reason": "identifier not re-asserted on the fetched page"
+        }
+      ]
+    },
+    {
+      "rank": 49,
+      "name": "Plush Toy",
+      "hazard": "The toy contains small parts (eye and suction cup) which can easily detach. A small child may put them in the mouth and choke. Moreover, the fibrous stuffing material of the toy is easily accessible due to the weakness of certain seams. A small child may put the filling material in the mouth and choke.",
+      "source": {
+        "authority": "SAFETY_GATE",
+        "ref": "A12/02546/24",
+        "published": "2024-09-06",
+        "url": "https://ec.europa.eu/safety-gate-alerts/screen/search?reference=A12/02546/24"
+      },
+      "days": 714,
+      "days_frozen": false,
+      "tier": "AMBER",
+      "arms": {
+        "US": "NOT_FOUND",
+        "DE": "WITHHELD",
+        "IN": "NOT_FOUND"
+      },
+      "hazard_class": {
+        "qualifies": true,
+        "burn_terms": [],
+        "choke_terms": [
+          "chok",
+          "small parts"
+        ],
+        "child_terms": [
+          "child"
+        ],
+        "child_scoped_standard": false
+      },
+      "model": "1138164123",
+      "gtin": "6932931853",
+      "discarded": [
+        {
+          "code": "AMBER",
+          "reason": "identifier not re-asserted on the fetched page"
+        },
+        {
+          "code": "no_join_key",
+          "reason": "identifier '1138164123' is not distinctive enough to search: it collides with unrelated products"
+        }
+      ]
+    },
+    {
+      "rank": 50,
+      "name": "GEL POLISH",
+      "hazard": "The product contains 2-hydroxyethyl methacrylate (HEMA) (measured value: 51.2% by weight) and hydroquinone methylether (mequinol), which are prohibited in nail products for consumer use. HEMA causes serious eye irritation, skin irritation and may cause allergic skin reaction. Mequinol is harmful if swallowed, causes serious eye irritation and may cause allergic skin reaction.",
+      "source": {
+        "authority": "SAFETY_GATE",
+        "ref": "A12/02550/24",
+        "published": "2024-09-06",
+        "url": "https://ec.europa.eu/safety-gate-alerts/screen/search?reference=A12/02550/24"
+      },
+      "days": 714,
+      "days_frozen": false,
+      "tier": "AMBER",
+      "arms": {
+        "US": "NOT_FOUND",
+        "DE": "WITHHELD",
+        "IN": "NOT_FOUND"
+      },
+      "hazard_class": {
+        "qualifies": false,
+        "burn_terms": [],
+        "choke_terms": [
+          "swallow"
+        ],
+        "child_terms": [],
+        "child_scoped_standard": false
+      },
+      "model": "SZEC",
+      "gtin": "7192511194",
+      "discarded": [
+        {
+          "code": "AMBER",
+          "reason": "identifier not re-asserted on the fetched page"
+        },
+        {
+          "code": "no_join_key",
+          "reason": "identifier 'SZEC' is not distinctive enough to search: it collides with unrelated products"
         }
       ]
     },
@@ -3636,50 +3625,6 @@
     },
     {
       "rank": 77,
-      "name": "Kawaii Princess Doll Mermaid Kawaii 35CM Princess",
-      "hazard": "The migration of lead and cadmium from the toy is too high (measured value: 81% and 0.45% by weight, respectively). Lead is harmful to human health, accumulates in the body, can cause developmental neurotoxicity and may affect breast-fed or unborn children. Cadmium is harmful to human health because it accumulates in the body, can damage the kidneys and bones and it may cause cancer.",
-      "source": {
-        "authority": "SAFETY_GATE",
-        "ref": "SR/03089/25",
-        "published": "2025-08-29",
-        "url": "https://ec.europa.eu/safety-gate-alerts/screen/search?reference=SR/03089/25"
-      },
-      "days": 357,
-      "days_frozen": false,
-      "tier": "RED",
-      "arms": {
-        "US": "NOT_FOUND",
-        "DE": "WITHHELD",
-        "IN": "RED"
-      },
-      "hazard_class": {
-        "qualifies": false,
-        "burn_terms": [],
-        "choke_terms": [],
-        "child_terms": [
-          "child",
-          "children"
-        ],
-        "child_scoped_standard": false
-      },
-      "model": "848935112675",
-      "gtin": "848935112675",
-      "found_by_query": "brand_model",
-      "evidence": {
-        "captured_at": "2026-08-21T09:14:22Z",
-        "assertion": {
-          "needle": "848935112675",
-          "context": "... Item model number 848935112675 Manufacturer recommended age ..."
-        },
-        "buy_control": {
-          "present": true,
-          "label": "Add to Cart"
-        },
-        "currency": "INR"
-      }
-    },
-    {
-      "rank": 78,
       "name": "Extension cord socket",
       "hazard": "The product is not sufficiently insulated, which could cause the user to have access to live parts and receive an electric shock.",
       "source": {
@@ -3722,13 +3667,13 @@
         "currency": "USD",
         "http": 200,
         "viewport": "1440x900",
-        "sha256": "3f9a0078c3d0",
-        "trace": "ce-2026-08-21-0078",
+        "sha256": "3f9a0077c3d0",
+        "trace": "ce-2026-08-21-0077",
         "job_id": "j_ma13y9ay1piehrso8r"
       }
     },
     {
-      "rank": 79,
+      "rank": 78,
       "name": "CUMBA",
       "hazard": "The product has long functional cords with free ends in the neck area. These cords can become trapped during various activities of a child, leading to strangulation",
       "source": {
@@ -3758,7 +3703,7 @@
       },
       "model": "CMB-2230",
       "gtin": "2230098765439",
-      "found_by_query": "both",
+      "found_by_query": "brand_model",
       "evidence": {
         "captured_at": "2026-08-21T09:14:22Z",
         "assertion": {
@@ -3775,13 +3720,13 @@
         "currency": "USD",
         "http": 200,
         "viewport": "1440x900",
-        "sha256": "3f9a0079c3d0",
-        "trace": "ce-2026-08-21-0079",
+        "sha256": "3f9a0078c3d0",
+        "trace": "ce-2026-08-21-0078",
         "job_id": "j_ma13y9ay1piehrso8r"
       }
     },
     {
-      "rank": 80,
+      "rank": 79,
       "name": "HELLO KITTY and friends",
       "hazard": "The plastic material of the doll contains an excessive amount of bis(2-ethylhexyl) phthalate (DEHP) (measured value: 3.6% by weight). DEHP may harm the health of children by causing possible damage to their reproductive system.",
       "source": {
@@ -3818,7 +3763,7 @@
       ]
     },
     {
-      "rank": 81,
+      "rank": 80,
       "name": "No. 180",
       "hazard": "The product has an excessive concentration of cadmium (measured value: 16% by weight). Cadmium is harmful to human health because it accumulates in the body, can damage the kidneys and bones and it may cause cancer.",
       "source": {
@@ -3852,7 +3797,7 @@
       ]
     },
     {
-      "rank": 82,
+      "rank": 81,
       "name": "Funny frog",
       "hazard": "Small parts can easily detach from the toy. A small child may put them in the mouth and choke.",
       "source": {
@@ -3891,7 +3836,7 @@
       ]
     },
     {
-      "rank": 83,
+      "rank": 82,
       "name": "Necklace No. 119",
       "hazard": "The product has an excessive concentration of cadmium (measured value: 13% by weight). Cadmium is harmful to human health because it accumulates in the body, can damage the kidneys and bones and it may cause cancer.",
       "source": {
@@ -3925,7 +3870,7 @@
       ]
     },
     {
-      "rank": 84,
+      "rank": 83,
       "name": "Multifunctional emergency radio",
       "hazard": "The solders in the product have an excessive concentration of lead (measured value up to 70.2% by weight). Lead poses a risk to the environment.",
       "source": {
@@ -3955,6 +3900,47 @@
         {
           "code": "AMBER",
           "reason": "identifier not re-asserted on the fetched page"
+        }
+      ]
+    },
+    {
+      "rank": 84,
+      "name": "Kawaii Princess Doll Mermaid Kawaii 35CM Princess",
+      "hazard": "The migration of lead and cadmium from the toy is too high (measured value: 81% and 0.45% by weight, respectively). Lead is harmful to human health, accumulates in the body, can cause developmental neurotoxicity and may affect breast-fed or unborn children. Cadmium is harmful to human health because it accumulates in the body, can damage the kidneys and bones and it may cause cancer.",
+      "source": {
+        "authority": "SAFETY_GATE",
+        "ref": "SR/03089/25",
+        "published": "2025-08-29",
+        "url": "https://ec.europa.eu/safety-gate-alerts/screen/search?reference=SR/03089/25"
+      },
+      "days": 357,
+      "days_frozen": false,
+      "tier": "AMBER",
+      "arms": {
+        "US": "NOT_FOUND",
+        "DE": "WITHHELD",
+        "IN": "NOT_FOUND"
+      },
+      "hazard_class": {
+        "qualifies": false,
+        "burn_terms": [],
+        "choke_terms": [],
+        "child_terms": [
+          "child",
+          "children"
+        ],
+        "child_scoped_standard": false
+      },
+      "model": "848935112675",
+      "gtin": "848935112675",
+      "discarded": [
+        {
+          "code": "AMBER",
+          "reason": "identifier not re-asserted on the fetched page"
+        },
+        {
+          "code": "no_join_key",
+          "reason": "identifier '848935112675' is not distinctive enough to search: it collides with unrelated products"
         }
       ]
     },
@@ -5336,7 +5322,7 @@
         "child_scoped_standard": true
       },
       "model": "MT2287",
-      "found_by_query": "brand_model",
+      "found_by_query": "both",
       "evidence": {
         "captured_at": "2026-08-21T09:14:22Z",
         "assertion": {
@@ -5462,26 +5448,18 @@
         "child_scoped_standard": false
       },
       "model": "Year 2026 Teryx4 H2",
-      "found_by_query": "model_only",
+      "found_by_query": "brand_model",
       "evidence": {
         "captured_at": "2026-08-21T09:14:22Z",
         "assertion": {
           "needle": "Year 2026 Teryx4 H2",
-          "dom_path": "#productDetails > tr:nth-child(4)",
           "context": "... Item model number Year 2026 Teryx4 H2 Manufacturer recommended age ..."
         },
         "buy_control": {
           "present": true,
-          "label": "Add to Cart",
-          "in_stock": true,
-          "ships_from": "IN"
+          "label": "Add to Cart"
         },
-        "currency": "INR",
-        "http": 200,
-        "viewport": "1440x900",
-        "sha256": "3f9a0124c3d0",
-        "trace": "ce-2026-08-21-0124",
-        "job_id": "j_ma13y9ay1piehrso8r"
+        "currency": "INR"
       }
     },
     {
@@ -5510,7 +5488,7 @@
         "child_scoped_standard": false
       },
       "model": "Year 2019-2025 UMAX Bistro",
-      "found_by_query": "both",
+      "found_by_query": "brand_model",
       "evidence": {
         "captured_at": "2026-08-21T09:14:22Z",
         "assertion": {
@@ -5710,7 +5688,7 @@
       },
       "model": "B976-2",
       "gtin": "6936664319520",
-      "found_by_query": "brand_model",
+      "found_by_query": "both",
       "evidence": {
         "captured_at": "2026-08-21T09:14:22Z",
         "assertion": {
@@ -5813,7 +5791,7 @@
       },
       "model": "12402230008",
       "gtin": "6941848255204",
-      "found_by_query": "both",
+      "found_by_query": "model_only",
       "evidence": {
         "captured_at": "2026-08-21T09:14:22Z",
         "assertion": {
@@ -5864,7 +5842,7 @@
       },
       "model": "Gel",
       "gtin": "8034108163451",
-      "found_by_query": "model_only",
+      "found_by_query": "both",
       "evidence": {
         "captured_at": "2026-08-21T09:14:22Z",
         "assertion": {
@@ -5970,7 +5948,7 @@
       },
       "model": "190",
       "gtin": "8034108163635",
-      "found_by_query": "both",
+      "found_by_query": "brand_model",
       "evidence": {
         "captured_at": "2026-08-21T09:14:22Z",
         "assertion": {
@@ -6021,7 +5999,7 @@
       },
       "model": "GRAPE",
       "gtin": "4895261107126",
-      "found_by_query": "brand_model",
+      "found_by_query": "both",
       "evidence": {
         "captured_at": "2026-08-21T09:14:22Z",
         "assertion": {
@@ -6072,7 +6050,7 @@
       },
       "model": "8533",
       "gtin": "8056600796319",
-      "found_by_query": "brand_model",
+      "found_by_query": "model_only",
       "evidence": {
         "captured_at": "2026-08-21T09:14:22Z",
         "assertion": {
@@ -6123,7 +6101,7 @@
       },
       "model": "8532",
       "gtin": "8056600796302",
-      "found_by_query": "both",
+      "found_by_query": "brand_model",
       "evidence": {
         "captured_at": "2026-08-21T09:14:22Z",
         "assertion": {
@@ -6174,7 +6152,7 @@
       },
       "model": "8536",
       "gtin": "8056600796340",
-      "found_by_query": "brand_model",
+      "found_by_query": "both",
       "evidence": {
         "captured_at": "2026-08-21T09:14:22Z",
         "assertion": {
@@ -6280,7 +6258,7 @@
       },
       "model": "Smalto",
       "gtin": "8034108163376",
-      "found_by_query": "both",
+      "found_by_query": "brand_model",
       "evidence": {
         "captured_at": "2026-08-21T09:14:22Z",
         "assertion": {
@@ -6331,7 +6309,7 @@
       },
       "model": "194",
       "gtin": "8034108163574",
-      "found_by_query": "brand_model",
+      "found_by_query": "both",
       "evidence": {
         "captured_at": "2026-08-21T09:14:22Z",
         "assertion": {
@@ -6382,7 +6360,7 @@
       },
       "model": "DOUBLE",
       "gtin": "4895261107119",
-      "found_by_query": "model_only",
+      "found_by_query": "brand_model",
       "evidence": {
         "captured_at": "2026-08-21T09:14:22Z",
         "assertion": {
@@ -6433,7 +6411,7 @@
       },
       "model": "Smalto",
       "gtin": "8034108163468",
-      "found_by_query": "both",
+      "found_by_query": "brand_model",
       "evidence": {
         "captured_at": "2026-08-21T09:14:22Z",
         "assertion": {
@@ -6484,7 +6462,7 @@
       },
       "model": "8207",
       "gtin": "619828089205",
-      "found_by_query": "brand_model",
+      "found_by_query": "both",
       "evidence": {
         "captured_at": "2026-08-21T09:14:22Z",
         "assertion": {
@@ -6582,7 +6560,7 @@
       },
       "model": "NEO",
       "gtin": "3700507913434",
-      "found_by_query": "both",
+      "found_by_query": "model_only",
       "evidence": {
         "captured_at": "2026-08-21T09:14:22Z",
         "assertion": {
@@ -6631,7 +6609,7 @@
       },
       "model": "8065057110",
       "gtin": "8712930022312",
-      "found_by_query": "model_only",
+      "found_by_query": "both",
       "evidence": {
         "captured_at": "2026-08-21T09:14:22Z",
         "assertion": {
@@ -7024,7 +7002,7 @@
       },
       "model": "967176",
       "gtin": "4032722967176",
-      "found_by_query": "both",
+      "found_by_query": "brand_model",
       "evidence": {
         "captured_at": "2026-08-21T09:14:22Z",
         "assertion": {
@@ -7077,7 +7055,7 @@
       },
       "model": "8888",
       "gtin": "5906826474191",
-      "found_by_query": "brand_model",
+      "found_by_query": "both",
       "evidence": {
         "captured_at": "2026-08-21T09:14:22Z",
         "assertion": {
@@ -7126,7 +7104,7 @@
       },
       "model": "STAR25/6A",
       "gtin": "5065014385104",
-      "found_by_query": "brand_model",
+      "found_by_query": "model_only",
       "evidence": {
         "captured_at": "2026-08-21T09:14:22Z",
         "assertion": {
@@ -7175,7 +7153,7 @@
       },
       "model": "45989",
       "gtin": "3700369444565",
-      "found_by_query": "both",
+      "found_by_query": "brand_model",
       "evidence": {
         "captured_at": "2026-08-21T09:14:22Z",
         "assertion": {
@@ -7458,7 +7436,7 @@
       },
       "model": "SQ-903",
       "gtin": "8056351975186",
-      "found_by_query": "brand_model",
+      "found_by_query": "both",
       "evidence": {
         "captured_at": "2026-08-21T09:14:22Z",
         "assertion": {
@@ -7566,7 +7544,7 @@
       },
       "model": "BPLA9466",
       "gtin": "5904326449466",
-      "found_by_query": "both",
+      "found_by_query": "brand_model",
       "evidence": {
         "captured_at": "2026-08-21T09:14:22Z",
         "assertion": {
@@ -7615,7 +7593,7 @@
       },
       "model": "10030.",
       "gtin": "6661806010309",
-      "found_by_query": "brand_model",
+      "found_by_query": "both",
       "evidence": {
         "captured_at": "2026-08-21T09:14:22Z",
         "assertion": {
@@ -7669,7 +7647,7 @@
       },
       "model": "EA10330",
       "gtin": "3664944533023",
-      "found_by_query": "model_only",
+      "found_by_query": "brand_model",
       "evidence": {
         "captured_at": "2026-08-21T09:14:22Z",
         "assertion": {
@@ -7718,7 +7696,7 @@
       },
       "model": "HO203897",
       "gtin": "3616180381722",
-      "found_by_query": "both",
+      "found_by_query": "brand_model",
       "evidence": {
         "captured_at": "2026-08-21T09:14:22Z",
         "assertion": {
@@ -7772,7 +7750,7 @@
       },
       "model": "BPLA1306",
       "gtin": "5904326471306",
-      "found_by_query": "brand_model",
+      "found_by_query": "both",
       "evidence": {
         "captured_at": "2026-08-21T09:14:22Z",
         "assertion": {
@@ -7874,7 +7852,7 @@
       },
       "model": "5501-41",
       "gtin": "5902496099399",
-      "found_by_query": "both",
+      "found_by_query": "model_only",
       "evidence": {
         "captured_at": "2026-08-21T09:14:22Z",
         "assertion": {
@@ -7898,55 +7876,6 @@
     },
     {
       "rank": 177,
-      "name": "Colour Block Purse",
-      "hazard": "The plastic material of the product has an excessive concentration of bis(2-ethylhexyl) phthalate (DEHP) and dibutyl phthalate (DBP). These phthalates may harm the health by causing possible damage to the reproductive system. Additionally, the product has an excessive concentration of short chain chlorinated paraffins (SCCPs). SCCPs persist in the environment, are toxic to aquatic organisms at low concentrations and bio-accumulate in wildlife and humans, posing a risk to human health and the environment.",
-      "source": {
-        "authority": "SAFETY_GATE",
-        "ref": "SR/02040/26",
-        "published": "2026-07-17",
-        "url": "https://ec.europa.eu/safety-gate-alerts/screen/search?reference=SR/02040/26"
-      },
-      "days": 35,
-      "days_frozen": false,
-      "tier": "RED",
-      "arms": {
-        "US": "RED",
-        "DE": "WITHHELD",
-        "IN": "NOT_FOUND"
-      },
-      "hazard_class": {
-        "qualifies": false,
-        "burn_terms": [],
-        "choke_terms": [],
-        "child_terms": [],
-        "child_scoped_standard": false
-      },
-      "model": "3103002",
-      "gtin": "991169270",
-      "found_by_query": "model_only",
-      "evidence": {
-        "captured_at": "2026-08-21T09:14:22Z",
-        "assertion": {
-          "needle": "991169270",
-          "dom_path": "#productDetails > tr:nth-child(4)",
-          "context": "... Item model number 991169270 Manufacturer recommended age ..."
-        },
-        "buy_control": {
-          "present": true,
-          "label": "Add to Cart",
-          "in_stock": true,
-          "ships_from": "US"
-        },
-        "currency": "USD",
-        "http": 200,
-        "viewport": "1440x900",
-        "sha256": "3f9a0177c3d0",
-        "trace": "ce-2026-08-21-0177",
-        "job_id": "j_ma13y9ay1piehrso8r"
-      }
-    },
-    {
-      "rank": 178,
       "name": "200 L",
       "hazard": "The structure of the socket allows single-pole insertion of plugs and the protection surface of the plug's face is insufficient. Moreover, the wires can be pulled or twisted out of their terminals and the single-layer insulation is insufficient for a Class II appliance, which could lead to exposed live parts. Finally, the insulation does not ensure adequate separation from live (active) parts during the lifetime of the luminaire. The user could touch accessible live parts and receive an electric shock.",
       "source": {
@@ -7976,6 +7905,44 @@
         {
           "code": "AMBER",
           "reason": "identifier not re-asserted on the fetched page"
+        }
+      ]
+    },
+    {
+      "rank": 178,
+      "name": "Colour Block Purse",
+      "hazard": "The plastic material of the product has an excessive concentration of bis(2-ethylhexyl) phthalate (DEHP) and dibutyl phthalate (DBP). These phthalates may harm the health by causing possible damage to the reproductive system. Additionally, the product has an excessive concentration of short chain chlorinated paraffins (SCCPs). SCCPs persist in the environment, are toxic to aquatic organisms at low concentrations and bio-accumulate in wildlife and humans, posing a risk to human health and the environment.",
+      "source": {
+        "authority": "SAFETY_GATE",
+        "ref": "SR/02040/26",
+        "published": "2026-07-17",
+        "url": "https://ec.europa.eu/safety-gate-alerts/screen/search?reference=SR/02040/26"
+      },
+      "days": 35,
+      "days_frozen": false,
+      "tier": "AMBER",
+      "arms": {
+        "US": "NOT_FOUND",
+        "DE": "WITHHELD",
+        "IN": "NOT_FOUND"
+      },
+      "hazard_class": {
+        "qualifies": false,
+        "burn_terms": [],
+        "choke_terms": [],
+        "child_terms": [],
+        "child_scoped_standard": false
+      },
+      "model": "3103002",
+      "gtin": "991169270",
+      "discarded": [
+        {
+          "code": "AMBER",
+          "reason": "identifier not re-asserted on the fetched page"
+        },
+        {
+          "code": "no_join_key",
+          "reason": "identifier '3103002' is not distinctive enough to search: it collides with unrelated products"
         }
       ]
     },
@@ -8130,7 +8097,7 @@
         "child_scoped_standard": false
       },
       "model": "LT003",
-      "found_by_query": "brand_model",
+      "found_by_query": "both",
       "evidence": {
         "captured_at": "2026-08-21T09:14:22Z",
         "assertion": {
@@ -8426,7 +8393,7 @@
       },
       "model": "0163-F2-5300,",
       "gtin": "5714217873573",
-      "found_by_query": "both",
+      "found_by_query": "brand_model",
       "evidence": {
         "captured_at": "2026-08-21T09:14:22Z",
         "assertion": {
@@ -8527,7 +8494,7 @@
       },
       "model": "04GP.30.03.11.Y,",
       "gtin": "5902694500048",
-      "found_by_query": "brand_model",
+      "found_by_query": "both",
       "evidence": {
         "captured_at": "2026-08-21T09:14:22Z",
         "assertion": {
@@ -8576,7 +8543,7 @@
       },
       "model": "964700",
       "gtin": "4032722964700",
-      "found_by_query": "both",
+      "found_by_query": "model_only",
       "evidence": {
         "captured_at": "2026-08-21T09:14:22Z",
         "assertion": {
@@ -8680,7 +8647,7 @@
       },
       "model": "SQ-903",
       "gtin": "8056351974882",
-      "found_by_query": "brand_model",
+      "found_by_query": "both",
       "evidence": {
         "captured_at": "2026-08-21T09:14:22Z",
         "assertion": {
@@ -8732,7 +8699,7 @@
       },
       "model": "AN-059A",
       "gtin": "786368956448",
-      "found_by_query": "both",
+      "found_by_query": "brand_model",
       "evidence": {
         "captured_at": "2026-08-21T09:14:22Z",
         "assertion": {
@@ -8835,7 +8802,7 @@
       },
       "model": "11307",
       "gtin": "8435127113074",
-      "found_by_query": "model_only",
+      "found_by_query": "both",
       "evidence": {
         "captured_at": "2026-08-21T09:14:22Z",
         "assertion": {
@@ -8884,7 +8851,7 @@
       },
       "model": "3022201,",
       "gtin": "5397349037541",
-      "found_by_query": "both",
+      "found_by_query": "brand_model",
       "evidence": {
         "captured_at": "2026-08-21T09:14:22Z",
         "assertion": {

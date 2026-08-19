@@ -46,6 +46,7 @@ function run(variant) {
     window: {},
     document: {
       readyState: "complete",
+      body: makeNode("body"),
       getElementById: (id) => nodes[id] || makeNode(id),
       querySelectorAll: () => [],
       addEventListener: () => {},
@@ -91,8 +92,16 @@ for (const variant of VARIANTS) {
   check(!/\bNaN\b/.test(html), `"NaN" leaked into rendered HTML`);
 
   // There is no green in this interface, and that has to stay true in the markup.
-  check(!/(green|#0[0-9a-f]?[a-f8-9][0-9a-f]{3}\b.*green)/i.test(html),
-        "a green token appeared in rendered markup");
+  //
+  // Scoped to OUR markup, not to the regulator's. CPSC notice 24338 reads "even
+  // if the indicator is green, the car seat may not be properly attached", and
+  // hazard text is quoted verbatim and never paraphrased. This check fired the
+  // moment that row entered the visible page, which made it a test that forbids
+  // the corpus rather than a test that forbids a colour.
+  const ours = html.replace(/<div class="quote">[\s\S]*?<\/div>/g, "")
+                   .replace(/<blockquote[\s\S]*?<\/blockquote>/g, "");
+  check(!/(green|#0[0-9a-f]?[a-f8-9][0-9a-f]{3}\b.*green)/i.test(ours),
+        "a green token appeared in the interface's own markup");
 
   if (variant === "loading") {
     check(/skeleton/.test(html), "loading state renders skeleton rows");

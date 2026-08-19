@@ -24,6 +24,10 @@ Run:  python3 make_fixture.py
 import json
 import datetime
 import pathlib
+import sys
+
+sys.path.insert(0, str(pathlib.Path(__file__).parent.parent / "collector"))
+from normalize import gtin_check_digit_ok  # noqa: E402
 
 SWEPT = datetime.datetime(2026, 8, 21, 14, 2, 11, tzinfo=datetime.timezone.utc)
 FRESHNESS_BOUND_S = 14400  # 4 hours
@@ -187,7 +191,16 @@ def identifier_strength(model, gtin):
     likely to still be on sale, are exactly the ones published without a
     searchable identifier.
     """
-    if gtin:
+    # A `gtin` field is only a GTIN if it passes its own modulo-10 check digit.
+    # Six of the 104 Safety Gate notices carrying one hold a value that does not,
+    # at lengths 9, 10, 12 and 14, because the notifying country types into a
+    # free-text barcode box. The live matcher refuses those as unassertable, so
+    # the fixture must too: a fixture that can show a RED row the live path would
+    # never produce is a fixture that overstates.
+    #
+    # Before this, "Lava lamp / GTIN 3973500298" was RED, and after the ledger was
+    # reordered findings-first it became the top row on the wall.
+    if gtin and gtin_check_digit_ok(gtin):
         return "strong"
     if not model:
         return "none"
