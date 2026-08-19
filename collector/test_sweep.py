@@ -239,15 +239,21 @@ check("zero_is_a_fault" in doc["detectors"],
 check(all("fired" in d for d in doc["detectors"].values()),
       "every detector records a verdict, so none can fail silently")
 
-# The IN arm returned an empty list, which is NOT the same as being told there
-# is nothing there. Its rows read NOT_FOUND because no listing came back for
-# this notice, but the ARM is withheld, because zero rows across a whole sweep
-# with no archived empty-result page is our silence rather than a finding.
-# Those two levels disagreeing is the design working, not a contradiction.
+# The IN arm returned an empty list, which is NOT the same as being told there is
+# nothing there. Its rows read NOT_FOUND because no listing came back for this
+# notice, but the ARM is withheld, because zero LISTINGS across a whole sweep with
+# no archived empty-result page is our silence rather than a finding.
+#
+# The distinction is listings, not verdicts. An arm that returns a thousand
+# listings and matches none of them has measured, and its zero is publishable; an
+# arm that returns nothing has told us nothing. Reading the RED count here instead
+# of the listing count inverted that and withheld a figure we had measured.
 check(doc["arms"]["IN"]["state"] == "WITHHELD",
-      "an arm returning zero uncorroborated rows is withheld, not believed")
-check(doc["arms"]["IN"]["reason"] == "zero_rows_uncorroborated",
-      "and the reason is named rather than left to inference")
+      "an arm returning zero LISTINGS is withheld, not believed")
+check(doc["arms"]["IN"]["reason"] == "zero_listings_uncorroborated",
+      "and the reason names listings, because that is the fact being judged")
+check(doc["arms"]["DE"]["listings"] > 0 and doc["arms"]["DE"]["state"] == "MEASURED",
+      "while an arm that returned listings and matched none of them has MEASURED")
 check(doc["verdict"].startswith("WITHHELD for IN, US"),
       "the verdict sentence is derived from the arm states, never typed")
 check("seed corpus are unaffected" in doc["verdict"],
@@ -314,8 +320,19 @@ check(set(payload) == {"sweep_id", "swept_at", "variant", "freshness_bound_s",
       "the payload carries exactly the eight keys wall.html reads")
 check(payload["provenance"]["fixture"] is False,
       "a live payload is not stamped as a fixture")
-check(payload["stats"]["survival"]["contaminated"] is True,
-      "a figure that depends on a collector is stamped contaminated")
+# Contamination means a collector was WITHHELD, not merely that one was involved.
+# Stamping it unconditionally redacted figures that had genuinely been measured,
+# and a redaction over a real measurement is the same error as a number over a
+# broken one.
+check(payload["stats"]["survival"]["contaminated"] is False,
+      "a measured arm leaves the figure publishable")
+withheld_payload = P.build(
+    pub_rows, dict(pub_health, arms={"DE": {"state": "WITHHELD", "reason": "x",
+                                            "rows": 0, "listings": 0, "fails": 0,
+                                            "inputs": 1, "joined": 0}}),
+    PUB_SEEDS, corpus=PUB_SEEDS)
+check(withheld_payload["stats"]["survival"]["contaminated"] is True,
+      "a withheld collector contaminates the figure that depends on it")
 check(payload["stats"]["unsearchable"]["contaminated"] is False,
       "a figure computed from the free corpus is not")
 check(payload["stats"]["survival"]["d"] == 2,

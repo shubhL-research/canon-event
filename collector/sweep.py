@@ -343,6 +343,11 @@ def sweep_arm(arm, collector_id, seeds, runner=cli_batch, captured_at=None,
     rows, report = normalize_sweep(flat, seeds_by_ref)
     report["arm"] = arm
     report["collector_id"] = collector_id
+    # Listings the arm actually brought back, counted from the adapter rather than
+    # from the normaliser: normalize_sweep also sees the synthetic rows injected
+    # when a batch fails, and a placeholder for a failed fetch is not a listing.
+    # Counting those made a blocked arm look like it had returned something.
+    report["listings"] = sum(a["rows_out"] for a in adapters)
     report["planned_loads"] = len(plan)
     report["batches"] = (len(plan) + batch_size - 1) // batch_size
     report["fetch_errors"] = errors
@@ -437,11 +442,14 @@ def run(seeds, collectors, runner=cli_batch, previous=None, now=None,
 
         reds = sum(1 for r in rows if r["tier"] == "RED")
         joined = sum(1 for r in rows if r["tier"] in ("RED", "AMBER"))
+        # listings is everything the arm brought back and decided; rows is what
+        # reddened. The detector needs the first, the wall shows the second.
+        listings = report.get("listings", 0)
         arms[arm] = dict(
-            health.arm_state(arm, reds, len(seeds), len(report["fetch_errors"]),
-                             joined),
-            rows=reds, fails=len(report["fetch_errors"]), inputs=len(seeds),
-            joined=joined, collector_id=collector_id,
+            health.arm_state(arm, listings, len(seeds),
+                             len(report["fetch_errors"]), joined),
+            rows=reds, listings=listings, fails=len(report["fetch_errors"]),
+            inputs=len(seeds), joined=joined, collector_id=collector_id,
         )
 
     rows = combine(seeds, per_arm)
@@ -528,6 +536,7 @@ def adjudicate_from_raw(seeds, arms=None, now=None):
             adapters.append(report)
 
         arm_rows, report = normalize_sweep(flat, seeds_by_ref)
+        report["listings"] = sum(a["rows_out"] for a in adapters)
         report["arm"] = arm
         report["collector_id"] = COLLECTORS.get(arm, "replayed-from-archive")
         report["planned_loads"] = len(by_url)
@@ -545,10 +554,11 @@ def adjudicate_from_raw(seeds, arms=None, now=None):
 
         reds = sum(1 for r in arm_rows if r["tier"] == "RED")
         joined = sum(1 for r in arm_rows if r["tier"] in ("RED", "AMBER"))
+        listings = report.get("listings", 0)
         arm_states[arm] = dict(
-            health.arm_state(arm, reds, len(seeds), 0, joined),
-            rows=reds, fails=0, inputs=len(seeds), joined=joined,
-            collector_id=COLLECTORS.get(arm, "replayed-from-archive"),
+            health.arm_state(arm, listings, len(seeds), 0, joined),
+            rows=reds, listings=listings, fails=0, inputs=len(seeds),
+            joined=joined, collector_id=COLLECTORS.get(arm, "replayed-from-archive"),
         )
 
     if not per_arm:

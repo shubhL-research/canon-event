@@ -169,13 +169,25 @@
 
     /* STILL ON SALE. Contaminated by any broken collector, so it is the figure
        most often withheld — which is why it is not the only one here. */
-    out.push(figure(
-      s.survival.contaminated ? pct(s.survival.v) : '<span class="count" data-to="' +
-        (s.survival.v * 100).toFixed(1) + '" data-suffix="%">0</span>',
-      "of recalled products we could search for are still on sale today",
-      s.survival.n + " of " + s.survival.d + " searchable notices · 95% confidence " +
-        pct(s.survival.ci95[0]) + " to " + pct(s.survival.ci95[1]),
-      s.survival.contaminated ? "is-withheld" : ""));
+    /* A redaction that prints its own value in the caption underneath is not a
+       redaction. When this figure is withheld the basis line says why it is
+       withheld, and nothing else — restating "0 of 58" beside a black bar leaks
+       exactly the number the bar is covering. */
+    if (s.survival.contaminated) {
+      out.push(figure("",
+        "of recalled products we could search for are still on sale today",
+        "Withheld: a collector was too broken for this figure to be trustworthy. " +
+        "The count exists and is not published.",
+        "is-withheld"));
+    } else {
+      out.push(figure(
+        '<span class="count" data-to="' + (s.survival.v * 100).toFixed(1) +
+          '" data-suffix="%">0</span>',
+        "of recalled products we could search for are still on sale today",
+        s.survival.n + " of " + s.survival.d + " searchable notices · 95% confidence " +
+          pct(s.survival.ci95[0]) + " to " + pct(s.survival.ci95[1]) +
+          (s.survival.partial ? " · " + esc(s.survival.partial) : "")));
+    }
 
     /* NEVER CHECKABLE. Computed entirely from the free government corpus, so no
        scraper can contaminate it and it survives every collector failing at

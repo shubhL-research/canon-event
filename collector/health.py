@@ -110,20 +110,33 @@ def identity_reassertion(rows):
     )
 
 
-def zero_is_a_fault(arm, rows_returned, empty_page_archived):
+def zero_is_a_fault(arm, listings_returned, empty_page_archived):
     """An arm claiming zero must corroborate it, or be withheld.
+
+    `listings_returned` is EVERY listing the arm brought back, not the number that
+    reddened. Those are opposite facts and passing the wrong one inverts this
+    detector completely.
+
+    It happened. The detector was handed the RED count, so an arm that returned
+    1,066 listings and matched none of them reported "returned zero rows with no
+    archived empty-result page", and the survival figure was withheld on the
+    grounds that we had learned nothing. We had learned something: we looked at
+    1,066 listings and none of them was the recalled product. That is a finding,
+    and withholding it was the same error as publishing an empty page — a
+    measurement misreported as silence.
 
     `empty_page_archived` is the marketplace's own no-results page, captured. It
     is the difference between "we looked and it is gone" and "we returned
     nothing", which are opposite claims that look identical in a row count.
     """
-    fired = rows_returned == 0 and not empty_page_archived
+    fired = listings_returned == 0 and not empty_page_archived
     return _detector(
         fired, "per claim",
-        ("%s returned zero rows with no archived empty-result page to "
+        ("%s returned zero listings with no archived empty-result page to "
          "corroborate it. Zero is not published as a finding without an "
          "affirmative negative." % arm) if fired else
-        ("%s returned %d rows." % (arm, rows_returned) if rows_returned else
+        ("%s returned %d listings and adjudicated every one."
+         % (arm, listings_returned) if listings_returned else
          "%s returned zero rows, corroborated by an archived empty-result "
          "page. The negative is affirmative and publishable." % arm),
         arm=arm,
@@ -255,8 +268,8 @@ def freshness(swept_at, now, bound_s=FRESHNESS_BOUND_S):
     )
 
 
-def arm_state(arm, returned, inputs, fails, joined, empty_page_archived=False,
-              heal_status="none", stale=False):
+def arm_state(arm, listings_returned, inputs, fails, joined,
+              empty_page_archived=False, heal_status="none", stale=False):
     """The single state this arm renders in, and the reason for it.
 
     Order matters and is not arbitrary: it runs from least to most credible. A
@@ -266,8 +279,10 @@ def arm_state(arm, returned, inputs, fails, joined, empty_page_archived=False,
     """
     if heal_status in ("in_flight", "awaiting_approval"):
         return {"state": WITHHELD, "reason": "heal_%s" % heal_status}
-    if returned == 0 and not empty_page_archived:
-        return {"state": WITHHELD, "reason": "zero_rows_uncorroborated"}
+    # An arm that brought back nothing at all is silent. An arm that brought back
+    # listings and matched none of them has measured, and its zero is publishable.
+    if listings_returned == 0 and not empty_page_archived:
+        return {"state": WITHHELD, "reason": "zero_listings_uncorroborated"}
     if inputs and fails / inputs > FAIL_RATE_BOUND:
         return {"state": DEGRADED, "reason": "fail_rate_above_bound"}
     if inputs and (joined / inputs) < JOIN_KEY_COVERAGE_BOUND:
@@ -317,8 +332,11 @@ def build(sweep_id, swept_at, arms, rows, reports, previous=None, now=None):
 
     detectors = {
         "identity_reassertion": identity_reassertion(rows),
+        # listings, not rows. See zero_is_a_fault's docstring: passing the RED
+        # count here inverts the detector.
         "zero_is_a_fault": _first_firing(
-            [zero_is_a_fault(a, v.get("rows", 0), v.get("empty_page_archived", False))
+            [zero_is_a_fault(a, v.get("listings", v.get("rows", 0)),
+                             v.get("empty_page_archived", False))
              for a, v in arms.items()]),
         "join_key_coverage": _first_firing(
             [join_key_coverage(a, v.get("joined", 0), v.get("inputs", 0))

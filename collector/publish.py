@@ -96,20 +96,34 @@ def unsearchable(seeds):
     return stat
 
 
-def still_buyable(rows):
+def still_buyable(rows, arms=None):
     """Share of SEARCHABLE notices found still on sale.
 
     The denominator excludes notices we could never look for. Scoring an
     unsearchable notice as not-buyable would convert our own blindness into
     evidence of safety, which is the failure this project exists to refuse.
+
+    Contamination is decided by whether a collector was WITHHELD, not by whether
+    a collector was involved. Marking it contaminated unconditionally redacted a
+    figure we had genuinely measured — 0 of 58, from 5,812 adjudicated listings —
+    and a redaction over a real measurement is the same lie as a number over a
+    broken one, pointed the other way. A DEGRADED arm makes the figure partial
+    rather than unpublishable, which is what the contract's partial stamp is for.
     """
     scored = [r for r in rows if searchable(r)]
     n = sum(1 for r in scored if r["tier"] == "RED")
+    states = [a.get("state") for a in (arms or {}).values()]
+    withheld = "WITHHELD" in states
+    partial = "DEGRADED" in states or "STALE" in states
+
     if not scored:
         return {"v": None, "n": 0, "d": 0, "ci95": None, "contaminated": True,
                 "pending": "No searchable notice reached a verdict."}
     stat = proportion(n, len(scored), "still buyable")
-    stat["contaminated"] = True
+    stat["contaminated"] = withheld
+    if partial and not withheld:
+        stat["partial"] = ("One collector is degraded, so this is a floor: a "
+                           "listing it failed to match could still exist.")
     return stat
 
 
@@ -330,7 +344,7 @@ def build(rows, health_doc, seeds, reports=None, graded=None, variant="live",
     stats = {
         # Over the whole corpus, always. Never over the swept subset.
         "unsearchable": unsearchable(corpus),
-        "survival": still_buyable(rows),
+        "survival": still_buyable(rows, health_doc.get("arms")),
         "survival_curve": curve,
         "hero": hero(rows, corpus),
         "precision": precision(rows, graded),

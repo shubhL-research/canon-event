@@ -46,8 +46,12 @@ function makeNode(id) {
 
 function run(variant, livePath) {
   const nodes = {};
-  const ids = ["verdict", "instruments", "armRail", "wall", "pager", "curve",
-               "notSeen", "healLedger", "provenance", "machinery"];
+  // Every element the renderer writes into. "figures" and the two notes were
+  // added with the five-act restructure and were missing here, so nothing the
+  // renderer put in them was ever checked.
+  const ids = ["verdict", "figures", "instruments", "armRail", "wall", "pager",
+               "curve", "notSeen", "healLedger", "provenance", "machinery",
+               "sortNote", "historicalNote", "rail"];
   ids.forEach((i) => (nodes[i] = makeNode(i)));
 
   const sandbox = {
@@ -106,8 +110,13 @@ if (fs.existsSync(LIVE)) {
   check(!/\[object Object\]/.test(html), '"[object Object]" leaked into the live payload');
   check(out.failures === 0,
         `no section failed to render (${out.failures} did)`);
-  check(/withheld|verdict/i.test(out.nodes.verdict.innerHTML),
-        "the live payload renders a verdict");
+  // The invariant is that a headline renders, not that it is a withheld one.
+  // Whether the verdict band appears depends on whether a collector broke, and a
+  // test should not require the sweep to have gone badly.
+  check(/<h1>/.test(out.nodes.verdict.innerHTML),
+        "the live payload renders a headline");
+  check(out.nodes.figures.innerHTML.indexOf("figure-claim") > -1,
+        "the live payload renders its two figures");
   console.log("");
 } else {
   console.log("live payload: none published, skipping\n");
