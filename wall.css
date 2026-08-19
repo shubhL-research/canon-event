@@ -866,3 +866,11 @@ body.rail-on .rail { opacity: 1; pointer-events: auto; }
   align-self: end; margin: 0 auto; padding: 0 40px; width: 100%;
   max-width: 1380px;
 }
+
+/* A section that could not be rendered says so, in place. Quiet, because it is a
+   fault report rather than a finding, and red is reserved for accusations. */
+.render-fail {
+  font-family: var(--font-machine); font-size: 11px; line-height: 1.6;
+  color: var(--ink-2); padding: 20px 22px; background: var(--surface-sunk);
+  border-left: 2px solid var(--rule-strong); max-width: 72ch;
+}

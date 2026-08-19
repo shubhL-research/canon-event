@@ -18,6 +18,14 @@ const vm = require("vm");
 const ROOT = __dirname;
 const VARIANTS = ["v1", "healing", "gate", "blackout", "loading"];
 
+/* The live payload is a different shape from the fixtures: it is assembled by
+   collector/publish.py rather than by data/make_fixture.py, and the two can drift.
+   They did — the live payload omitted stats.credits, which threw inside
+   renderInstruments and halted boot() after the rows had rendered, so the page
+   looked complete while the motion layer never ran and every suite still passed.
+   Rendering it here is what makes that impossible to repeat. */
+const LIVE = path.join(ROOT, "data", "live.js");
+
 function makeNode(id) {
   return {
     id,
@@ -36,7 +44,7 @@ function makeNode(id) {
   };
 }
 
-function run(variant) {
+function run(variant, livePath) {
   const nodes = {};
   const ids = ["verdict", "instruments", "armRail", "wall", "pager", "curve",
                "notSeen", "healLedger", "provenance", "machinery"];
@@ -65,9 +73,16 @@ function run(variant) {
   vm.createContext(sandbox);
 
   vm.runInContext(fs.readFileSync(path.join(ROOT, "data", "fixtures.js"), "utf8"), sandbox);
+  if (livePath) {
+    vm.runInContext(fs.readFileSync(livePath, "utf8"), sandbox);
+  }
   vm.runInContext(fs.readFileSync(path.join(ROOT, "wall.js"), "utf8"), sandbox);
 
-  return { nodes, html: ids.map((i) => nodes[i].innerHTML).join("\n") + "\n" + nodes.pager.textContent };
+  const html = ids.map((i) => nodes[i].innerHTML).join("\n") + "\n" + nodes.pager.textContent;
+  // A guarded section reports its own failure in place, so counting those is how
+  // the test sees a half-rendered page that would otherwise look fine.
+  const failures = (html.match(/render-fail/g) || []).length;
+  return { nodes, html, failures };
 }
 
 let failures = 0;
@@ -76,6 +91,27 @@ function check(cond, msg) {
 }
 
 console.log("wall renderer smoke test\n");
+
+/* The live payload, if one has been published.
+   It is assembled by collector/publish.py, the fixtures by data/make_fixture.py,
+   and the two drifted: the live payload omitted stats.credits, which threw inside
+   renderInstruments and halted boot() after the rows had drawn. The page looked
+   complete, the motion layer never ran, and every suite passed. */
+if (fs.existsSync(LIVE)) {
+  const out = run("v1", LIVE);
+  const html = out.html;
+  console.log("live payload (data/live.js)");
+  check(!/\bundefined\b/.test(html), '"undefined" leaked into the live payload');
+  check(!/\bNaN\b/.test(html), '"NaN" leaked into the live payload');
+  check(!/\[object Object\]/.test(html), '"[object Object]" leaked into the live payload');
+  check(out.failures === 0,
+        `no section failed to render (${out.failures} did)`);
+  check(/withheld|verdict/i.test(out.nodes.verdict.innerHTML),
+        "the live payload renders a verdict");
+  console.log("");
+} else {
+  console.log("live payload: none published, skipping\n");
+}
 
 for (const variant of VARIANTS) {
   let out;

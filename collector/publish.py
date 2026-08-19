@@ -58,6 +58,10 @@ FRESHNESS_BOUND_S = 14400
 # and the footer says so rather than letting the reader assume they saw everything.
 ROWS_SHOWN = 40
 
+# Which storefront each arm actually measured. The wall names it on screen, so it
+# has to come from the payload rather than be assumed by the renderer.
+ARM_HOST = {"US": "amazon.com", "DE": "kaufland.de", "IN": "flipkart.com"}
+
 # Hand-adjudicated listings required before a precision figure may be published.
 # Below this the interval is too wide to qualify anything, and a precision claim
 # that cannot qualify the numbers underneath it is decoration.
@@ -109,16 +113,35 @@ def still_buyable(rows):
     return stat
 
 
-def hero(rows):
-    """The burning-or-choking-children count, with the oldest example named.
+def hero(rows, seeds):
+    """The headline sentence, and it is allowed to be a different sentence.
 
-    The classification is a transparent keyword rule recorded on every row, so a
-    reader can audit which words triggered it. An opaque classifier under the
-    most quoted sentence in the project would be indefensible.
+    THE HEADLINE IS NOT GUARANTEED TO EXIST
+    ---------------------------------------
+    The fixture's headline is "N products recalled for burning or choking children
+    are in a cart right now". That sentence requires at least one RED row whose
+    hazard names a burn or choking mechanism and names children. The first real
+    sweeps produced no RED rows at all: 4,209 listings scraped across two
+    countries, sixty recall notices, zero identifiers re-asserted on a live page
+    with an active buy control.
+
+    So the sentence has to be able to change, and it must not be the fixture's
+    sentence rendered over a zero. A headline that survives its own evidence
+    disappearing is not a headline, it is a slogan.
+
+    The fallback is the unsearchable rate, and it is a better finding rather than
+    a consolation. It is computed entirely from the free government corpus, so no
+    collector failure can touch it, and it indicts the regulator rather than a
+    seller: a notice naming no searchable identifier cannot be checked by anyone,
+    ever, including the authority that published it.
+
+    The classification behind the primary sentence stays a transparent keyword
+    rule recorded on every row, so a reader can audit which words triggered it.
     """
     qualifying = [r for r in rows
                   if r["tier"] == "RED" and r.get("hazard_class", {}).get("qualifies")]
     out = {"n": len(qualifying), "oldest_days": 0, "oldest": None}
+
     if qualifying:
         oldest = max(qualifying, key=lambda r: r.get("days") or 0)
         out["oldest_days"] = oldest.get("days") or 0
@@ -128,6 +151,23 @@ def hero(rows):
             "authority": oldest["source"]["authority"],
             "hazard": oldest["hazard"],
         }
+        out["sentence"] = ("%d products recalled for burning or choking children "
+                           "are in a cart right now. The oldest has been buyable "
+                           "for %d days." % (len(qualifying), out["oldest_days"]))
+        out["basis"] = "measured"
+        return out
+
+    # No confirmed listing. Lead with the figure no scraper can contaminate.
+    uns = unsearchable(seeds)
+    out["sentence"] = ("%d of %d recall notices name nothing a machine can search "
+                       "for. Nobody can check whether those products ever left "
+                       "the shelves." % (uns["n"], uns["d"]))
+    out["basis"] = "unsearchable_fallback"
+    out["fallback_reason"] = (
+        "No listing reached RED in this sweep: no recalled identifier was "
+        "re-asserted on a fetched page carrying an active buy control. The "
+        "headline is therefore the figure computed from the regulators' own "
+        "corpus, which no collector failure can affect.")
     return out
 
 
@@ -185,17 +225,32 @@ def discarded(health_doc, reports):
 
     Reported by cause rather than as a single number, because an opaque discard
     count is indistinguishable from a broken matcher.
+
+    The denominator is the number of ADJUDICATION DECISIONS, not the number of
+    search loads. One load returns thirty to four hundred listings and every one
+    of them is decided, so dividing discards by loads produced a ratio above 1 and
+    a Wilson call that raised — caught on the first live payload. A rate has to be
+    discards over things decided or it is not a rate.
     """
-    by_code, total = {}, 0
+    by_code, total, decided = {}, 0, 0
     for report in reports:
         for code, count in (report.get("by_code") or {}).items():
             by_code[code] = by_code.get(code, 0) + count
             total += count
-    planned = sum(r.get("planned_loads", 0) for r in reports)
-    out = {"n": total, "d": planned, "by_code": by_code, "contaminated": True}
-    if planned:
-        out["v"] = round(total / planned, 4)
-        out["ci95"] = [round(x, 4) for x in wilson(total, planned)]
+        decided += report.get("out", 0)
+
+    out = {"n": total, "d": decided, "by_code": by_code, "contaminated": True}
+    # A row may carry more than one discard reason, so the count can exceed the
+    # number of rows. Report the counts and withhold the ratio rather than
+    # inventing a denominator that makes the arithmetic work.
+    if decided and total <= decided:
+        out["v"] = round(total / decided, 4)
+        out["ci95"] = [round(x, 4) for x in wilson(total, decided)]
+    else:
+        out["v"] = None
+        out["ci95"] = None
+        out["note"] = ("Reported as counts by cause. A row can carry more than one "
+                       "discard reason, so a single ratio would misstate it.")
     return out
 
 
@@ -243,23 +298,43 @@ def annotate(rows):
     return rows
 
 
-def build(rows, health_doc, seeds, reports=None, graded=None, variant="live"):
+def build(rows, health_doc, seeds, reports=None, graded=None, variant="live",
+          corpus=None):
     """Assemble the wall payload. Every figure computed, none inherited.
 
-    `reports` are the per-arm normaliser reports from the sweep. `graded` is the
-    output of golden/grade.py when enough listings have been hand-adjudicated.
+    TWO DIFFERENT DENOMINATORS, AND CONFUSING THEM PRODUCES A FALSE HEADLINE
+    -----------------------------------------------------------------------
+    `seeds` are the notices this sweep actually visited. `corpus` is every notice
+    the regulators published. Most figures belong to the first; UNSEARCHABLE
+    belongs to the second, and it is the one that matters most.
+
+    Caught on the first live payload: a trial slice selects notices by identifier
+    strength, so every notice it visits has a searchable identifier by
+    construction. Computing the unsearchable rate over that subset returned 0 of
+    60 — a headline saying every recall is checkable, produced by the sampling
+    rule rather than by the world. The true figure over the full corpus is 96 of
+    207.
+
+    The unsearchable rate does not depend on sweeping at all. That is the whole
+    reason it survives every collector failing, and it has to be computed over
+    everything the regulator published or it means nothing.
+
+    `reports` are the per-arm normaliser reports. `graded` is golden/grade.py's
+    output once enough listings have been hand-adjudicated.
     """
     reports = reports or []
+    corpus = corpus or seeds
     rows = annotate(rows)
     curve = survival_curve(observations_from_rows(rows)) if rows else {"grid": []}
 
     stats = {
-        "unsearchable": unsearchable(seeds),
+        # Over the whole corpus, always. Never over the swept subset.
+        "unsearchable": unsearchable(corpus),
         "survival": still_buyable(rows),
         "survival_curve": curve,
-        "hero": hero(rows),
+        "hero": hero(rows, corpus),
         "precision": precision(rows, graded),
-        "border_escape": border_escape(rows, seeds),
+        "border_escape": border_escape(rows, corpus),
         "discarded": discarded(health_doc, reports),
         "arithmetic": arithmetic(seeds, reports),
         "findings": {
@@ -269,6 +344,17 @@ def build(rows, health_doc, seeds, reports=None, graded=None, variant="live"):
             "shown": min(ROWS_SHOWN, len(rows)),
             "footer": "%d of %d shown, full set in data/sweeps/"
                       % (min(ROWS_SHOWN, len(rows)), len(rows)),
+        },
+        # The wall reads stats.credits. Omitting it threw
+        # "Cannot read properties of undefined (reading 'used')" and halted boot()
+        # after the rows had rendered, so the page looked complete and no animation
+        # or count-up ever ran. Derived from the same plan the arithmetic is, so
+        # the two cannot disagree.
+        "credits": {
+            "used": sum(r.get("planned_loads", 0) for r in reports),
+            "cap": 5000,
+            "code": sum(r.get("planned_loads", 0) for r in reports),
+            "browser": 0,
         },
         "arms_measured": {
             "n": sum(1 for a in health_doc["arms"].values()
@@ -316,6 +402,7 @@ def _arms_for_wall(health_doc):
             continue
         out.append({
             "code": arm,
+            "host": ARM_HOST.get(arm),
             "state": block["state"],
             "reason": block.get("reason"),
             "collector_id": block.get("collector_id"),
@@ -346,14 +433,16 @@ def main(argv):
 
     rows = [json.loads(l) for l in path.read_text(encoding="utf-8").splitlines() if l]
     health_doc = json.loads(health_path.read_text(encoding="utf-8"))
-    seeds = json.loads((ROOT / "data" / "seeds.json").read_text(encoding="utf-8"))["seeds"]
-    # A trial slice must be scored against the notices it actually swept, or the
-    # denominators describe a sweep that did not happen.
+    corpus = json.loads((ROOT / "data" / "seeds.json").read_text(encoding="utf-8"))["seeds"]
+    seeds = corpus
+    # A trial slice is scored against the notices it actually swept, or the
+    # denominators describe a sweep that did not happen. The full corpus is kept
+    # separately because the unsearchable rate belongs to it, not to the slice.
     if health_doc.get("trial_slice"):
         refs = {r["source"]["ref"] for r in rows}
-        seeds = [s for s in seeds if s["ref"] in refs]
+        seeds = [s for s in corpus if s["ref"] in refs]
 
-    payload = build(rows, health_doc, seeds,
+    payload = build(rows, health_doc, seeds, corpus=corpus,
                     reports=health_doc.get("reports") or [],
                     variant="trial" if health_doc.get("trial_slice") else "live")
 
@@ -361,6 +450,16 @@ def main(argv):
     out.write_text(json.dumps(payload, indent=1, ensure_ascii=False) + "\n",
                    encoding="utf-8")
     print("wrote %s" % out.relative_to(ROOT))
+
+    # And the file the wall actually loads. This is the "swap day is cp" step,
+    # done as a write rather than a copy: the wall reads data/live.js if it
+    # exists and falls back to the fixture if it does not, so a clean clone with
+    # no sweep still opens and still says which it is showing.
+    live = ROOT / "data" / "live.js"
+    live.write_text("window.CANON_LIVE = " +
+                    json.dumps(payload, ensure_ascii=False) + ";\n",
+                    encoding="utf-8")
+    print("wrote %s  <- the wall loads this" % live.relative_to(ROOT))
 
     s = payload["stats"]
     print()

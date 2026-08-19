@@ -76,10 +76,40 @@
      not decoration, it is the unit. */
   function heroSentence(sentence) {
     if (!sentence) return "";
-    return esc(sentence).replace(/(\d[\d,]*)(\s*days)/,
-      function (_, n, tail) {
+    var html = esc(sentence);
+
+    // The day count is the sentence when there is one: a number arriving at 714
+    // is a fact, a number climbing to it is a duration.
+    var days = /(\d[\d,]*)(\s*days)/;
+    if (days.test(html)) {
+      return html.replace(days, function (_, n, tail) {
         return '<span class="count" data-to="' + n.replace(/,/g, "") + '">0</span>' + tail;
       });
+    }
+
+    // The fallback headline counts its own numerator instead — "96 of 207
+    // recall notices name nothing a machine can search for" — so the sentence
+    // still resolves rather than simply appearing.
+    return html.replace(/^(\d[\d,]*)/, function (n) {
+      return '<span class="count" data-to="' + n.replace(/,/g, "") + '">0</span>';
+    });
+  }
+
+  /* The line under the headline has to agree with the headline.
+     When the sweep confirms listings, it says what they are. When it confirms
+     none, saying "found on sale again" would contradict the sentence directly
+     above it — which is how a page ends up asserting something its own data
+     denies. So the sub is derived from which headline is being shown. */
+  function heroSub(hero, doc) {
+    if (hero.basis === "unsearchable_fallback") {
+      var s = doc.stats.survival;
+      return '<p class="sub">We searched every notice that named an identifier, ' +
+        "in each country, twice. " +
+        (s && s.d ? "None of the " + s.d + " we could search for was found on " +
+          "sale — which is a result, not a blank." : "") + "</p>";
+    }
+    return '<p class="sub">Every one of these is a product a government recalled, ' +
+      "found on sale again from a residential connection in that country.</p>";
   }
 
   function renderVerdict(doc) {
@@ -103,8 +133,7 @@
       body =
         '<span class="withheld-mark">Verdict withheld · ' + esc(a.code) + "</span>" +
         "<h1>" + heroSentence(hero.sentence) + "</h1>" +
-        '<p class="sub">Every one of these is a product a government recalled, ' +
-        "found on sale again from a residential connection in that country.</p>" +
+        heroSub(hero, doc) +
         '<p class="clause">The ' + esc(a.code) + " collector has been broken since " +
         esc(doc.swept_at.slice(11, 16)) + " UTC, so anything that depends on it is " +
         "withheld rather than published. " + doc.stats.arms_measured.n + " of " +
@@ -112,8 +141,7 @@
     } else {
       body =
         "<h1>" + heroSentence(hero.sentence) + "</h1>" +
-        '<p class="sub">Every one of these is a product a government recalled, ' +
-        "found on sale again from a residential connection in that country.</p>" +
+        heroSub(hero, doc) +
         '<p class="clause">' + doc.stats.arms_measured.n + " of " +
         doc.stats.arms_measured.d + " countries measured.</p>";
     }
@@ -213,9 +241,16 @@
       esc(freshness(doc.swept_at)) + "</span>",
       "freshness bound " + doc.freshness_bound_s / 3600 + "h", "is-apparatus"));
 
-    out.push(instrument("Credits", commas(s.credits.used),
-      "of " + commas(s.credits.cap) + " · " + commas(s.credits.code) + " code, " +
-      commas(s.credits.browser) + " browser", "is-apparatus"));
+    /* Defensive because a payload is data, and data can be short a key.
+       A missing stat used to throw inside renderInstruments and halt boot() after
+       the rows had already rendered — so the page looked finished while the whole
+       motion layer, the count-ups and the act rail silently never ran. A figure
+       that is absent should be absent, which is the same rule the row contract
+       already obeys. */
+    if (s.credits) {
+      out.push(instrument("Search loads", commas(s.credits.used),
+        "of " + commas(s.credits.cap) + " budgeted", "is-apparatus"));
+    }
 
     el("instruments").innerHTML = out.join("");
   }
@@ -265,13 +300,22 @@
         extra = '<div class="steps">' + cells + "</div>";
       }
 
-      var at = a.attest;
+      var at = a.attest || {};
       /* A config file claiming `de` is unfalsifiable. An ASN reading Vodafone
          rather than a datacentre, captured at the same timestamp as the buy
          control, is proof. Geo goes in the evidence on every arm, every row. */
-      var attest = a.state === "WITHHELD" && !doc.global_blackout
-        ? "telemetry suppressed · " + doc.swept_at.slice(11, 19) + "Z"
-        : at.exit_ip + " · " + at.country + " · " + at.asn_org + " · AS" + at.asn + " · " + at.city;
+      /* Absent attestation is stated, not filled in. An exit IP we did not
+         capture is not a country we reached, and printing "undefined · undefined"
+         would be worse than admitting the sweep did not record it. */
+      var attest;
+      if (a.state === "WITHHELD" && !doc.global_blackout) {
+        attest = "telemetry suppressed · " + doc.swept_at.slice(11, 19) + "Z";
+      } else if (at.exit_ip) {
+        attest = at.exit_ip + " · " + at.country + " · " + at.asn_org +
+          " · AS" + at.asn + " · " + at.city;
+      } else {
+        attest = "exit not attested on this sweep";
+      }
 
       return '<div class="arm state-' + a.state + '">' +
         '<div class="arm-head">' +
@@ -645,10 +689,18 @@
       "<table><tr><th>arm</th><th>collector</th><th>template</th><th>job</th>" +
       "<th>inputs</th><th>rows</th><th>fails</th><th>page loads</th><th>exit</th></tr>" +
       doc.arms.map(function (x) {
-        return "<tr><td>" + x.code + "</td><td>" + x.collector_id + "</td><td>" + x.template +
-          "</td><td>" + x.job.id + "</td><td>" + x.job.inputs + "</td><td>" + x.job.data_lines +
-          "</td><td>" + x.job.fails + "</td><td>" + x.job.page_loads + "</td><td>" +
-          x.attest.country + " AS" + x.attest.asn + "</td></tr>";
+        // Absent means absent. The fixture carries a template id and a job id;
+        // a live sweep does not always, and printing "undefined" into a table of
+        // provenance would be worse than an em dash, because the whole point of
+        // this drawer is that a reader can check what produced a number.
+        var j = x.job || {};
+        return "<tr>" + [x.code, x.collector_id, x.template, j.id, j.inputs,
+                         j.data_lines, j.fails, j.page_loads,
+                         ((x.attest && x.attest.country) || null) &&
+                           x.attest.country + (x.attest.asn ? " AS" + x.attest.asn : "")]
+          .map(function (v) {
+            return "<td>" + (v === undefined || v === null || v === "" ? "—" : esc(v)) + "</td>";
+          }).join("") + "</tr>";
       }).join("") + "</table>";
   }
 
@@ -671,8 +723,31 @@
 
   // ------------------------------------------------------------------- boot
 
+  /* Render one section, and report it in place if it throws. Returns whether it
+     succeeded, so the caller can still see the shape of the failure. */
+  function section(id, render) {
+    try {
+      render();
+      return true;
+    } catch (err) {
+      var node = el(id);
+      if (node) {
+        node.innerHTML = '<p class="render-fail">This section could not be ' +
+          "rendered from the payload: " + esc(err && err.message) +
+          ". The rest of the page is unaffected, and nothing here should be " +
+          "read as a measurement.</p>";
+      }
+      if (window.console) console.error("render failed:", id, err);
+      return false;
+    }
+  }
+
   function boot() {
-    var variant = new URLSearchParams(location.search).get("state") || "v1";
+    // An explicitly requested state always wins, because those are the fixtures
+    // the failure modes are filmed from. With nothing requested, live measurement
+    // wins over the fixture — the default view should be the real one.
+    var asked = new URLSearchParams(location.search).get("state");
+    var variant = asked || "v1";
 
     if (variant === "loading") { renderLoading(); return; }
 
@@ -682,17 +757,30 @@
         '<p class="sub">data/fixtures.js did not load. Run <code>python3 data/make_fixture.py</code>.</p>';
       return;
     }
-    var doc = all[variant] || all.v1;
+    /* data/live.js is written by collector/publish.py from a real sweep. A clean
+       clone has no such file, so the wall falls back to the fixture — and the
+       provenance block says which of the two is on screen, because a reader must
+       never have to guess whether a number was measured. */
+    var doc = asked ? all[asked] : (window.CANON_LIVE || all.v1);
+    if (!doc) doc = all.v1;
 
-    renderVerdict(doc);
-    renderFigures(doc);
-    renderInstruments(doc);
-    renderArms(doc);
-    renderRows(doc);
-    renderCurve(doc);
-    renderNotSeen(doc);
-    renderHeal(doc);
-    renderProvenance(doc);
+    /* Each section renders inside a guard.
+       This is the project's own rule applied to its renderer. A payload is data,
+       and data can be short a key: the live payload omitted stats.credits, which
+       threw inside renderInstruments and stopped boot() after the rows had
+       already drawn. The result was a page that looked complete, with the motion
+       layer, every count-up and the act rail silently absent. An interface that
+       half-fails and says nothing is the exact failure this whole project exists
+       to refuse, so a section that cannot render now says which one it is. */
+    section("verdict", function () { renderVerdict(doc); });
+    section("figures", function () { renderFigures(doc); });
+    section("instruments", function () { renderInstruments(doc); });
+    section("armRail", function () { renderArms(doc); });
+    section("wall", function () { renderRows(doc); });
+    section("curve", function () { renderCurve(doc); });
+    section("notSeen", function () { renderNotSeen(doc); });
+    section("healLedger", function () { renderHeal(doc); });
+    section("provenance", function () { renderProvenance(doc); });
 
     animate();
     rail();
