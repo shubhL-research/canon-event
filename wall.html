@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CANON EVENT</title>
+<meta name="description" content="Recalled products, checked against live marketplace listings from three residential exit IPs. When the collector breaks, the verdict is withheld.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;700&family=IBM+Plex+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="wall.css">
+</head>
+<body>
+<div class="shell">
+
+  <header class="masthead">
+    <div class="wordmark">CANON<span>·</span>EVENT</div>
+    <div class="tagline">A recall is supposed to happen in every universe. It doesn't.</div>
+    <div class="spacer"></div>
+    <div class="affiliation">
+      Independent. Not affiliated with, endorsed by, or operated by CPSC, the EU
+      Safety Gate, or any marketplace named on this page.
+    </div>
+  </header>
+
+  <section class="verdict" id="verdict"></section>
+
+  <section class="instruments" id="instruments"></section>
+
+  <section class="arm-rail" id="armRail"></section>
+
+  <div class="wall-head">
+    <span class="num">#</span>
+    <span>Identifier</span>
+    <span>Hazard, as published</span>
+    <span>Arms</span>
+    <span>Days unremedied</span>
+    <span class="num">Tier</span>
+  </div>
+
+  <main id="wall"></main>
+  <div class="pager" id="pager"></div>
+
+  <section class="panels">
+    <div class="panel" id="notSeen"></div>
+    <div class="panel" id="healLedger"></div>
+  </section>
+
+  <section class="legend">
+    <ul>
+      <li><span class="swatch" style="background:var(--hazard);border-color:var(--hazard)"></span>
+        <span><b>RED.</b> A recalled product with an active buy control, identifier re-asserted from the fetched page.</span></li>
+      <li><span class="swatch"></span>
+        <span><b>Hollow.</b> Arm measured, product not found.</span></li>
+      <li><span class="swatch" style="background:#000;border-color:#000"></span>
+        <span><b>Black.</b> Arm withheld. Not measured, and not clean.</span></li>
+      <li><span class="swatch" style="background:repeating-linear-gradient(45deg,#fff,#fff 2px,var(--hatch) 2px,var(--hatch) 4px)"></span>
+        <span><b>Hatched.</b> Stale beyond the freshness bound. Day counters are frozen at last capture.</span></li>
+    </ul>
+    <p class="final">There is no green in this interface. The absence of a red row is not evidence of safety.</p>
+
+    <div class="provenance" id="provenance"></div>
+
+    <details class="machinery">
+      <summary>Machinery</summary>
+      <div id="machinery"></div>
+    </details>
+  </section>
+
+</div>
+
+<script src="data/fixtures.js"></script>
+<script src="wall.js"></script>
+</body>
+</html>

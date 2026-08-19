@@ -1,0 +1,364 @@
+/* CANON EVENT wall.
+   Light only. Dark theme is cut. There is no green token anywhere in this file,
+   and that absence is stated on screen in the legend.
+
+   Two typefaces, one rule: if a machine produced it (identifier, GTIN, hash,
+   timestamp, collector id, template version, rate, count) it is IBM Plex Mono.
+   If a human or a regulator wrote it, it is Public Sans. Public Sans is the US
+   Web Design System typeface, the type CPSC itself publishes in, so the wall
+   visually cites the regulator it audits.
+
+   Type scale, no exceptions:  10 11 12 14 15 16 20 28
+   Spacing scale:              4 8 12 16 24 32 48
+   Weights:                    400 and 700 only
+   Radius:                     0 everywhere except buttons at 4px
+   Elevation:                  none. Separation is 1px hairlines and one step
+                               of surface lightness. Zero box-shadow except focus.
+*/
+
+@import url("contract/tokens.css");
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: var(--ground);
+  color: var(--ink);
+  font-family: var(--font-prose);
+  font-size: 14px;
+  line-height: 1.45;
+  -webkit-font-smoothing: antialiased;
+}
+
+.mono { font-family: var(--font-machine); font-variant-numeric: tabular-nums; }
+.shell { max-width: 1440px; margin: 0 auto; padding: 0 32px 96px; }
+
+:focus-visible { outline: none; box-shadow: inset 0 0 0 2px var(--focus); }
+
+/* ---------------------------------------------------------------- masthead */
+
+.masthead {
+  display: flex; align-items: baseline; gap: 16px;
+  padding: 32px 0 16px;
+  border-bottom: 1px solid var(--rule-strong);
+}
+.wordmark { font-size: 20px; font-weight: 700; letter-spacing: -0.01em; }
+.wordmark span { color: var(--hazard); }
+.tagline { font-size: 12px; color: var(--ink-3); }
+.masthead .spacer { flex: 1; }
+.affiliation {
+  font-size: 10px; color: var(--ink-3); text-align: right; max-width: 280px;
+  line-height: 1.35;
+}
+
+/* ----------------------------------------------------------- verdict band */
+
+.verdict {
+  padding: 32px 0 24px;
+  border-bottom: 1px solid var(--rule);
+  transition: background-color 420ms ease, color 420ms ease, padding 420ms ease;
+}
+.verdict h1 {
+  font-size: 28px; font-weight: 700; line-height: 1.25; max-width: 26ch;
+  letter-spacing: -0.015em;
+}
+.verdict .sub { margin-top: 12px; font-size: 14px; color: var(--ink-2); max-width: 60ch; }
+.verdict .clause {
+  margin-top: 12px; font-size: 12px; color: var(--ink-3);
+  font-family: var(--font-machine);
+}
+
+/* The one motion moment in the entire interface. Nothing else animates. */
+.verdict.is-withheld {
+  background: var(--void); color: var(--void-ink);
+  margin: 0 -32px; padding: 48px 32px;
+}
+.verdict.is-withheld h1 { color: var(--void-ink); }
+.verdict.is-withheld .sub { color: #C9CDD1; }
+.verdict.is-withheld .clause { color: #868E95; }
+.verdict.is-withheld .withheld-mark {
+  display: block; font-family: var(--font-machine); font-size: 12px;
+  letter-spacing: 0.14em; margin-bottom: 16px; color: var(--hazard);
+}
+
+/* --------------------------------------------------------- instrument line */
+
+.instruments {
+  display: flex; gap: 0; border-bottom: 1px solid var(--rule);
+  flex-wrap: wrap;
+}
+.instrument {
+  padding: 16px 24px 16px 0; margin-right: 24px;
+  border-right: 1px solid var(--rule); min-width: 150px;
+}
+.instrument:last-child { border-right: none; }
+.instrument .label {
+  font-family: var(--font-machine); font-size: 10px; letter-spacing: 0.1em;
+  color: var(--ink-3); text-transform: uppercase;
+}
+.instrument .value {
+  font-family: var(--font-machine); font-size: 16px; font-weight: 700;
+  margin-top: 4px;
+}
+.instrument .qualifier { font-size: 11px; color: var(--ink-3); margin-top: 4px; }
+.instrument.is-struck .value { color: var(--unknown); text-decoration: line-through; }
+.instrument.is-struck .qualifier::after {
+  content: " contaminated by a withheld arm"; color: var(--hazard-deep);
+}
+.instrument.is-pending .value { color: var(--unknown); }
+
+/* -------------------------------------------------------------- arm rail */
+
+.arm-rail { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px;
+            background: var(--rule); border-bottom: 1px solid var(--rule); }
+.arm {
+  background: var(--surface); padding: 16px 20px; min-height: 132px;
+  display: flex; flex-direction: column; gap: 8px;
+}
+.arm-head { display: flex; align-items: baseline; gap: 8px; }
+.arm-code { font-family: var(--font-machine); font-size: 16px; font-weight: 700; }
+.arm-host { font-family: var(--font-machine); font-size: 11px; color: var(--ink-3); }
+.arm-state {
+  margin-left: auto; font-family: var(--font-machine); font-size: 10px;
+  letter-spacing: 0.08em; padding: 2px 6px; border: 1px solid var(--rule-strong);
+  color: var(--ink-2);
+}
+.arm-copy { font-size: 12px; color: var(--ink-2); line-height: 1.4; }
+.arm-attest {
+  font-family: var(--font-machine); font-size: 10px; color: var(--ink-3);
+  margin-top: auto; padding-top: 8px; border-top: 1px solid var(--rule);
+}
+
+.arm.state-WITHHELD { background: var(--void); color: var(--void-ink); }
+.arm.state-WITHHELD .arm-host,
+.arm.state-WITHHELD .arm-attest { color: #868E95; }
+.arm.state-WITHHELD .arm-copy { color: #C9CDD1; }
+.arm.state-WITHHELD .arm-state { border-color: var(--hazard); color: var(--hazard); }
+
+.arm.state-DEGRADED .arm-state { border-color: var(--hazard); color: var(--hazard-deep); }
+.arm.state-STALE { background: repeating-linear-gradient(45deg,
+  var(--surface), var(--surface) 2px, var(--hatch) 2px, var(--hatch) 4px); }
+.arm.state-STALE .arm-copy, .arm.state-STALE .arm-attest { color: var(--ink-3); }
+
+.coverage { height: 4px; background: var(--surface-sunk); }
+.coverage > i { display: block; height: 100%; background: var(--hazard); }
+
+/* 7-cell heal step track replaces telemetry while healing. */
+.steps { display: flex; gap: 2px; }
+.steps i {
+  flex: 1; height: 10px; background: var(--surface-sunk);
+  border: 1px solid var(--rule);
+}
+.steps i.done { background: var(--flux); border-color: var(--flux); }
+.steps i.active { background: var(--surface); border-color: var(--flux); }
+
+/* --------------------------------------------------------------- the wall */
+
+.wall-head {
+  display: grid; grid-template-columns: 28px 300px minmax(340px, 1fr) 108px minmax(260px, 1fr) 96px;
+  gap: 16px; padding: 24px 0 8px; align-items: end;
+  border-bottom: 1px solid var(--rule-strong);
+}
+.wall-head span {
+  font-family: var(--font-machine); font-size: 10px; letter-spacing: 0.1em;
+  color: var(--ink-3); text-transform: uppercase;
+}
+.wall-head .num { text-align: right; }
+
+.row {
+  display: grid; grid-template-columns: 28px 300px minmax(340px, 1fr) 108px minmax(260px, 1fr) 96px;
+  gap: 16px; height: 64px; align-items: center;
+  border-bottom: 1px solid var(--rule);
+  background: var(--surface); cursor: pointer;
+  transition: background-color 120ms linear;
+}
+.row:hover { background: var(--hazard-wash); }
+.row.is-amber { background: var(--ground); }
+.row.is-amber:hover { background: var(--surface-sunk); }
+
+.c-gutter { font-family: var(--font-machine); font-size: 11px; color: var(--ink-3); text-align: right; }
+
+.c-id .name {
+  font-weight: 700; font-size: 15px; line-height: 1.2;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.c-id .ident {
+  font-family: var(--font-machine); font-size: 12px; color: var(--ink-2);
+  margin-top: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+
+.c-hazard .quote {
+  font-size: 14px; color: var(--ink-2); line-height: 1.3;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.c-hazard .src { font-family: var(--font-machine); font-size: 11px; color: var(--ink-3); margin-top: 2px; }
+
+.chips { display: flex; gap: 4px; }
+.chip {
+  width: 26px; height: 18px; display: grid; place-items: center;
+  font-family: var(--font-machine); font-size: 10px; font-weight: 700;
+  border: 1px solid var(--rule-strong); color: var(--ink-3); background: var(--surface);
+}
+.chip.v-RED { background: var(--hazard); border-color: var(--hazard); color: #fff; }
+.chip.v-WITHHELD { background: var(--void); border-color: var(--void); color: #fff; }
+.chip.v-STALE { background: repeating-linear-gradient(45deg,
+  var(--surface), var(--surface) 2px, var(--hatch) 2px, var(--hatch) 4px); }
+
+/* The wall's shape. Bars share a left edge and are sorted descending, so the
+   silhouette is a staircase. Red is length, never fill. */
+.c-bar { display: flex; align-items: center; gap: 12px; }
+.track { flex: 1; height: 10px; background: var(--surface-sunk); }
+.track > i { display: block; height: 100%; background: var(--hazard); }
+.row.is-amber .track > i { background: var(--hatch); }
+.days {
+  font-family: var(--font-machine); font-size: 16px; font-weight: 700;
+  min-width: 56px; text-align: right;
+}
+.days.frozen::after { content: " ❄"; font-size: 10px; color: var(--unknown); }
+
+.c-tier { text-align: right; }
+.tier-box {
+  display: inline-block; font-family: var(--font-machine); font-size: 10px;
+  padding: 1px 5px; border: 1px solid var(--hazard); color: var(--hazard);
+  letter-spacing: 0.06em;
+}
+.tier-box.t-AMBER { border-color: var(--amber); color: var(--amber); }
+.c-tier .cap { font-family: var(--font-machine); font-size: 10px; color: var(--ink-3); margin-top: 3px; }
+
+/* ------------------------------------------------------ two-receipt card */
+
+.receipt {
+  border-bottom: 1px solid var(--rule-strong);
+  border-top: 1px solid var(--rule-strong);
+  background: var(--surface); padding: 24px 0;
+}
+.receipt-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--rule); }
+.receipt-pane { background: var(--surface); padding: 20px 24px; }
+.receipt-pane h3 {
+  font-family: var(--font-machine); font-size: 10px; letter-spacing: 0.1em;
+  color: var(--ink-3); text-transform: uppercase; margin-bottom: 12px;
+}
+.field { margin-bottom: 10px; }
+.field .k {
+  font-family: var(--font-machine); font-size: 10px; color: var(--ink-3);
+  text-transform: uppercase; letter-spacing: 0.06em;
+}
+.field .v { font-size: 14px; margin-top: 2px; }
+.field .v.mono { font-family: var(--font-machine); font-size: 12px; }
+
+/* Bright Data omits absent keys rather than nulling them. Everyone else treats
+   that as a parser annoyance. Rendering it deliberately is how you show absence
+   without implying zero. Never 0, never null, never blank. */
+.field.is-missing .k { text-decoration: line-through; color: var(--unknown); }
+.field.is-missing .v { color: var(--unknown); font-family: var(--font-machine); font-size: 12px; }
+
+.assertion {
+  border-left: 2px solid var(--hazard); padding: 10px 14px; margin: 12px 0;
+  background: var(--ground); font-family: var(--font-machine); font-size: 12px;
+  line-height: 1.5; word-break: break-word;
+}
+.assertion mark { background: var(--hazard-wash); color: var(--hazard-deep); font-weight: 700; padding: 0 2px; }
+.assertion .why { display: block; margin-top: 8px; font-family: var(--font-prose);
+  font-size: 11px; color: var(--ink-3); line-height: 1.4; }
+
+.attest-chip {
+  display: inline-flex; align-items: center; gap: 6px; margin-top: 8px;
+  border: 1px solid var(--rule-strong); padding: 4px 8px;
+  font-family: var(--font-machine); font-size: 10px; color: var(--ink-2);
+}
+.attest-chip b { color: var(--ink); }
+
+.buy {
+  display: inline-block; border: 1px solid var(--hazard); color: var(--hazard);
+  font-size: 12px; padding: 4px 10px; margin-top: 8px; border-radius: 4px;
+}
+
+/* -------------------------------------------------------------- panels */
+
+.panels { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 48px; }
+.panel { background: var(--surface); border: 1px solid var(--rule); padding: 20px 24px; }
+.panel h2 {
+  font-family: var(--font-machine); font-size: 11px; letter-spacing: 0.12em;
+  text-transform: uppercase; margin-bottom: 4px;
+}
+.panel .lede { font-size: 12px; color: var(--ink-3); margin-bottom: 16px; line-height: 1.4; }
+.panel dl { display: grid; grid-template-columns: 1fr auto; gap: 6px 16px; }
+.panel dt { font-size: 13px; color: var(--ink-2); }
+.panel dd { font-family: var(--font-machine); font-size: 13px; font-weight: 700; text-align: right; }
+
+.budget { margin-top: 12px; }
+.budget .meter { height: 8px; background: var(--surface-sunk); }
+.budget .meter > i { display: block; height: 100%; background: var(--flux); }
+.budget .cap { font-family: var(--font-machine); font-size: 11px; color: var(--ink-3); margin-top: 4px; }
+
+.heal-entry { border-top: 1px solid var(--rule); padding-top: 12px; margin-top: 12px; }
+.heal-entry.rejected { border-top-color: var(--hazard); }
+.heal-verdict {
+  font-family: var(--font-machine); font-size: 11px; letter-spacing: 0.08em;
+  color: var(--hazard); margin-bottom: 6px;
+}
+.prompt-box {
+  font-family: var(--font-machine); font-size: 11px; background: var(--ground);
+  border: 1px solid var(--rule); padding: 10px 12px; line-height: 1.5;
+  white-space: pre-wrap; margin-top: 8px; max-height: 180px; overflow: auto;
+}
+.btn-approve {
+  margin-top: 10px; font-family: var(--font-machine); font-size: 11px;
+  padding: 6px 12px; border: 1px solid var(--rule-strong); background: var(--surface-sunk);
+  color: var(--unknown); cursor: not-allowed;
+}
+.btn-reason { font-size: 11px; color: var(--hazard-deep); margin-top: 6px; }
+
+/* -------------------------------------------------------------- legend */
+
+.legend { margin-top: 48px; border-top: 1px solid var(--rule-strong); padding-top: 24px; }
+.legend ul { list-style: none; display: grid; gap: 8px; max-width: 78ch; }
+.legend li { display: flex; gap: 12px; align-items: flex-start; font-size: 13px; color: var(--ink-2); }
+.legend .swatch { flex: none; width: 26px; height: 18px; border: 1px solid var(--rule-strong); }
+.legend .final {
+  margin-top: 20px; font-size: 16px; font-weight: 700; color: var(--ink);
+  max-width: 60ch; line-height: 1.4;
+}
+
+.provenance {
+  margin-top: 32px; padding-top: 16px; border-top: 1px solid var(--rule);
+  font-family: var(--font-machine); font-size: 10px; color: var(--ink-3);
+  display: flex; flex-wrap: wrap; gap: 16px;
+}
+.fixture-stamp {
+  border: 1px solid var(--amber); color: var(--amber); padding: 1px 6px;
+}
+
+details.machinery { margin-top: 24px; }
+details.machinery summary {
+  font-family: var(--font-machine); font-size: 11px; letter-spacing: 0.1em;
+  text-transform: uppercase; cursor: pointer; color: var(--ink-3);
+  padding: 8px 0; border-top: 1px solid var(--rule);
+}
+details.machinery table { width: 100%; border-collapse: collapse; margin-top: 8px; }
+details.machinery td, details.machinery th {
+  font-family: var(--font-machine); font-size: 11px; text-align: left;
+  padding: 6px 12px 6px 0; border-bottom: 1px solid var(--rule); color: var(--ink-2);
+}
+details.machinery th { color: var(--ink-3); font-weight: 400; }
+
+.pager { padding: 16px 0; font-family: var(--font-machine); font-size: 11px; color: var(--ink-3); }
+
+/* Skeleton: full chrome, real headers, correct 64px geometry, no spinner and no
+   shimmer. Nothing shifts when data lands because the geometry is already right. */
+.row.skeleton { pointer-events: none; }
+.row.skeleton .name, .row.skeleton .ident, .row.skeleton .quote, .row.skeleton .src {
+  color: transparent; background: var(--surface-sunk);
+}
+.row.skeleton .days::after { content: "–––"; color: var(--ink-3); }
+
+@media (max-width: 1279px) {
+  .shell::before {
+    content: "This wall is built for 1280px and wider. Below that, columns are dropped rather than reflowed, because a hazard ledger that reflows stops being a ledger.";
+    display: block; padding: 16px; margin: 16px 0; border: 1px solid var(--amber);
+    color: var(--amber); font-size: 12px;
+  }
+  .wall-head, .row { grid-template-columns: 28px 1fr 100px 140px; }
+  .c-hazard, .c-tier { display: none; }
+  .panels, .receipt-grid { grid-template-columns: 1fr; }
+}
