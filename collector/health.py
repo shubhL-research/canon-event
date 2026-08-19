@@ -335,6 +335,11 @@ def build(sweep_id, swept_at, arms, rows, reports, previous=None, now=None):
         "swept_at": swept_at.strftime("%Y-%m-%dT%H:%M:%SZ"),
         "arms": arms,
         "detectors": detectors,
+        # The per-arm normaliser reports, carried rather than consumed. They are
+        # the raw material behind the discard rate and the credit arithmetic, and
+        # a health file that computed a detector from them and then dropped them
+        # would leave every downstream figure unre-derivable.
+        "reports": reports,
         "verdict": verdict_line(arms),
         "blackout": detectors["implausible_cleanliness"]["fired"],
     }

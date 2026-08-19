@@ -258,5 +258,71 @@ rows3, _ = S.run([SEED], {"DE": "c_de"},
 check(rows3[0]["arms"]["DE"] != "RED",
       "a live buy control on the WRONG product does not redden")
 
+# ----------------------------------------------------------------- publishing
+print("\nThe payload the wall reads")
+
+import publish as P                                                # noqa: E402
+
+PUB_SEEDS = [
+    dict(SEED),
+    {**SEED, "ref": "A12/00002/24", "gtin": None, "model": "KX-77B"},
+    # No identifier at all: this notice is unsearchable, and that is the figure
+    # no collector can contaminate.
+    {**SEED, "ref": "A12/00003/24", "gtin": None, "model": None,
+     "hazard": "Button cell batteries pose an ingestion hazard to children."},
+    # A gtin field holding a value that fails its own check digit. Six real
+    # Safety Gate notices look like this, and they are not searchable.
+    {**SEED, "ref": "A12/00004/24", "gtin": "3973500298", "model": None},
+]
+
+check(P.searchable({"gtin": "8721003407246"}), "a valid GTIN is searchable")
+check(P.searchable({"model": "KX-77B"}), "a model number is searchable")
+check(not P.searchable({"gtin": "3973500298"}),
+      "a gtin that fails its own check digit is NOT searchable")
+check(not P.searchable({"gtin": None, "model": "  "}),
+      "whitespace is not an identifier")
+
+uns = P.unsearchable(PUB_SEEDS)
+check(uns["n"] == 2 and uns["d"] == 4,
+      "the unsearchable count includes the bad-check-digit notice")
+check(uns["contaminated"] is False,
+      "unsearchable is uncontaminated: it survives every arm being withheld")
+check(uns["ci95"][0] > 0 and uns["ci95"][1] < 1,
+      "and it carries a Wilson interval, not a bare proportion")
+
+pub_rows, pub_health = S.run(
+    PUB_SEEDS, {"DE": "c_de"},
+    runner=fake_runner({"DE": ([LIVE_ROW], None)}))
+payload = P.build(pub_rows, pub_health, PUB_SEEDS,
+                  reports=pub_health.get("reports") or [])
+
+check(set(payload) == {"sweep_id", "swept_at", "variant", "freshness_bound_s",
+                       "arms", "rows", "stats", "provenance"},
+      "the payload carries exactly the eight keys wall.html reads")
+check(payload["provenance"]["fixture"] is False,
+      "a live payload is not stamped as a fixture")
+check(payload["stats"]["survival"]["contaminated"] is True,
+      "a figure that depends on a collector is stamped contaminated")
+check(payload["stats"]["unsearchable"]["contaminated"] is False,
+      "a figure computed from the free corpus is not")
+check(payload["stats"]["survival"]["d"] == 2,
+      "the buyable denominator counts only SEARCHABLE notices, never the corpus")
+check(payload["stats"]["precision"]["v"] is None
+      and "hand adjudication" in payload["stats"]["precision"]["pending"],
+      "precision is PENDING with the count needed, never invented from the sweep")
+check("recall" in payload["stats"]["precision"],
+      "the capture-recapture floor rides with it, because recall is bounded not measured")
+check(payload["stats"]["arms_measured"]["d"] == 1,
+      "arms_measured reports against the arms actually swept")
+check(all("hazard_class" in r for r in payload["rows"] if r.get("hazard")),
+      "every row carries the transparent hazard classification the hero uses")
+check(payload["stats"]["arithmetic"]["search_page_loads"] > 0,
+      "the credit arithmetic is derived from the plan, so a reader can re-add it")
+
+graded = P.precision(pub_rows, {"filled": 50, "precision": 0.94,
+                                "ci95": [0.83, 0.98], "v": 0.94})
+check(graded.get("v") == 0.94,
+      "once enough listings are hand-verified, the real figure is published")
+
 print("\n" + ("%d FAILURES" % len(FAILURES) if FAILURES else "all sweep tests passed"))
 sys.exit(1 if FAILURES else 0)

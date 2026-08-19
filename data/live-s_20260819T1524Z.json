@@ -1,0 +1,359 @@
+{
+ "sweep_id": "s_2026-08-19T15:24Z",
+ "swept_at": "2026-08-19T15:24:50Z",
+ "variant": "trial",
+ "freshness_bound_s": 14400,
+ "arms": [
+  {
+   "code": "US",
+   "state": "WITHHELD",
+   "reason": "zero_rows_uncorroborated",
+   "collector_id": "c_mt01usw31e8y5ubqjs",
+   "job": {
+    "inputs": 3,
+    "data_lines": 0,
+    "fails": 0
+   },
+   "heal": {
+    "status": "none",
+    "step": null,
+    "completed_steps": [],
+    "started_at": null,
+    "canary_pass": null,
+    "canary_total": 3,
+    "ledger": null
+   }
+  },
+  {
+   "code": "DE",
+   "state": "WITHHELD",
+   "reason": "zero_rows_uncorroborated",
+   "collector_id": "c_mt00jidz6zhqjbpew",
+   "job": {
+    "inputs": 3,
+    "data_lines": 0,
+    "fails": 0
+   },
+   "heal": {
+    "status": "none",
+    "step": null,
+    "completed_steps": [],
+    "started_at": null,
+    "canary_pass": null,
+    "canary_total": 3,
+    "ledger": null
+   }
+  },
+  {
+   "code": "IN",
+   "state": "WITHHELD",
+   "reason": "zero_rows_uncorroborated",
+   "collector_id": "c_mt03cj5z2fo651wy8q",
+   "job": {
+    "inputs": 3,
+    "data_lines": 0,
+    "fails": 0
+   },
+   "heal": {
+    "status": "none",
+    "step": null,
+    "completed_steps": [],
+    "started_at": null,
+    "canary_pass": null,
+    "canary_total": 3,
+    "ledger": null
+   }
+  }
+ ],
+ "rows": [
+  {
+   "name": "Your fragrance Woman",
+   "hazard": "According to the list of ingredients the product contains 2-(4-tert-butylbenzyl) propionaldehyde (BMHCA), which is prohibited in cosmetic products. BMHCA may harm the reproductive system, may harm the health of the unborn child and may cause skin sensitisation.",
+   "source": {
+    "authority": "SAFETY_GATE",
+    "ref": "A12/02381/24",
+    "published": "2024-08-30",
+    "url": "https://ec.europa.eu/safety-gate-alerts/screen/webReport/alertDetail/10013972"
+   },
+   "days": 719,
+   "days_frozen": false,
+   "tier": "AMBER",
+   "model": "82411614",
+   "gtin": "737052268675",
+   "arms": {
+    "US": "NOT_FOUND",
+    "DE": "NOT_FOUND",
+    "IN": "NOT_FOUND"
+   },
+   "discarded": [
+    {
+     "code": "AMBER",
+     "reason": "identifier not re-asserted on the fetched page"
+    },
+    {
+     "code": "AMBER",
+     "reason": "identifier not re-asserted on the fetched page"
+    }
+   ],
+   "found_by_query": "both",
+   "rank": 1,
+   "hazard_class": {
+    "qualifies": false,
+    "burn_terms": [],
+    "choke_terms": [],
+    "child_terms": [
+     "child"
+    ],
+    "child_scoped_standard": false
+   }
+  },
+  {
+   "name": "Foam mat",
+   "hazard": "The plastic film covering the foam may peel off in small pieces. A small child may put them in the mouth and choke.",
+   "source": {
+    "authority": "SAFETY_GATE",
+    "ref": "A12/02404/24",
+    "published": "2024-08-30",
+    "url": "https://ec.europa.eu/safety-gate-alerts/screen/webReport/alertDetail/10014176"
+   },
+   "days": 719,
+   "days_frozen": false,
+   "tier": "AMBER",
+   "model": "12715",
+   "gtin": "605566127156",
+   "arms": {
+    "US": "NOT_FOUND",
+    "DE": "NOT_FOUND",
+    "IN": "NOT_FOUND"
+   },
+   "discarded": [
+    {
+     "code": "AMBER",
+     "reason": "identifier not re-asserted on the fetched page"
+    },
+    {
+     "code": "AMBER",
+     "reason": "identifier not re-asserted on the fetched page"
+    }
+   ],
+   "found_by_query": "both",
+   "rank": 2,
+   "hazard_class": {
+    "qualifies": true,
+    "burn_terms": [],
+    "choke_terms": [
+     "chok"
+    ],
+    "child_terms": [
+     "child"
+    ],
+    "child_scoped_standard": false
+   }
+  },
+  {
+   "name": "Happy Glow",
+   "hazard": "The soother's handle can break apart, releasing small parts. A small child may put them in the mouth and choke.",
+   "source": {
+    "authority": "SAFETY_GATE",
+    "ref": "A12/02462/24",
+    "published": "2024-08-30",
+    "url": "https://ec.europa.eu/safety-gate-alerts/screen/webReport/alertDetail/10014201"
+   },
+   "days": 719,
+   "days_frozen": false,
+   "tier": "AMBER",
+   "model": "123316",
+   "gtin": "7312507120307",
+   "arms": {
+    "US": "NOT_FOUND",
+    "DE": "NOT_FOUND",
+    "IN": "NOT_FOUND"
+   },
+   "discarded": [
+    {
+     "code": "AMBER",
+     "reason": "identifier not re-asserted on the fetched page"
+    },
+    {
+     "code": "AMBER",
+     "reason": "identifier not re-asserted on the fetched page"
+    }
+   ],
+   "found_by_query": "both",
+   "rank": 3,
+   "hazard_class": {
+    "qualifies": true,
+    "burn_terms": [],
+    "choke_terms": [
+     "chok",
+     "small parts"
+    ],
+    "child_terms": [
+     "child"
+    ],
+    "child_scoped_standard": false
+   }
+  }
+ ],
+ "stats": {
+  "unsearchable": {
+   "label": "unsearchable",
+   "v": 0.0,
+   "n": 0,
+   "d": 3,
+   "ci95": [
+    0.0,
+    0.5615
+   ],
+   "method": "Wilson score interval, 95%",
+   "contaminated": false
+  },
+  "survival": {
+   "label": "still buyable",
+   "v": 0.0,
+   "n": 0,
+   "d": 3,
+   "ci95": [
+    0.0,
+    0.5615
+   ],
+   "method": "Wilson score interval, 95%",
+   "contaminated": true
+  },
+  "survival_curve": {
+   "method": "isotonic regression (PAVA), nonparametric MLE for current-status data",
+   "assumption": "survival is monotone non-increasing in days since recall",
+   "confound": "Age is confounded with cohort: a 2024 recall is not exchangeable with a 2026 one. This is a cross-sectional age profile, not a within-product survival trajectory.",
+   "n": 3,
+   "n_still_buyable": 0,
+   "blocks": [
+    {
+     "from_day": 719,
+     "to_day": 719,
+     "survival": 0.0,
+     "n": 1
+    },
+    {
+     "from_day": 719,
+     "to_day": 719,
+     "survival": 0.0,
+     "n": 1
+    },
+    {
+     "from_day": 719,
+     "to_day": 719,
+     "survival": 0.0,
+     "n": 1
+    }
+   ],
+   "grid": [
+    {
+     "day": 719,
+     "survival": 0.0,
+     "ci95": [
+      0.0,
+      0.7935
+     ],
+     "support": 3,
+     "block_n": 1,
+     "thin": true,
+     "publishable": false
+    }
+   ],
+   "min_support": 5,
+   "interval_method": "Wilson score interval on the isotonic block supporting each grid point. A percentile bootstrap is deliberately NOT used: it is known to be inconsistent for Grenander-type monotone estimators at a fixed point, and on this corpus it returned intervals that excluded their own point estimate. These intervals condition on the fitted block structure, so they describe uncertainty in the level within a block, not uncertainty in where the block boundaries fall."
+  },
+  "hero": {
+   "n": 0,
+   "oldest_days": 0,
+   "oldest": null
+  },
+  "precision": {
+   "v": null,
+   "n": 0,
+   "d": 50,
+   "ci95": null,
+   "contaminated": false,
+   "pending": "Requires hand adjudication. 0 of 50 listings verified; 50 to go before precision can be published. See golden/HOW-TO.md.",
+   "recall": {
+    "estimator": "Chapman (bias-corrected Lincoln-Petersen)",
+    "n1_brand_model": 0,
+    "n2_model_only": 0,
+    "m_both": 0,
+    "observed": 0,
+    "n_hat": 0.0,
+    "se": null,
+    "missed_floor": 0.0,
+    "independence_violated": true,
+    "bias_direction": "downward",
+    "note": "The two query strategies share the model token and are positively correlated, which inflates the overlap and deflates N-hat. The miss count is therefore a LOWER bound on what we failed to see, not an estimate of it. Always print it as 'at least'.",
+    "reportable": false,
+    "reportable_note": "With an overlap below 3 the estimator is too unstable to publish. Report the raw counts and say recall is unmeasured."
+   }
+  },
+  "border_escape": {
+   "eu_seeds": 3,
+   "eu_searchable": 3,
+   "contaminated": true,
+   "v": 0.0,
+   "n": 0,
+   "d": 3,
+   "ci95": [
+    5.551115123125783e-17,
+    0.5614970317550454
+   ]
+  },
+  "discarded": {
+   "n": 0,
+   "d": 0,
+   "by_code": {},
+   "contaminated": true
+  },
+  "arithmetic": {
+   "corpus_seeds": 3,
+   "searchable_seeds": 3,
+   "queries_per_seed_per_arm": 2,
+   "arms": 0,
+   "search_page_loads": 0,
+   "batches": 0,
+   "total_page_loads": 0,
+   "working": "3 searchable of 3 notices x 2 queries x 0 arms = 0 search loads, submitted as 0 batch jobs.",
+   "note": "Only searchable notices are queried, so the 96 with no usable identifier cost nothing. Batching is what makes a full sweep possible: one job per 40 urls rather than one job per url."
+  },
+  "findings": {
+   "red": 0,
+   "amber": 3,
+   "total": 3,
+   "shown": 3,
+   "footer": "3 of 3 shown, full set in data/sweeps/"
+  },
+  "arms_measured": {
+   "n": 0,
+   "d": 3
+  },
+  "adversarial_precision_set": {
+   "n": 21,
+   "all_discarded": true,
+   "by_kind": {
+    "adjacent_gtin": 4,
+    "same_brand_diff_model": 4,
+    "same_model_diff_brand": 1,
+    "successor_sku": 4,
+    "superstring_trap": 4,
+    "truncated_identifier": 4
+   },
+   "note": "Deliberately confusable near-misses fed to the matcher. Every one must land in DISCARDED. Any that reaches RED is a precision bug and blocks the freeze. Distinct from the heal loop's negative canaries, which are dead listings testing the collector rather than live products testing the matcher."
+  }
+ },
+ "provenance": {
+  "seed_source": "CPSC official REST API and EU Safety Gate. Zero Bright Data credits: the seed layer never touches the platform, deliberately.",
+  "seed_note": "Every hazard sentence is the regulator's verbatim text. Never paraphrased.",
+  "fixture": false,
+  "stamp": "LIVE MEASUREMENT. TRIAL SLICE, 3 of 207 notices. Denominators are not the full corpus.",
+  "collectors": {
+   "DE": "c_mt00jidz6zhqjbpew",
+   "IN": "c_mt03cj5z2fo651wy8q",
+   "US": "c_mt01usw31e8y5ubqjs"
+  }
+ }
+}
