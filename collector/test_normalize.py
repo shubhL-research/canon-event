@@ -17,7 +17,7 @@ sys.path.insert(0, str(HERE.parent / "contract"))
 
 from normalize import (normalize, normalize_sweep, reassert, norm_needle,  # noqa: E402
                        classify, currency_ok, pick, context_around,
-                       gtin_check_digit_ok, collapse_repeat, language_ok,
+                       gtin_check_digit_ok, collapse_repeat, language_ok, gtin_forms,
                        needle_is_assertable, buy_control_present)
 from contract_keys import MISSING  # noqa: E402
 
@@ -180,6 +180,26 @@ check(gtin_check_digit_ok("0 36000 29145 2"), "separators in a GTIN are tolerate
 check(not gtin_check_digit_ok("3973500298"),
       "a real Safety Gate 10-digit 'barcode' is not a GTIN")
 check(not gtin_check_digit_ok(None), "an absent GTIN fails rather than raising")
+
+print("\nGTIN formats: a leading zero is not a different product")
+# GS1: GTIN-8/12/13/14 are one number space, and the shorter form is the longer
+# one with leading zeros stripped. Found on the first live trial sweep, on a real
+# kaufland.de row carrying both forms in the same field.
+check(gtin_check_digit_ok("605566127453") and gtin_check_digit_ok("0605566127453"),
+      "a UPC-12 and its EAN-13 form are both valid GTINs")
+check(reassert("EAN 0605566127453 Taf Toys", "605566127453"),
+      "a 12-digit notice matches a page printing the 13-digit form")
+check(reassert("EAN 605566127453 Taf Toys", "0605566127453"),
+      "and the reverse, because the anchor must not treat a format as a product")
+# The refusal this must not weaken. Same brand, same GS1 prefix, last three
+# digits different: a sibling item, not the recalled one. Seen live.
+check(not reassert("EAN 605566127156 Taf Toys", "605566127453"),
+      "an ADJACENT GTIN is still refused, which is the whole point of anchoring")
+check(gtin_forms("113210") == [],
+      "a non-GTIN has no equivalent renderings and gets none invented")
+check(context_around("Marke Taf EAN 0605566127453 Farbe", "605566127453")
+      is not MISSING,
+      "the receipt quotes the form that actually matched, not the one we asked for")
 
 print("\nWhat may assert identity at all")
 check(needle_is_assertable("BR-C708S"), "a model number containing letters is assertable")

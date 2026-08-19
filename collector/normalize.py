@@ -169,6 +169,42 @@ def gtin_check_digit_ok(raw):
     return (10 - total % 10) % 10 == check
 
 
+def gtin_forms(raw):
+    """Every legal rendering of one GTIN, longest first. Empty if not a GTIN.
+
+    WHY THIS EXISTS, AND WHAT IT COST TO FIND
+    -----------------------------------------
+    GS1 defines GTIN-8, -12, -13 and -14 as one number space: a shorter form is
+    the longer form with leading zeros removed. `605566127453` and
+    `0605566127453` are the SAME product, and a marketplace may print either.
+
+    The boundary-anchored matcher rejects that pair. Searching for the 12-digit
+    form against a page printing the 13-digit form fails the lookbehind, because
+    the character before the match is `0`, which is alphanumeric. The anchor is
+    right — it is what stops `PS-100` matching `PS-1000` — but a leading zero is
+    not a different product, and treating it as one silently loses a real match.
+
+    Found on the first live trial sweep, on a real kaufland.de row whose `ean`
+    field carried both forms at once. **The error direction is the one that
+    matters: it makes us MISS products that are still on sale, which understates
+    the hazard and argues against our own headline.** Same direction as the
+    identifier-rule correction in extract/identifier.py.
+
+    Only check-digit-valid input produces forms. A number that is not a GTIN has
+    no equivalent renderings, and inventing some for it would be a way to match
+    more things rather than the right things.
+    """
+    digits = re.sub(r"\D", "", "" if raw is None else str(raw))
+    if not gtin_check_digit_ok(digits):
+        return []
+    core = digits.lstrip("0") or "0"
+    forms = {digits}
+    for width in (8, 12, 13, 14):
+        if len(core) <= width:
+            forms.add(core.rjust(width, "0"))
+    return sorted(forms, key=lambda f: (-len(f), f))
+
+
 def collapse_repeat(value):
     """Collapse "X X" to "X" when both halves are byte-identical.
 
@@ -256,6 +292,18 @@ def language_ok(raw):
     return any(str(lang).strip().lower().startswith(p) for p in prefixes)
 
 
+def matching_forms(needle):
+    """The renderings of `needle` that count as the same identifier.
+
+    A GTIN contributes its whole legal family, because a leading zero is a format
+    and not a different product. Anything else contributes only itself: a model
+    number has no equivalent renderings, and inventing some would widen the match
+    in the one direction this project must never widen.
+    """
+    forms = gtin_forms(needle)
+    return forms if forms else [str(needle)]
+
+
 def reassert(page_text, needle):
     """Did the identifier actually reappear on the page we fetched?
 
@@ -264,19 +312,30 @@ def reassert(page_text, needle):
     as a hazard still on sale. The identifier must be present in the fetched
     page's own text, not merely in the URL we asked for, and it must appear as
     a whole token rather than as a fragment of a longer one.
+
+    A GTIN is matched across its legal forms, for the reason in gtin_forms().
+    Everything else is matched exactly, boundary-anchored.
     """
     if not present(page_text) or not present(needle):
         return False
-    pat = needle_pattern(needle)
-    return bool(pat and pat.search(str(page_text)))
+    text = str(page_text)
+    for form in matching_forms(needle):
+        pat = needle_pattern(form)
+        if pat and pat.search(text):
+            return True
+    return False
 
 
 def context_around(page_text, needle, width=90):
     """A short excerpt containing the needle, for the two-receipt card."""
     if not present(page_text) or not present(needle):
         return MISSING
-    pat = needle_pattern(needle)
-    m = pat.search(str(page_text)) if pat else None
+    m = None
+    for form in matching_forms(needle):
+        pat = needle_pattern(form)
+        m = pat.search(str(page_text)) if pat else None
+        if m:
+            break
     if not m:
         return MISSING
     start = max(0, m.start() - width)
