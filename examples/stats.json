@@ -4,24 +4,25 @@
   "_contract": "contract/row.schema.json",
   "_validate": "python validate.py",
   "headline": {
-    "n": 7,
-    "oldest_days": 722,
+    "n": 25,
+    "oldest_days": 721,
     "oldest": {
-      "name": "Dumbbell toy sold with Baby Biceps Gift Set",
-      "ref": "24351",
-      "hazard": "The gray caps on the end of the dumbbell toy can come off, posing a choking hazard to infants.",
-      "rank_on_wall": 23
+      "name": "Foam mat",
+      "ref": "A12/02404/24",
+      "authority": "SAFETY_GATE",
+      "hazard": "The plastic film covering the foam may peel off in small pieces. A small child may put them in the mouth and choke.",
+      "rank_on_wall": 25
     },
-    "sentence": "7 products recalled for burning or choking children are in a cart right now. The oldest has been buyable for 722 days.",
+    "sentence": "25 products recalled for burning or choking children are in a cart right now. The oldest has been buyable for 721 days.",
     "method": "Transparent keyword rule over the regulator's verbatim hazard sentence. Matched terms are recorded per row so the classification is auditable. See hazard_class()."
   },
   "survival": {
-    "v": 0.25,
-    "n": 45,
-    "d": 180,
+    "v": 0.5362,
+    "n": 111,
+    "d": 207,
     "ci95": [
-      0.1924,
-      0.318
+      0.4683,
+      0.6029
     ],
     "contaminated": true
   },
@@ -29,106 +30,731 @@
     "method": "isotonic regression (PAVA), nonparametric MLE for current-status data",
     "assumption": "survival is monotone non-increasing in days since recall",
     "confound": "Age is confounded with cohort: a 2024 recall is not exchangeable with a 2026 one. This is a cross-sectional age profile, not a within-product survival trajectory.",
-    "n": 37,
-    "n_still_buyable": 31,
+    "n": 111,
+    "n_still_buyable": 111,
     "blocks": [
       {
-        "from_day": 8,
-        "to_day": 8,
+        "from_day": 21,
+        "to_day": 21,
         "survival": 1.0,
         "n": 1
       },
       {
-        "from_day": 8,
-        "to_day": 8,
+        "from_day": 21,
+        "to_day": 21,
         "survival": 1.0,
         "n": 1
       },
       {
-        "from_day": 8,
-        "to_day": 750,
-        "survival": 0.8929,
-        "n": 28
+        "from_day": 21,
+        "to_day": 21,
+        "survival": 1.0,
+        "n": 1
       },
       {
-        "from_day": 750,
-        "to_day": 757,
-        "survival": 0.6667,
-        "n": 6
+        "from_day": 21,
+        "to_day": 21,
+        "survival": 1.0,
+        "n": 1
       },
       {
-        "from_day": 757,
-        "to_day": 757,
-        "survival": 0.0,
+        "from_day": 21,
+        "to_day": 21,
+        "survival": 1.0,
+        "n": 1
+      },
+      {
+        "from_day": 21,
+        "to_day": 21,
+        "survival": 1.0,
+        "n": 1
+      },
+      {
+        "from_day": 21,
+        "to_day": 21,
+        "survival": 1.0,
+        "n": 1
+      },
+      {
+        "from_day": 21,
+        "to_day": 21,
+        "survival": 1.0,
+        "n": 1
+      },
+      {
+        "from_day": 21,
+        "to_day": 21,
+        "survival": 1.0,
+        "n": 1
+      },
+      {
+        "from_day": 21,
+        "to_day": 21,
+        "survival": 1.0,
+        "n": 1
+      },
+      {
+        "from_day": 21,
+        "to_day": 21,
+        "survival": 1.0,
+        "n": 1
+      },
+      {
+        "from_day": 22,
+        "to_day": 22,
+        "survival": 1.0,
+        "n": 1
+      },
+      {
+        "from_day": 35,
+        "to_day": 35,
+        "survival": 1.0,
+        "n": 1
+      },
+      {
+        "from_day": 35,
+        "to_day": 35,
+        "survival": 1.0,
+        "n": 1
+      },
+      {
+        "from_day": 35,
+        "to_day": 35,
+        "survival": 1.0,
+        "n": 1
+      },
+      {
+        "from_day": 35,
+        "to_day": 35,
+        "survival": 1.0,
+        "n": 1
+      },
+      {
+        "from_day": 35,
+        "to_day": 35,
+        "survival": 1.0,
+        "n": 1
+      },
+      {
+        "from_day": 35,
+        "to_day": 35,
+        "survival": 1.0,
+        "n": 1
+      },
+      {
+        "from_day": 35,
+        "to_day": 35,
+        "survival": 1.0,
+        "n": 1
+      },
+      {
+        "from_day": 35,
+        "to_day": 35,
+        "survival": 1.0,
+        "n": 1
+      },
+      {
+        "from_day": 35,
+        "to_day": 35,
+        "survival": 1.0,
+        "n": 1
+      },
+      {
+        "from_day": 35,
+        "to_day": 35,
+        "survival": 1.0,
+        "n": 1
+      },
+      {
+        "from_day": 35,
+        "to_day": 35,
+        "survival": 1.0,
+        "n": 1
+      },
+      {
+        "from_day": 36,
+        "to_day": 36,
+        "survival": 1.0,
+        "n": 1
+      },
+      {
+        "from_day": 42,
+        "to_day": 42,
+        "survival": 1.0,
+        "n": 1
+      },
+      {
+        "from_day": 42,
+        "to_day": 42,
+        "survival": 1.0,
+        "n": 1
+      },
+      {
+        "from_day": 42,
+        "to_day": 42,
+        "survival": 1.0,
+        "n": 1
+      },
+      {
+        "from_day": 42,
+        "to_day": 42,
+        "survival": 1.0,
+        "n": 1
+      },
+      {
+        "from_day": 70,
+        "to_day": 70,
+        "survival": 1.0,
+        "n": 1
+      },
+      {
+        "from_day": 70,
+        "to_day": 70,
+        "survival": 1.0,
+        "n": 1
+      },
+      {
+        "from_day": 70,
+        "to_day": 70,
+        "survival": 1.0,
+        "n": 1
+      },
+      {
+        "from_day": 70,
+        "to_day": 70,
+        "survival": 1.0,
+        "n": 1
+      },
+      {
+        "from_day": 70,
+        "to_day": 70,
+        "survival": 1.0,
+        "n": 1
+      },
+      {
+        "from_day": 70,
+        "to_day": 70,
+        "survival": 1.0,
+        "n": 1
+      },
+      {
+        "from_day": 70,
+        "to_day": 70,
+        "survival": 1.0,
+        "n": 1
+      },
+      {
+        "from_day": 70,
+        "to_day": 70,
+        "survival": 1.0,
+        "n": 1
+      },
+      {
+        "from_day": 70,
+        "to_day": 70,
+        "survival": 1.0,
+        "n": 1
+      },
+      {
+        "from_day": 70,
+        "to_day": 70,
+        "survival": 1.0,
+        "n": 1
+      },
+      {
+        "from_day": 70,
+        "to_day": 70,
+        "survival": 1.0,
+        "n": 1
+      },
+      {
+        "from_day": 70,
+        "to_day": 70,
+        "survival": 1.0,
+        "n": 1
+      },
+      {
+        "from_day": 70,
+        "to_day": 70,
+        "survival": 1.0,
+        "n": 1
+      },
+      {
+        "from_day": 70,
+        "to_day": 70,
+        "survival": 1.0,
+        "n": 1
+      },
+      {
+        "from_day": 70,
+        "to_day": 70,
+        "survival": 1.0,
+        "n": 1
+      },
+      {
+        "from_day": 70,
+        "to_day": 70,
+        "survival": 1.0,
+        "n": 1
+      },
+      {
+        "from_day": 70,
+        "to_day": 70,
+        "survival": 1.0,
+        "n": 1
+      },
+      {
+        "from_day": 70,
+        "to_day": 70,
+        "survival": 1.0,
+        "n": 1
+      },
+      {
+        "from_day": 70,
+        "to_day": 70,
+        "survival": 1.0,
+        "n": 1
+      },
+      {
+        "from_day": 70,
+        "to_day": 70,
+        "survival": 1.0,
+        "n": 1
+      },
+      {
+        "from_day": 70,
+        "to_day": 70,
+        "survival": 1.0,
+        "n": 1
+      },
+      {
+        "from_day": 70,
+        "to_day": 70,
+        "survival": 1.0,
+        "n": 1
+      },
+      {
+        "from_day": 70,
+        "to_day": 70,
+        "survival": 1.0,
+        "n": 1
+      },
+      {
+        "from_day": 70,
+        "to_day": 70,
+        "survival": 1.0,
+        "n": 1
+      },
+      {
+        "from_day": 70,
+        "to_day": 70,
+        "survival": 1.0,
+        "n": 1
+      },
+      {
+        "from_day": 70,
+        "to_day": 70,
+        "survival": 1.0,
+        "n": 1
+      },
+      {
+        "from_day": 71,
+        "to_day": 71,
+        "survival": 1.0,
+        "n": 1
+      },
+      {
+        "from_day": 71,
+        "to_day": 71,
+        "survival": 1.0,
+        "n": 1
+      },
+      {
+        "from_day": 85,
+        "to_day": 85,
+        "survival": 1.0,
+        "n": 1
+      },
+      {
+        "from_day": 113,
+        "to_day": 113,
+        "survival": 1.0,
+        "n": 1
+      },
+      {
+        "from_day": 350,
+        "to_day": 350,
+        "survival": 1.0,
+        "n": 1
+      },
+      {
+        "from_day": 350,
+        "to_day": 350,
+        "survival": 1.0,
+        "n": 1
+      },
+      {
+        "from_day": 350,
+        "to_day": 350,
+        "survival": 1.0,
+        "n": 1
+      },
+      {
+        "from_day": 350,
+        "to_day": 350,
+        "survival": 1.0,
+        "n": 1
+      },
+      {
+        "from_day": 350,
+        "to_day": 350,
+        "survival": 1.0,
+        "n": 1
+      },
+      {
+        "from_day": 350,
+        "to_day": 350,
+        "survival": 1.0,
+        "n": 1
+      },
+      {
+        "from_day": 350,
+        "to_day": 350,
+        "survival": 1.0,
+        "n": 1
+      },
+      {
+        "from_day": 350,
+        "to_day": 350,
+        "survival": 1.0,
+        "n": 1
+      },
+      {
+        "from_day": 350,
+        "to_day": 350,
+        "survival": 1.0,
+        "n": 1
+      },
+      {
+        "from_day": 350,
+        "to_day": 350,
+        "survival": 1.0,
+        "n": 1
+      },
+      {
+        "from_day": 350,
+        "to_day": 350,
+        "survival": 1.0,
+        "n": 1
+      },
+      {
+        "from_day": 350,
+        "to_day": 350,
+        "survival": 1.0,
+        "n": 1
+      },
+      {
+        "from_day": 350,
+        "to_day": 350,
+        "survival": 1.0,
+        "n": 1
+      },
+      {
+        "from_day": 350,
+        "to_day": 350,
+        "survival": 1.0,
+        "n": 1
+      },
+      {
+        "from_day": 357,
+        "to_day": 357,
+        "survival": 1.0,
+        "n": 1
+      },
+      {
+        "from_day": 357,
+        "to_day": 357,
+        "survival": 1.0,
+        "n": 1
+      },
+      {
+        "from_day": 357,
+        "to_day": 357,
+        "survival": 1.0,
+        "n": 1
+      },
+      {
+        "from_day": 357,
+        "to_day": 357,
+        "survival": 1.0,
+        "n": 1
+      },
+      {
+        "from_day": 357,
+        "to_day": 357,
+        "survival": 1.0,
+        "n": 1
+      },
+      {
+        "from_day": 357,
+        "to_day": 357,
+        "survival": 1.0,
+        "n": 1
+      },
+      {
+        "from_day": 357,
+        "to_day": 357,
+        "survival": 1.0,
+        "n": 1
+      },
+      {
+        "from_day": 357,
+        "to_day": 357,
+        "survival": 1.0,
+        "n": 1
+      },
+      {
+        "from_day": 357,
+        "to_day": 357,
+        "survival": 1.0,
+        "n": 1
+      },
+      {
+        "from_day": 357,
+        "to_day": 357,
+        "survival": 1.0,
+        "n": 1
+      },
+      {
+        "from_day": 357,
+        "to_day": 357,
+        "survival": 1.0,
+        "n": 1
+      },
+      {
+        "from_day": 357,
+        "to_day": 357,
+        "survival": 1.0,
+        "n": 1
+      },
+      {
+        "from_day": 372,
+        "to_day": 372,
+        "survival": 1.0,
+        "n": 1
+      },
+      {
+        "from_day": 714,
+        "to_day": 714,
+        "survival": 1.0,
+        "n": 1
+      },
+      {
+        "from_day": 714,
+        "to_day": 714,
+        "survival": 1.0,
+        "n": 1
+      },
+      {
+        "from_day": 714,
+        "to_day": 714,
+        "survival": 1.0,
+        "n": 1
+      },
+      {
+        "from_day": 714,
+        "to_day": 714,
+        "survival": 1.0,
+        "n": 1
+      },
+      {
+        "from_day": 714,
+        "to_day": 714,
+        "survival": 1.0,
+        "n": 1
+      },
+      {
+        "from_day": 714,
+        "to_day": 714,
+        "survival": 1.0,
+        "n": 1
+      },
+      {
+        "from_day": 714,
+        "to_day": 714,
+        "survival": 1.0,
+        "n": 1
+      },
+      {
+        "from_day": 714,
+        "to_day": 714,
+        "survival": 1.0,
+        "n": 1
+      },
+      {
+        "from_day": 714,
+        "to_day": 714,
+        "survival": 1.0,
+        "n": 1
+      },
+      {
+        "from_day": 714,
+        "to_day": 714,
+        "survival": 1.0,
+        "n": 1
+      },
+      {
+        "from_day": 714,
+        "to_day": 714,
+        "survival": 1.0,
+        "n": 1
+      },
+      {
+        "from_day": 714,
+        "to_day": 714,
+        "survival": 1.0,
+        "n": 1
+      },
+      {
+        "from_day": 714,
+        "to_day": 714,
+        "survival": 1.0,
+        "n": 1
+      },
+      {
+        "from_day": 714,
+        "to_day": 714,
+        "survival": 1.0,
+        "n": 1
+      },
+      {
+        "from_day": 714,
+        "to_day": 714,
+        "survival": 1.0,
+        "n": 1
+      },
+      {
+        "from_day": 714,
+        "to_day": 714,
+        "survival": 1.0,
+        "n": 1
+      },
+      {
+        "from_day": 714,
+        "to_day": 714,
+        "survival": 1.0,
+        "n": 1
+      },
+      {
+        "from_day": 714,
+        "to_day": 714,
+        "survival": 1.0,
+        "n": 1
+      },
+      {
+        "from_day": 714,
+        "to_day": 714,
+        "survival": 1.0,
+        "n": 1
+      },
+      {
+        "from_day": 714,
+        "to_day": 714,
+        "survival": 1.0,
+        "n": 1
+      },
+      {
+        "from_day": 714,
+        "to_day": 714,
+        "survival": 1.0,
+        "n": 1
+      },
+      {
+        "from_day": 714,
+        "to_day": 714,
+        "survival": 1.0,
+        "n": 1
+      },
+      {
+        "from_day": 714,
+        "to_day": 714,
+        "survival": 1.0,
+        "n": 1
+      },
+      {
+        "from_day": 721,
+        "to_day": 721,
+        "survival": 1.0,
+        "n": 1
+      },
+      {
+        "from_day": 721,
+        "to_day": 721,
+        "survival": 1.0,
+        "n": 1
+      },
+      {
+        "from_day": 721,
+        "to_day": 721,
+        "survival": 1.0,
         "n": 1
       }
     ],
     "grid": [
       {
-        "day": 8,
-        "survival": 0.8929,
+        "day": 21,
+        "survival": 1.0,
         "ci95": [
-          0.7727,
+          1.0,
           1.0
         ],
-        "support": 37,
+        "support": 111,
         "thin": false,
         "publishable": true
       },
       {
         "day": 30,
-        "survival": 0.8929,
+        "survival": 1.0,
         "ci95": [
-          0.7727,
+          1.0,
           1.0
         ],
-        "support": 31,
+        "support": 99,
         "thin": false,
         "publishable": true
       },
       {
         "day": 90,
-        "survival": 0.8929,
+        "survival": 1.0,
         "ci95": [
-          0.7727,
+          1.0,
           1.0
         ],
-        "support": 31,
+        "support": 54,
         "thin": false,
         "publishable": true
       },
       {
         "day": 365,
-        "survival": 0.8929,
+        "survival": 1.0,
         "ci95": [
-          0.7667,
+          1.0,
           1.0
         ],
-        "support": 20,
+        "support": 27,
         "thin": false,
         "publishable": true
       },
       {
-        "day": 730,
-        "survival": 0.8929,
+        "day": 721,
+        "survival": 1.0,
         "ci95": [
-          0.7667,
+          1.0,
           1.0
         ],
-        "support": 15,
-        "thin": false,
-        "publishable": true
-      },
-      {
-        "day": 757,
-        "survival": 0.0,
-        "ci95": [
-          0.0,
-          0.9091
-        ],
-        "support": 5,
-        "thin": false,
-        "publishable": true
+        "support": 3,
+        "thin": true,
+        "publishable": false
       }
     ],
     "min_support": 5,
@@ -141,18 +767,20 @@
   "border_escape": {
     "v": null,
     "n": 0,
-    "d": 0,
+    "d": 104,
     "ci95": null,
     "contaminated": true,
-    "pending": "EU Safety Gate seeds are not yet in the corpus. Border escape is 'of EU-recalled products, what share are buyable from an Indian residential IP', and it cannot be computed from CPSC notices alone."
+    "pending": "Denominator ready: 104 EU-recalled products carry a searchable identifier. The numerator requires a live sweep from an Indian residential exit IP, which has not run yet.",
+    "eu_seeds": 104,
+    "eu_searchable": 104
   },
   "unsearchable": {
-    "v": 0.2889,
-    "n": 52,
-    "d": 180,
+    "v": 0.4638,
+    "n": 96,
+    "d": 207,
     "ci95": [
-      0.2276,
-      0.359
+      0.3971,
+      0.5317
     ],
     "contaminated": false
   },
@@ -166,12 +794,12 @@
     ],
     "contaminated": false,
     "recall": {
-      "n1_brand_model": 38,
-      "n2_model_only": 24,
-      "m_both": 17,
-      "observed": 45,
-      "n_hat": 53.17,
-      "missed_floor": 8.17,
+      "n1_brand_model": 96,
+      "n2_model_only": 52,
+      "m_both": 37,
+      "observed": 111,
+      "n_hat": 134.29,
+      "missed_floor": 23.29,
       "estimator": "Chapman (bias-corrected Lincoln-Petersen)",
       "independence_violated": true,
       "note": "The two query strategies share the model token and are positively correlated. N-hat is therefore biased downward, so missed_floor is a LOWER bound on what we failed to see."
@@ -179,13 +807,13 @@
   },
   "recall_floor": {
     "estimator": "Chapman (bias-corrected Lincoln-Petersen)",
-    "n1_brand_model": 27,
-    "n2_model_only": 15,
-    "m_both": 11,
-    "observed": 31,
-    "n_hat": 36.33,
-    "se": 3.91,
-    "missed_floor": 5.33,
+    "n1_brand_model": 96,
+    "n2_model_only": 52,
+    "m_both": 37,
+    "observed": 111,
+    "n_hat": 134.29,
+    "se": 8.99,
+    "missed_floor": 23.29,
     "independence_violated": true,
     "bias_direction": "downward",
     "note": "The two query strategies share the model token and are positively correlated, which inflates the overlap and deflates N-hat. The miss count is therefore a LOWER bound on what we failed to see, not an estimate of it. Always print it as 'at least'.",
@@ -193,9 +821,9 @@
     "reportable_note": "With an overlap below 3 the estimator is too unstable to publish. Report the raw counts and say recall is unmeasured."
   },
   "discarded": {
-    "v": 0.0833,
+    "v": 0.0725,
     "n": 45,
-    "d": 540,
+    "d": 621,
     "by_code": {
       "AMBER": 12,
       "dead_page": 9,
@@ -249,13 +877,13 @@
     ]
   },
   "arithmetic": {
-    "corpus_seeds": 180,
+    "corpus_seeds": 207,
     "queries_per_seed_per_arm": 2,
     "arms": 3,
-    "search_page_loads": 1080,
-    "pdp_promotions": 121,
-    "total_page_loads": 1201,
-    "working": "180 seeds x 2 queries x 3 arms = 1080 search loads, + 121 product-page promotions = 1201 page loads at 1 credit each.",
+    "search_page_loads": 1242,
+    "pdp_promotions": 111,
+    "total_page_loads": 1353,
+    "working": "207 seeds x 2 queries x 3 arms = 1242 search loads, + 111 product-page promotions = 1353 page loads at 1 credit each.",
     "note": "Promotion to a product page is decided outside Scraper Studio by the matcher, so only RED candidates cost a browser load. Chaining with next_stage would have promoted every discovered listing and multiplied this by roughly forty."
   }
 }

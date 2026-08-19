@@ -4,45 +4,49 @@
   "_contract": "contract/row.schema.json",
   "_validate": "python validate.py",
   "_why": "evidence.assertion.dom_path and evidence.buy_control.ships_from are ABSENT, not null and not empty. A consumer runs row.get(k, MISSING) over contract/contract_keys.py and renders the field name struck through with the word MISSING. Rendering absence as 0 would turn a gap in our own measurement into a claim about the world.",
-  "rank": 3,
-  "name": "Besrey Twins Strollers",
-  "hazard": "Entrapment, fall and choking hazards; violation of federal regulation for strollers.",
+  "rank": 27,
+  "name": "Happy Glow",
+  "hazard": "The soother's handle can break apart, releasing small parts. A small child may put them in the mouth and choke.",
   "source": {
-    "authority": "CPSC",
-    "ref": "24316",
-    "published": "2024-07-25",
-    "url": "https://www.cpsc.gov/Recalls/2026/24316"
+    "authority": "SAFETY_GATE",
+    "ref": "A12/02462/24",
+    "published": "2024-08-30",
+    "url": "https://ec.europa.eu/safety-gate-alerts/screen/search?reference=A12/02462/24"
   },
-  "days": 757,
+  "days": 721,
   "days_frozen": false,
   "tier": "RED",
   "arms": {
     "US": "RED",
     "DE": "WITHHELD",
-    "IN": "RED"
+    "IN": "NOT_FOUND"
   },
   "hazard_class": {
-    "qualifies": false,
+    "qualifies": true,
     "burn_terms": [],
     "choke_terms": [
-      "chok"
+      "chok",
+      "small parts"
     ],
-    "child_terms": [],
+    "child_terms": [
+      "child"
+    ],
     "child_scoped_standard": false
   },
-  "model": "BR-C708S",
+  "model": "123316",
+  "gtin": "7312507120307",
   "found_by_query": "brand_model",
   "evidence": {
     "captured_at": "2026-08-21T09:14:22Z",
     "assertion": {
-      "needle": "BR-C708S",
-      "context": "... Item model number BR-C708S Manufacturer recommended age ..."
+      "needle": "7312507120307",
+      "context": "... Item model number 7312507120307 Manufacturer recommended age ..."
     },
     "buy_control": {
       "present": true,
       "label": "Add to Cart",
       "in_stock": true
     },
-    "currency": "INR"
+    "currency": "USD"
   }
 }

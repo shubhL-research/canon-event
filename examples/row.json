@@ -3,16 +3,16 @@
   "_generated_by": "examples/make_examples.py",
   "_contract": "contract/row.schema.json",
   "_validate": "python validate.py",
-  "rank": 1,
-  "name": "Lancaster Table & Seating Plastic Restaurant High Chairs",
-  "hazard": "The T-bar located at the front middle of the chair can become loose and fall or break off while the high chair is in use, posing a fall hazard to children.",
+  "rank": 25,
+  "name": "Foam mat",
+  "hazard": "The plastic film covering the foam may peel off in small pieces. A small child may put them in the mouth and choke.",
   "source": {
-    "authority": "CPSC",
-    "ref": "24311",
-    "published": "2024-07-25",
-    "url": "https://www.cpsc.gov/Recalls/2026/24311"
+    "authority": "SAFETY_GATE",
+    "ref": "A12/02404/24",
+    "published": "2024-08-30",
+    "url": "https://ec.europa.eu/safety-gate-alerts/screen/search?reference=A12/02404/24"
   },
-  "days": 757,
+  "days": 721,
   "days_frozen": false,
   "tier": "RED",
   "arms": {
@@ -21,23 +21,25 @@
     "IN": "RED"
   },
   "hazard_class": {
-    "qualifies": false,
+    "qualifies": true,
     "burn_terms": [],
-    "choke_terms": [],
+    "choke_terms": [
+      "chok"
+    ],
     "child_terms": [
-      "child",
-      "children"
+      "child"
     ],
     "child_scoped_standard": false
   },
-  "model": "274HCBKWTASM",
+  "model": "12715",
+  "gtin": "605566127156",
   "found_by_query": "both",
   "evidence": {
     "captured_at": "2026-08-21T09:14:22Z",
     "assertion": {
-      "needle": "274HCBKWTASM",
+      "needle": "605566127156",
       "dom_path": "#productDetails > tr:nth-child(4)",
-      "context": "... Item model number 274HCBKWTASM Manufacturer recommended age ..."
+      "context": "... Item model number 605566127156 Manufacturer recommended age ..."
     },
     "buy_control": {
       "present": true,
@@ -48,8 +50,8 @@
     "currency": "INR",
     "http": 200,
     "viewport": "1440x900",
-    "sha256": "3f9a0001c3d0",
-    "trace": "ce-2026-08-21-0001",
+    "sha256": "3f9a0025c3d0",
+    "trace": "ce-2026-08-21-0025",
     "job_id": "j_ma13y9ay1piehrso8r"
   }
 }
