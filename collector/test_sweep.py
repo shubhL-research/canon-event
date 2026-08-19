@@ -115,18 +115,78 @@ check(S.needle_for(SEED) == SEED["gtin"],
       "the GTIN is preferred over the model as the needle")
 
 
+# ------------------------------------------------------------------ batching
+print("\nBatching, without which the sweep is 124 hours long")
+
+plan = S.plan_arm("DE", [SEED])
+check(len(plan) == 2, "one notice plans exactly two loads, one per strategy")
+check({p[2] for p in plan} == {S.BRAND_MODEL, S.MODEL_ONLY},
+      "both strategies are planned, never one")
+check(all(p[0].startswith("https://www.kaufland.de/") for p in plan),
+      "the DE plan targets the DE storefront")
+check(len({p[0] for p in plan}) == 2,
+      "the two strategies produce two DISTINCT urls, or one would shadow the other")
+check(S.plan_arm("DE", [{"ref": "x", "name": "", "model": "", "gtin": ""}]) == [],
+      "a notice with no identifier plans no loads rather than an empty search")
+
+grouped = S.group_by_input([
+    {"title": "a", "input": {"url": "u1"}},
+    {"title": "b", "input": {"url": "u1"}},
+    {"title": "c", "input": {"url": "u2"}},
+    {"title": "d"},
+])
+check(len(grouped["u1"]) == 2 and len(grouped["u2"]) == 1,
+      "rows are split back to the url that produced them")
+check(None in grouped,
+      "a row with no input echo is kept under None, not dropped")
+
+check(S.cli_batch("c_x", [])[0] == [],
+      "an empty batch is a no-op, not a job")
+
+
+# A whole batch failing must not look like an absence of hazard. This is the
+# batching-specific version of the project's central refusal: one failed job now
+# covers 40 urls instead of one, so getting it wrong is 40 times as wrong.
+def failing_runner(collector_id, urls, timeout_s=None):
+    return None, "cli timeout after 3600s on a batch of %d" % len(urls)
+
+
+rows_f, report_f = S.sweep_arm("DE", "c_de", [SEED], runner=failing_runner)
+check(len(report_f["fetch_errors"]) == 2,
+      "a failed batch records an error for every url it covered")
+check(rows_f and rows_f[0]["tier"] == "DISCARDED",
+      "and every covered notice becomes a counted discard, not a silent absence")
+check(S.arm_verdict(rows_f[0]) == "WITHHELD",
+      "which surfaces as WITHHELD, never as NOT_FOUND")
+check(report_f["planned_loads"] == 2 and report_f["batches"] == 1,
+      "the report states what was planned, so a short sweep is visible")
+
+
 # --------------------------------------------------------- the whole pipeline
 print("\nEnd to end, offline, from a saved payload")
 
 
 def fake_runner(payloads):
-    """A runner that replays canned payloads per arm."""
-    def run(collector_id, url):
+    """A batch runner that replays canned rows per arm.
+
+    Mirrors the real cli_batch contract: given many urls, return a flat list of
+    rows each carrying the `input.url` that produced it. That echo is what makes
+    batching safe, so the fake has to reproduce it or the test would pass against
+    a mapping that does not work in production.
+    """
+    def run(collector_id, urls, timeout_s=None):
+        rows, error = [], None
         for arm, marker in (("DE", "kaufland.de"), ("US", "amazon.com"),
-                            ("IN", "amazon.in")):
-            if marker in url:
-                return payloads.get(arm, ([], None))
-        return [], None
+                            ("IN", "flipkart.com")):
+            if not any(marker in u for u in urls):
+                continue
+            canned, error = payloads.get(arm, ([], None))
+            if error:
+                return None, error
+            for url in urls:
+                for row in canned or []:
+                    rows.append({**row, "input": {"url": url}})
+        return rows, error
     return run
 
 
