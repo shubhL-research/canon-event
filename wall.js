@@ -122,40 +122,56 @@
     var s = doc.stats, out = [];
     var struck = function (stat) { return stat.contaminated ? "is-struck" : ""; };
 
-    out.push(instrument("Survival", pct(s.survival.v),
-      s.survival.n + " of " + s.survival.d + " · " + ci(s.survival.ci95), struck(s.survival)));
+    // Two figures lead, six follow as apparatus.
+    //
+    // The eight instruments used to be rendered identically, which meant the
+    // headline finding and the credit count had the same claim on the reader. The
+    // two below are the ones the project is willing to be judged on: how much of
+    // what a regulator recalled is still buyable, and how much of it could never
+    // be checked at all. UNSEARCHABLE leads alongside SURVIVAL deliberately —
+    // it is computed from the free government corpus, so it is the one figure
+    // that survives every collector failing, and on the project's worst day it is
+    // the only thing still publishable.
+    out.push(instrument("Still buyable", pct(s.survival.v),
+      s.survival.n + " of " + s.survival.d + " searchable notices · " + ci(s.survival.ci95),
+      "is-lead " + struck(s.survival)));
+
+    out.push(instrument("Never checkable", pct(s.unsearchable.v),
+      s.unsearchable.n + " of " + s.unsearchable.d +
+      " notices name no identifier a matcher can search · " + ci(s.unsearchable.ci95),
+      "is-lead"));
 
     if (s.border_escape.v === null) {
       out.push(instrument("Border escape", "PENDING",
-        esc(s.border_escape.pending.slice(0, 64)) + "…", "is-pending"));
+        esc(s.border_escape.pending.slice(0, 64)) + "…", "is-apparatus is-pending"));
     } else {
       out.push(instrument("Border escape", pct(s.border_escape.v),
         s.border_escape.n + " of " + s.border_escape.d + " · " + ci(s.border_escape.ci95),
-        struck(s.border_escape)));
+        "is-apparatus " + struck(s.border_escape)));
     }
-
-    out.push(instrument("Unsearchable", pct(s.unsearchable.v),
-      s.unsearchable.n + " of " + s.unsearchable.d + " · " + ci(s.unsearchable.ci95), ""));
 
     /* Precision carries its interval next to the number it qualifies, never in a
        footnote. Recall is not directly measured: capture-recapture across the two
        query strategies puts a floor under what we missed. */
     var rc = s.precision.recall;
     out.push(instrument("Precision", pct(s.precision.v),
-      s.precision.n + " of " + s.precision.d + " hand-verified · " + ci(s.precision.ci95)));
+      s.precision.n + " of " + s.precision.d + " hand-verified · " + ci(s.precision.ci95),
+      "is-apparatus"));
     out.push(instrument("Recall, floor", "≥ " + Math.round(rc.missed_floor) + " missed",
-      "capture-recapture, " + esc(rc.estimator.split(" ")[0]) + " · lower bound"));
+      "capture-recapture, " + esc(rc.estimator.split(" ")[0]) + " · lower bound",
+      "is-apparatus"));
 
     out.push(instrument("Arms measured", s.arms_measured.n + " of " + s.arms_measured.d,
-      doc.arms.map(function (a) { return a.code + " " + a.state.toLowerCase(); }).join(" · ")));
+      doc.arms.map(function (a) { return a.code + " " + a.state.toLowerCase(); }).join(" · "),
+      "is-apparatus"));
 
-    out.push(instrument("Last sweep", '<span style="font-size:12px">' +
+    out.push(instrument("Last sweep", '<span style="font-size:11px">' +
       esc(freshness(doc.swept_at)) + "</span>",
-      "freshness bound " + doc.freshness_bound_s / 3600 + "h"));
+      "freshness bound " + doc.freshness_bound_s / 3600 + "h", "is-apparatus"));
 
     out.push(instrument("Credits", commas(s.credits.used),
       "of " + commas(s.credits.cap) + " · " + commas(s.credits.code) + " code, " +
-      commas(s.credits.browser) + " browser"));
+      commas(s.credits.browser) + " browser", "is-apparatus"));
 
     el("instruments").innerHTML = out.join("");
   }

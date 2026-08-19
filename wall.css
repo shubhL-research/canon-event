@@ -443,3 +443,161 @@ body.is-blackout #wall .quote { color: var(--ink-2); }
    page is live while the board is black. */
 body.is-blackout #wall .track > i { background: var(--hatch); }
 body.is-blackout #wall .chip.v-RED { background: var(--unknown); border-color: var(--unknown); }
+
+/* ============================================================================
+   EDITORIAL PASS
+   ----------------------------------------------------------------------------
+   The wall worked and read as a dashboard. Everything carried the same visual
+   weight: eight instruments in a uniform row, forty rows each with a full-width
+   red bar, every panel in a 1px box, every label in the same uppercase mono. Red
+   appeared on tier chips, day bars, arm chips, contamination notes and eyebrows
+   at once, which is the same as red appearing nowhere.
+
+   The register this project actually belongs to is not a dashboard. It is an
+   exhibit in an inquiry: a document that states findings, names its own limits,
+   and refuses to release what it cannot stand behind. Three moves, no new
+   colours and no new typefaces.
+
+   1. RED IS RATIONED. Red now marks an accusation and nothing else: the tier
+      chip and a reddened arm. Duration bars keep red — length is Shubh's
+      encoding and it is a real one — but drop from 10px to 3px, so the
+      staircase silhouette survives at a fraction of the ink.
+
+   2. THE DAY COUNTER IS THE SENTENCE. "714 days" is the finding; it was set at
+      16px beside a bar that, for the top five rows, was identically full. It now
+      carries the row.
+
+   3. WITHHELD IS REDACTED, NOT GREYED. A struck grey number reads as a styling
+      state. A redaction reads as a decision, which is what it is. See below.
+   ========================================================================== */
+
+/* --- 1. Red, rationed ---------------------------------------------------- */
+
+/* The bar still encodes duration by length. It no longer competes with the
+   accusation for the reader's attention. */
+.track { height: 3px; }
+.row.is-amber .track > i { background: var(--rule-strong); }
+
+/* Row hover was a red wash across the full width, which on a page of forty rows
+   turned every pointer movement into an alarm. */
+.row:hover { background: var(--surface-sunk); }
+.row.is-amber:hover { background: var(--surface-sunk); }
+
+/* --- 2. The day counter carries the row ---------------------------------- */
+
+.row { height: 76px; }
+.days {
+  font-size: var(--type-figure); font-weight: 700; line-height: 1;
+  min-width: 72px; letter-spacing: -0.02em;
+}
+/* The unit belongs with the number, small, so the figure reads as a duration
+   rather than as an unlabelled quantity. */
+.days::after {
+  content: " d"; font-size: 12px; font-weight: 400; color: var(--ink-3);
+  letter-spacing: 0;
+}
+.days.frozen::after { content: " d ❄"; }
+.c-bar { gap: 16px; }
+
+/* --- 3. Redaction, the signature ---------------------------------------- */
+
+/* A contaminated figure is not unknown. It was computed, and we decline to
+   publish it, which is a different fact and deserves a different mark.
+   The number stays in the DOM: the claim is "we will not release this", not
+   "this does not exist", and a reader inspecting the page should find it there.
+   It cannot be revealed by hovering. A document that hides a figure behind an
+   interaction is still publishing it. */
+.instrument.is-struck .value {
+  position: relative; color: transparent; text-decoration: none;
+  background: var(--void); display: inline-block; padding: 0 8px;
+  user-select: none;
+}
+.instrument.is-struck .value::after {
+  content: "WITHHELD"; position: absolute; inset: 0;
+  display: grid; place-items: center;
+  font-family: var(--font-machine); font-size: 10px; letter-spacing: 0.12em;
+  color: var(--void-ink);
+}
+/* The reason sits in the qualifier, in ink rather than in red: it explains a
+   figure, it does not accuse anyone. */
+.instrument.is-struck .qualifier::after {
+  content: " · withheld, contaminated by an unhealed arm";
+  color: var(--ink-3);
+}
+
+/* --- Hierarchy: two figures the project stands behind -------------------- */
+
+/* Eight equal instruments meant the headline finding and the credit count were
+   set identically. The two figures below are the ones the project is willing to
+   be judged on: what share is still buyable, and what share it could never
+   check. Everything else is apparatus and reads as apparatus. */
+.instruments { align-items: stretch; }
+.instrument.is-lead {
+  min-width: 320px; padding: 32px 32px 32px 0; margin-right: 32px;
+}
+.instrument.is-lead .value {
+  font-size: var(--type-display); line-height: 0.95; letter-spacing: -0.03em;
+  margin-top: 8px; font-family: var(--font-prose);
+}
+.instrument.is-lead .label { font-size: 11px; letter-spacing: 0.14em; }
+.instrument.is-lead .qualifier { font-size: 12px; margin-top: 8px; max-width: 34ch; }
+.instrument.is-lead.is-struck .value { font-size: 28px; }
+
+/* Apparatus: smaller, quieter, and it wraps rather than demanding a column. */
+.instrument.is-apparatus { min-width: 0; padding: 16px 20px 16px 0; margin-right: 20px; }
+.instrument.is-apparatus .value { font-size: 14px; }
+.instrument.is-apparatus .label { font-size: 10px; color: var(--ink-3); }
+.instrument.is-apparatus .qualifier { font-size: 10px; font-family: var(--font-machine); }
+
+/* --- Boxes off ---------------------------------------------------------- */
+
+/* Two bordered cards side by side is the shape of a dashboard. A rule and space
+   say the same thing without drawing a frame around every thought. */
+.panels { grid-template-columns: 1.05fr 1fr; gap: 56px; margin-top: 64px; }
+.panel {
+  border: none; background: transparent; padding: 0;
+  border-top: 2px solid var(--ink); padding-top: 20px;
+}
+.panel h2 { letter-spacing: 0.14em; }
+.panel .lede { max-width: 46ch; }
+
+/* --- Masthead: the document says what it is ----------------------------- */
+
+.masthead { align-items: baseline; }
+.exhibit {
+  font-family: var(--font-machine); font-size: 10px; letter-spacing: 0.14em;
+  color: var(--ink-3); text-transform: uppercase; margin-top: 6px;
+}
+
+/* --- Two bands, not one ragged row --------------------------------------- */
+
+/* The leads and the apparatus were flowing in the same flex line, so BORDER
+   ESCAPE was pulled up beside the two figures and CREDITS was orphaned on a line
+   of its own. Giving each lead a 46% basis forces the apparatus to wrap as a
+   block, which produces two bands: what the project claims, then how it knows. */
+.instruments { row-gap: 0; }
+.instrument.is-lead { flex: 0 1 46%; min-width: 300px; }
+.instrument.is-apparatus { flex: 0 1 auto; }
+
+/* The apparatus band sits on its own ground so the eye reads it as machinery
+   rather than as more findings. */
+.instrument.is-apparatus {
+  border-top: 1px solid var(--rule); margin-top: -1px;
+}
+
+/* --- The bar is a gauge, not a rule -------------------------------------- */
+
+/* At 3px and 300px wide the duration bar read as a stray horizontal rule under
+   the row. Narrowing the column lets the number lead and gives the bar back its
+   job, which is the staircase silhouette down the page. */
+.wall-head, .row {
+  grid-template-columns: 28px 300px minmax(340px, 1fr) 108px 168px 96px;
+}
+.track { height: 4px; background: var(--rule); }
+.days { min-width: 84px; }
+
+/* Wrapping plus a right border on every item left dangling verticals at the end
+   of each line. Space separates them; a rule is not needed twice. */
+.instrument.is-apparatus { border-right: none; margin-right: 40px; }
+.instrument.is-lead { border-right: 1px solid var(--rule); }
+.instrument.is-lead + .instrument.is-lead { border-right: none; }

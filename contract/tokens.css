@@ -37,12 +37,23 @@
 
   --font-prose:    "Public Sans", system-ui, sans-serif;
   --font-machine:  "IBM Plex Mono", ui-monospace, monospace;
+
+  /* Display steps. Rationed: see the scale note below. */
+  --type-display:  56px;
+  --type-figure:   40px;
 }
 
 /* Scales, used without exception.
-   Type   10 11 12 14 15 16 20 28
+   Type   10 11 12 14 15 16 20 28 · 40 56 for display only
    Space  4 8 12 16 24 32 48
-   Weight 400 and 700 only. Nothing lighter than 400. */
+   Weight 400 and 700 only. Nothing lighter than 400.
+
+   The scale stopped at 28, which is why every figure on the page had the same
+   visual weight: the headline finding was set at the same size as the credit
+   count. A ledger needs somewhere for the eye to land, so two display steps are
+   added and rationed. 56 is spent only on the two figures the project is willing
+   to be judged on, and 40 only on the day counter, which is the sentence the
+   whole project is making: how long this has been on sale. */
 
 html { font-variant-numeric: tabular-nums; }
 *, *::before, *::after { border-radius: 0; box-shadow: none; }
