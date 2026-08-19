@@ -787,3 +787,11 @@ details.machinery th { color: var(--ink-3); font-weight: 400; }
   font-size: 13px; letter-spacing: 0.02em;
 }
 .attest-chip { line-height: 1.6 }
+
+/* The verdict badge is right-aligned in the last grid column, and the row had no
+   horizontal padding, so it sat hard against the edge of its own surface with the
+   timestamp underneath it. Both the header and the rows take the same inset or
+   the columns stop lining up. */
+.wall-head, .row { padding-left: 22px; padding-right: 22px; }
+.sort-note { padding-left: 22px; padding-right: 22px; }
+.receipt { padding-left: 22px; padding-right: 22px; }
