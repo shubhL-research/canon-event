@@ -18,6 +18,11 @@ echo
 echo "== identifier extractor =="
 python3 extract/test_identifier.py
 echo
+echo "== collection: the RED gate and the contract boundary =="
+python3 collect/test_adjudicate.py
+echo
+python3 collect/test_normalise.py
+echo
 echo "== wall renderer, headless =="
 node test_render.js
 echo
