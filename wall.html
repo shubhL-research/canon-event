@@ -29,13 +29,26 @@
      Everything a stranger needs in five seconds. -->
 <section class="act act-finding" id="verdict"></section>
 
+<!-- The act rail.
+     The page is one document by design: a report is read top to bottom, and a
+     single citable URL holding the whole finding is a feature rather than a
+     limitation. But there was no way to tell where you were in it, which is what
+     made a sequence feel like a dump. This is wayfinding, not routing — no build
+     step, no router, and the file still opens from a plain copy of the folder. -->
+<nav class="rail" id="rail" aria-label="Sections">
+  <a href="#actFigures"><span class="rail-dot"></span><span class="rail-num">01</span><span class="rail-label">What we found</span></a>
+  <a href="#actLedger"><span class="rail-dot"></span><span class="rail-num">02</span><span class="rail-label">Every recall</span></a>
+  <a href="#method"><span class="rail-dot"></span><span class="rail-num">03</span><span class="rail-label">How we know</span></a>
+  <a href="#actGaps"><span class="rail-dot"></span><span class="rail-num">04</span><span class="rail-label">What we missed</span></a>
+</nav>
+
 <div class="shell">
 
   <!-- ACT II — the two figures, in plain English.
        The confidence intervals and the method names live in ACT IV. A reader who
        does not know what a Wilson interval is should still be able to leave with
        the finding. -->
-  <section class="act act-figures" aria-labelledby="figuresHead">
+  <section class="act act-figures" id="actFigures" aria-labelledby="figuresHead">
     <h2 class="act-head" id="figuresHead">
       <span class="act-num">01</span> What the sweep found
     </h2>
@@ -44,7 +57,7 @@
   </section>
 
   <!-- ACT III — the ledger. Five columns, not ten. -->
-  <section class="act act-ledger" aria-labelledby="ledgerHead">
+  <section class="act act-ledger" id="actLedger" aria-labelledby="ledgerHead">
     <h2 class="act-head" id="ledgerHead">
       <span class="act-num">02</span> Every recall, and what we found on sale
     </h2>
@@ -87,7 +100,7 @@
   </section>
 
   <!-- ACT V — the other half of the measurement. -->
-  <section class="act act-gaps" aria-labelledby="gapsHead">
+  <section class="act act-gaps" id="actGaps" aria-labelledby="gapsHead">
     <h2 class="act-head" id="gapsHead">
       <span class="act-num">04</span> What we did not see, and what we refused
     </h2>

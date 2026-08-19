@@ -795,3 +795,50 @@ details.machinery th { color: var(--ink-3); font-weight: 400; }
 .wall-head, .row { padding-left: 22px; padding-right: 22px; }
 .sort-note { padding-left: 22px; padding-right: 22px; }
 .receipt { padding-left: 22px; padding-right: 22px; }
+
+/* --- the act rail -------------------------------------------------------- */
+
+/* Wayfinding for a document that is deliberately one page. Fixed to the left
+   edge, hidden while ACT I is on screen because the finding should arrive with
+   nothing beside it, and hidden again in the footer where there is nowhere left
+   to go. Labels appear on hover so the resting state is four marks and a number,
+   which is orientation without furniture. */
+.rail {
+  position: fixed; left: 0; top: 50%; transform: translateY(-50%);
+  z-index: 4; display: flex; flex-direction: column; gap: 2px;
+  padding: 12px 0 12px 20px;
+  opacity: 0; pointer-events: none;
+  transition: opacity 320ms var(--ease);
+}
+body.rail-on .rail { opacity: 1; pointer-events: auto; }
+
+.rail a {
+  display: flex; align-items: center; gap: 10px;
+  padding: 7px 14px 7px 0; text-decoration: none; color: var(--ink-3);
+  transition: color var(--t-state) var(--ease);
+}
+.rail a:hover { color: var(--ink); }
+.rail-dot {
+  flex: none; width: 7px; height: 7px; border: 1.5px solid currentColor;
+  transition: background-color var(--t-state) var(--ease),
+              transform var(--t-state) var(--ease);
+}
+.rail-num {
+  font-family: var(--font-machine); font-size: 10px; letter-spacing: 0.08em;
+}
+.rail-label {
+  font-family: var(--font-machine); font-size: 10px; letter-spacing: 0.06em;
+  text-transform: uppercase; white-space: nowrap;
+  max-width: 0; overflow: hidden; opacity: 0;
+  transition: max-width 260ms var(--ease), opacity 200ms var(--ease);
+}
+.rail:hover .rail-label { max-width: 180px; opacity: 1; }
+
+/* The act you are reading. Red, because it is the only place on the page where
+   red means "here" rather than "hazard" — and it is a 7px square, which is not
+   competing with anything. */
+.rail a.is-here { color: var(--ink); }
+.rail a.is-here .rail-dot { background: var(--hazard); border-color: var(--hazard); }
+.rail a:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+
+@media (max-width: 1279px) { .rail { display: none } }

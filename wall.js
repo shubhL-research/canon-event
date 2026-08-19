@@ -695,6 +695,7 @@
     renderProvenance(doc);
 
     animate();
+    rail();
 
     if (doc.global_blackout && doc.global_blackout.fired) {
       document.querySelectorAll(".instrument").forEach(function (n) { n.classList.add("is-struck"); });
@@ -757,6 +758,51 @@
       if (p < 1) requestAnimationFrame(step);
     }
     requestAnimationFrame(step);
+  }
+
+  /* The rail tracks which act is being read, and hides itself where it would be
+     noise: over ACT I, because the finding arrives alone, and in the footer,
+     because there is nowhere left to go. */
+  function rail() {
+    var nav = el("rail");
+    if (!nav || !("IntersectionObserver" in window)) return;
+
+    var links = [].slice.call(nav.querySelectorAll("a"));
+    var byId = {};
+    links.forEach(function (a) { byId[a.getAttribute("href").slice(1)] = a; });
+
+    function show(on) { document.body.classList.toggle("rail-on", on); }
+
+    // The finding owns the first screen, so the rail waits until it is scrolled
+    // past, and stands down again once the footer is reached.
+    var finding = document.querySelector(".act-finding");
+    if (finding) {
+      new IntersectionObserver(function (entries) {
+        entries.forEach(function (e) { show(!e.isIntersecting); });
+      }, { threshold: 0.35 }).observe(finding);
+    }
+    var foot = document.querySelector(".act-foot");
+    if (foot) {
+      new IntersectionObserver(function (entries) {
+        entries.forEach(function (e) { if (e.isIntersecting) show(false); });
+      }, { threshold: 0.2 }).observe(foot);
+    }
+
+    // Mark whichever act occupies the reading band. The margins narrow the
+    // viewport to its middle third so the highlight changes when a section
+    // becomes what you are reading, not when it first appears at the edge.
+    var here = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (!e.isIntersecting) return;
+        links.forEach(function (a) { a.classList.remove("is-here"); });
+        if (byId[e.target.id]) byId[e.target.id].classList.add("is-here");
+      });
+    }, { rootMargin: "-40% 0px -55% 0px", threshold: 0 });
+
+    Object.keys(byId).forEach(function (id) {
+      var node = document.getElementById(id);
+      if (node) here.observe(node);
+    });
   }
 
   function animate() {
