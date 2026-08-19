@@ -27,6 +27,9 @@ echo
 echo "== sweep: adapter, arm combination, detectors, all offline =="
 python3 collector/test_sweep.py
 echo
+echo "== hand-verification worksheet =="
+python3 golden/grade.py
+echo
 echo "== wall renderer, headless =="
 node test_render.js
 echo
