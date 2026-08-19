@@ -37,9 +37,13 @@ proxy detail.** That is the part a curl loop cannot reproduce at any price.
 | Interface, all states | Complete |
 | Statistics and identifier extraction | Complete, tested |
 | Structured output and validation | Complete |
-| **Live collectors** | **Not built yet** |
-| **Real measurements** | **Not taken yet** |
-| Self-healing loop | Not built yet |
+| Corpus, 207 notices from two regulators | Complete, zero credits |
+| Collection path: adapter, gate, detectors, sweep | Complete, tested offline |
+| Live collector, DE | Built and healed, returning real rows |
+| Live collectors, US and IN | Building |
+| Self-healing loop | Exercised: one heal refused, one approved |
+| **Full three-arm sweep** | **Not run yet** |
+| **Real measurements on the wall** | **Not taken yet** |
 
 **Every number currently shown on the wall is fixture data and is stamped as such on screen.** The
 recall notices, hazard sentences, model numbers, GTINs and publication dates inside those fixtures
@@ -74,6 +78,32 @@ recalls of age *t* are still buyable today", not "what happens to a recall as it
 model years, package dimensions. That inflated the searchable population and so **deflated** the
 unsearchable rate, against our own headline. Fixed in `extract/identifier.py`, with those 12 real
 values as a regression suite.
+
+**Currency does not prove which country answered, and we assumed it did.** The plan rested on the
+storefront's currency symbol as the in-page attestation of the exit market. A heal preview on 19
+August returned a fully Danish page from `amazon.de` — "På lager", "Tilføj til indkøbskurv" —
+quoting EUR. The currency was correct and the market was not, because `amazon.de` quotes EUR to
+every visitor from every exit. **A currency check cannot separate a German session from a Danish
+one, and the entire three-arm comparison rests on that separation.** Page language is now the
+attestation and currency is corroboration; the collectors emit `page_language` from the page's own
+`lang` attribute. The buy-control check happened to catch this case because the Danish label is not
+in the German list, but luck is not a control. Written up in `heals/2026-08-19-de-001.md`, which is
+a refusal rather than a repair.
+
+**Six of the Safety Gate GTINs are not GTINs.** Of the 104 notices in the corpus carrying a `gtin`
+field, six hold a value that fails its own modulo-10 check digit, at lengths 9, 10, 12 and 14. The
+notifying country types into a free-text barcode box. They are refused as unassertable rather than
+matched, because a ten-digit number searched against a retail page is a false accusation waiting to
+happen. Same class of error as the identifier rule below, found in a different field, and it moves
+the unsearchable rate the same direction: **up, against our own headline.**
+
+**The three arms are three different marketplaces, so country and marketplace are confounded.**
+`kaufland.de`, `amazon.com`, `amazon.in`. Bright Data's own documentation states the AI Agent works
+best on regional ecommerce and that the large marketplaces are covered by pre-built scrapers the
+rules disqualify, and `amazon.de` did in fact require two heals before it would open a product page
+at all. A cross-arm difference therefore cannot be attributed to the country alone. The
+within-country measure — is this recalled product buyable in this market, right now — is unaffected,
+and it is the one the headline makes.
 
 **Border escape has no input data yet.** It compares EU-recalled products against a non-EU
 marketplace, and the corpus is currently CPSC-only. The measure renders as `PENDING` with the
