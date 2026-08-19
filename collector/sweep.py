@@ -78,15 +78,15 @@ ARM_SEARCH = {
 # publishing them is what lets a judge re-run any figure on this wall against the
 # same scraper that produced it.
 #
-# The US entry is the arm that does not work. Its heal was refused for returning
-# rows containing only a URL (heals/2026-08-19-us-001.md), so it sits on its
-# original template, which cannot open a search page. It is listed rather than
-# quietly omitted, because an arm missing from a config file is invisible and an
-# arm reporting WITHHELD is a measurement.
+# All three measure. The US arm was recorded as broken for several hours on the
+# strength of a wait_element_timeout, which turned out to be the collector working
+# correctly on a query that could not succeed: we were searching amazon.com for a
+# barcode. With the query fixed it returns 1,636 rows across 24 search pages with
+# zero errors. The correction is at the end of heals/2026-08-19-us-001.md.
 COLLECTORS = {
     "DE": "c_mt00jidz6zhqjbpew",   # kaufland.de, built clean, first try
     "IN": "c_mt03cj5z2fo651wy8q",  # flipkart.com, built clean, first try
-    "US": "c_mt01usw31e8y5ubqjs",  # amazon.com, broken, heal refused
+    "US": "c_mt01usw31e8y5ubqjs",  # amazon.com, one refused heal, measures
 }
 
 # amazon.de, healed twice and approved. Held separately because it is a SECOND
