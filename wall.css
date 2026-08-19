@@ -398,241 +398,392 @@ details.machinery th { color: var(--ink-3); font-weight: 400; }
   line-height: 1.5;
 }
 
-/* ------------------------------------------------ sort order, stated on screen
-
-   The ledger is sorted findings-first rather than by age alone. Printing the
-   order where the columns are named is the condition on reordering at all: a
-   reader who can see the sort can check it, and one who cannot has to trust it. */
-.sort-note {
-  font-family: var(--font-machine); font-size: 10px; letter-spacing: 0.08em;
-  text-transform: uppercase; color: var(--ink-3);
-  margin: 0; padding: 6px 32px 10px;
-}
-
-/* ------------------------------------------------------- blackout, the ledger
-
-   When implausible cleanliness fires, every figure is struck and every arm goes
-   black. The rows used to keep rendering as though nothing had happened, which
-   is the one thing this state exists to prevent.
-
-   They are not deleted: a reader needs to see what the last corroborated sweep
-   found, and removing them would be a different kind of lie. They are hatched
-   and desaturated, the same treatment STALE gives historical rows, with the
-   reason written out above them rather than left to be inferred. */
-.historical-note {
-  display: none; margin: 0; padding: 10px 32px 14px;
-  font-family: var(--font-machine); font-size: 11px; line-height: 1.5;
-  color: var(--ink-2); border-top: 1px solid var(--rule);
-  background: var(--surface-sunk);
-}
-body.is-blackout .historical-note { display: block; }
-
-body.is-blackout #wall .row {
-  background-image: repeating-linear-gradient(45deg,
-    var(--surface), var(--surface) 2px, var(--hatch) 2px, var(--hatch) 4px);
-}
-/* The tier chip is the strongest claim on a row, so it is the one that must stop
-   asserting. Struck, not hidden: the row still says what it once found. */
-body.is-blackout #wall .tier-box {
-  color: var(--unknown); border-color: var(--unknown);
-  text-decoration: line-through; background: transparent;
-}
-body.is-blackout #wall .name,
-body.is-blackout #wall .quote { color: var(--ink-2); }
-/* A filled red day bar reads as a live measurement at a glance. Nothing on this
-   page is live while the board is black. */
-body.is-blackout #wall .track > i { background: var(--hatch); }
-body.is-blackout #wall .chip.v-RED { background: var(--unknown); border-color: var(--unknown); }
-
 /* ============================================================================
-   EDITORIAL PASS
+   DESIGN LAYER — five acts, not one plane
    ----------------------------------------------------------------------------
-   The wall worked and read as a dashboard. Everything carried the same visual
-   weight: eight instruments in a uniform row, forty rows each with a full-width
-   red bar, every panel in a 1px box, every label in the same uppercase mono. Red
-   appeared on tier chips, day bars, arm chips, contamination notes and eyebrows
-   at once, which is the same as red appearing nowhere.
+   Everything above this line is the contract's visual states: which colour a
+   withheld arm is, how a stale row hatches, what MISSING looks like. Those are
+   decisions the data makes and they do not change.
 
-   The register this project actually belongs to is not a dashboard. It is an
-   exhibit in an inquiry: a document that states findings, names its own limits,
-   and refuses to release what it cannot stand behind. Three moves, no new
-   colours and no new typefaces.
+   Everything below is the editorial treatment: what a reader meets first, what
+   they meet only if they ask, and how the page moves while they arrive.
 
-   1. RED IS RATIONED. Red now marks an accusation and nothing else: the tier
-      chip and a reddened arm. Duration bars keep red — length is Shubh's
-      encoding and it is a real one — but drop from 10px to 3px, so the
-      staircase silhouette survives at a fraction of the ink.
+   THE PROBLEM THIS SOLVES
+   The page was written for its author. Every field was on screen because it was
+   defensible, not because it was legible, so three audiences were flattened onto
+   one plane at once: a stranger who needs one sentence, a judge who needs the
+   finding and the method, and an auditor who needs a DOM path and a content
+   hash. The auditor's fields were arriving first, unexplained.
 
-   2. THE DAY COUNTER IS THE SENTENCE. "714 days" is the finding; it was set at
-      16px beside a bar that, for the top five rows, was identically full. It now
-      carries the row.
-
-   3. WITHHELD IS REDACTED, NOT GREYED. A struck grey number reads as a styling
-      state. A redaction reads as a decision, which is what it is. See below.
+   So the page is now five acts. Nothing is deleted. Everything that was on the
+   first screen is still in the document, further down, behind a heading that
+   says who it is for.
    ========================================================================== */
 
-/* --- 1. Red, rationed ---------------------------------------------------- */
+/* --- shell, rhythm ------------------------------------------------------- */
 
-/* The bar still encodes duration by length. It no longer competes with the
-   accusation for the reader's attention. */
-.track { height: 3px; }
-.row.is-amber .track > i { background: var(--rule-strong); }
+.shell { max-width: 1380px; margin: 0 auto; padding: 0 40px 120px; }
 
-/* Row hover was a red wash across the full width, which on a page of forty rows
-   turned every pointer movement into an alarm. */
-.row:hover { background: var(--surface-sunk); }
-.row.is-amber:hover { background: var(--surface-sunk); }
-
-/* --- 2. The day counter carries the row ---------------------------------- */
-
-.row { height: 76px; }
-.days {
-  font-size: var(--type-figure); font-weight: 700; line-height: 1;
-  min-width: 72px; letter-spacing: -0.02em;
+.act { padding: 96px 0 0; }
+.act-head {
+  display: flex; align-items: baseline; gap: 16px;
+  font-family: var(--font-display); font-variation-settings: "wdth" 104;
+  font-size: 20px; font-weight: 700; letter-spacing: -0.01em;
+  padding-bottom: 20px; border-bottom: 2px solid var(--rule-ink);
 }
-/* The unit belongs with the number, small, so the figure reads as a duration
-   rather than as an unlabelled quantity. */
+/* The act numbers are a real sequence: a reader moves through finding, ledger,
+   method, gaps in that order, and each one presumes the one before it. */
+.act-num {
+  font-family: var(--font-machine); font-size: 11px; font-weight: 500;
+  color: var(--hazard); letter-spacing: 0.1em;
+}
+.act-lede {
+  margin: 20px 0 0; max-width: 62ch; font-size: 15px; line-height: 1.55;
+  color: var(--ink-2);
+}
+.act-jump {
+  display: inline-block; margin-top: 32px; font-family: var(--font-machine);
+  font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--ink-2); text-decoration: none;
+  border-bottom: 1px solid var(--rule-strong); padding-bottom: 3px;
+  transition: color var(--t-state) var(--ease), border-color var(--t-state) var(--ease);
+}
+.act-jump:hover { color: var(--hazard); border-color: var(--hazard); }
+
+/* --- the corner mark ----------------------------------------------------- */
+
+.mark {
+  position: absolute; top: 0; left: 0; right: 0; z-index: 3;
+  display: grid; grid-template-columns: auto 1fr auto; align-items: start;
+  gap: 20px; padding: 28px 40px; color: var(--ink-inv);
+  mix-blend-mode: difference;   /* legible over the black act and the paper */
+}
+.mark-name {
+  font-family: var(--font-display); font-variation-settings: "wdth" 118;
+  font-size: 14px; font-weight: 700; letter-spacing: 0.06em;
+}
+.mark-name span { color: var(--hazard); }
+.mark-role, .mark-independence {
+  font-family: var(--font-machine); font-size: 10px; letter-spacing: 0.08em;
+  text-transform: uppercase; opacity: 0.7; line-height: 1.5;
+}
+.mark-independence { text-align: right; max-width: 34ch; text-transform: none; letter-spacing: 0; }
+
+/* --- ACT I: the finding -------------------------------------------------- */
+
+.act-finding {
+  background: var(--void); color: var(--ink-inv);
+  min-height: 92vh; padding: 0;
+  display: grid; align-content: center;
+}
+.act-finding > .finding-inner {
+  max-width: 1380px; margin: 0 auto; padding: 0 40px; width: 100%;
+}
+.withheld-mark {
+  display: inline-flex; align-items: center; gap: 10px;
+  font-family: var(--font-machine); font-size: 11px; font-weight: 500;
+  letter-spacing: 0.16em; color: var(--hazard); text-transform: uppercase;
+}
+/* A live indicator that is not green, because nothing here is ever green. The
+   pulse says the page is reporting; it does not say the news is good. */
+.withheld-mark::before {
+  content: ""; width: 7px; height: 7px; background: var(--hazard);
+  animation: pulse 2.4s var(--ease) infinite;
+}
+@keyframes pulse { 0%,100% { opacity: 1 } 50% { opacity: 0.25 } }
+
+.act-finding h1 {
+  font-family: var(--font-display); font-variation-settings: "wdth" 100;
+  font-size: var(--type-hero); font-weight: 700; letter-spacing: -0.03em;
+  line-height: 1.02; margin: 28px 0 0; max-width: 26ch;
+  text-wrap: balance;
+}
+/* The day count inside the sentence is the finding. It gets the width axis and
+   the only red on this screen. */
+.act-finding h1 .count {
+  color: var(--hazard); font-variation-settings: "wdth" 118;
+  font-variant-numeric: tabular-nums;
+}
+.act-finding .sub {
+  margin: 32px 0 0; max-width: 56ch; font-size: 17px; line-height: 1.5;
+  color: #C9CDD1;
+}
+.act-finding .clause {
+  margin: 16px 0 0; font-family: var(--font-machine); font-size: 11px;
+  line-height: 1.6; color: #7C858D; max-width: 72ch;
+}
+.scroll-cue {
+  margin-top: 56px; font-family: var(--font-machine); font-size: 10px;
+  letter-spacing: 0.16em; text-transform: uppercase; color: #6B747C;
+  display: flex; align-items: center; gap: 10px;
+}
+.scroll-cue::after {
+  content: ""; width: 1px; height: 28px; background: #3A4148;
+  animation: drop 2.6s var(--ease) infinite;
+}
+@keyframes drop {
+  0% { transform: scaleY(0); transform-origin: top }
+  55% { transform: scaleY(1); transform-origin: top }
+  56% { transform-origin: bottom }
+  100% { transform: scaleY(0); transform-origin: bottom }
+}
+
+/* --- ACT II: two figures, plain English ---------------------------------- */
+
+.figures {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+  gap: 1px; background: var(--rule); margin-top: 48px;
+}
+.figure {
+  background: var(--surface); padding: 44px 40px 40px;
+  display: flex; flex-direction: column; gap: 0;
+}
+.figure-value {
+  font-family: var(--font-display); font-variation-settings: "wdth" 112;
+  font-size: var(--type-display); font-weight: 700; line-height: 0.94;
+  letter-spacing: -0.035em;
+}
+/* The sentence, not the label. A reader should be able to read the figure and
+   the line beneath it aloud and have said something true. */
+.figure-claim {
+  margin-top: 20px; font-size: 19px; line-height: 1.35; max-width: 26ch;
+  color: var(--ink); font-weight: 600; letter-spacing: -0.01em;
+}
+.figure-basis {
+  margin-top: auto; padding-top: 24px; font-family: var(--font-machine);
+  font-size: 11px; line-height: 1.6; color: var(--ink-3);
+}
+/* A withheld figure is redacted, never greyed. The number was computed and we
+   decline to stand behind it, which is a decision and not a missing value. */
+.figure.is-withheld .figure-value {
+  position: relative; color: transparent; background: var(--void);
+  display: inline-block; padding: 0 16px; user-select: none;
+  font-size: var(--type-figure);
+}
+.figure.is-withheld .figure-value::after {
+  content: "WITHHELD"; position: absolute; inset: 0; display: grid;
+  place-items: center; font-family: var(--font-machine); font-size: 13px;
+  font-weight: 500; letter-spacing: 0.16em; color: var(--void-ink);
+}
+.figure.is-pending .figure-value { color: var(--unknown); font-size: var(--type-figure); }
+
+/* --- ACT III: the ledger ------------------------------------------------- */
+
+/* Five columns, not ten. The model number, the GTIN, the notice reference and
+   the publication date were on every collapsed row; a reader scanning for a
+   hazard does not need any of them, and all four are one click away. */
+.wall-head, .row {
+  grid-template-columns: 34px minmax(220px, 1fr) minmax(320px, 1.5fr) 108px 190px 92px;
+  gap: 20px;
+}
+.wall-head {
+  padding: 32px 0 10px; border-bottom: 1px solid var(--rule-strong);
+  align-items: end;
+}
+.wall-head span { font-size: 10px; letter-spacing: 0.1em; color: var(--ink-3); }
+
+.row {
+  height: auto; min-height: 84px; padding: 18px 0;
+  border-bottom: 1px solid var(--rule); background: var(--surface);
+  transition: background-color var(--t-state) var(--ease);
+}
+.row:hover, .row.is-amber:hover { background: var(--surface-raised); }
+.row.is-amber { background: var(--surface); }
+/* An excluded row is quieter than a finding, but it is not hidden: the AMBER
+   rows are the ones carrying "we could not confirm this". */
+.row.is-amber .name { color: var(--ink-2); }
+
+.c-id .name { font-size: 16px; line-height: 1.25; white-space: normal; overflow: visible; }
+.c-id .ident { margin-top: 5px; font-size: 11px; color: var(--ink-3); }
+.c-hazard .quote { font-size: 14px; line-height: 1.45; color: var(--ink-2); }
+.c-hazard .src { display: none; }   /* moved into the open row */
+
+.chips { gap: 5px; }
+.chip { width: 30px; height: 20px; font-size: 10px; }
+
+.c-bar { gap: 18px; }
+.track { height: 4px; background: var(--rule); }
+.row.is-amber .track > i { background: var(--rule-strong); }
+.days {
+  font-family: var(--font-display); font-variation-settings: "wdth" 112;
+  font-size: var(--type-figure); font-weight: 700; line-height: 1;
+  min-width: 92px; letter-spacing: -0.03em;
+}
 .days::after {
-  content: " d"; font-size: 12px; font-weight: 400; color: var(--ink-3);
-  letter-spacing: 0;
+  content: " d"; font-family: var(--font-machine); font-size: 11px;
+  font-weight: 400; color: var(--ink-3); letter-spacing: 0;
 }
 .days.frozen::after { content: " d ❄"; }
-.c-bar { gap: 16px; }
 
-/* --- 3. Redaction, the signature ---------------------------------------- */
+.tier-box { font-size: 10px; padding: 2px 6px; letter-spacing: 0.08em; }
 
-/* A contaminated figure is not unknown. It was computed, and we decline to
-   publish it, which is a different fact and deserves a different mark.
-   The number stays in the DOM: the claim is "we will not release this", not
-   "this does not exist", and a reader inspecting the page should find it there.
-   It cannot be revealed by hovering. A document that hides a figure behind an
-   interaction is still publishing it. */
-.instrument.is-struck .value {
-  position: relative; color: transparent; text-decoration: none;
-  background: var(--void); display: inline-block; padding: 0 8px;
-  user-select: none;
-}
-.instrument.is-struck .value::after {
-  content: "WITHHELD"; position: absolute; inset: 0;
-  display: grid; place-items: center;
-  font-family: var(--font-machine); font-size: 10px; letter-spacing: 0.12em;
-  color: var(--void-ink);
-}
-/* The reason sits in the qualifier, in ink rather than in red: it explains a
-   figure, it does not accuse anyone. */
-.instrument.is-struck .qualifier::after {
-  content: " · withheld, contaminated by an unhealed arm";
-  color: var(--ink-3);
-}
-
-/* --- Hierarchy: two figures the project stands behind -------------------- */
-
-/* Eight equal instruments meant the headline finding and the credit count were
-   set identically. The two figures below are the ones the project is willing to
-   be judged on: what share is still buyable, and what share it could never
-   check. Everything else is apparatus and reads as apparatus. */
-.instruments { align-items: stretch; }
-.instrument.is-lead {
-  min-width: 320px; padding: 32px 32px 32px 0; margin-right: 32px;
-}
-.instrument.is-lead .value {
-  font-size: var(--type-display); line-height: 0.95; letter-spacing: -0.03em;
-  margin-top: 8px; font-family: var(--font-prose);
-}
-.instrument.is-lead .label { font-size: 11px; letter-spacing: 0.14em; }
-.instrument.is-lead .qualifier { font-size: 12px; margin-top: 8px; max-width: 34ch; }
-.instrument.is-lead.is-struck .value { font-size: 28px; }
-
-/* Apparatus: smaller, quieter, and it wraps rather than demanding a column. */
-.instrument.is-apparatus { min-width: 0; padding: 16px 20px 16px 0; margin-right: 20px; }
-.instrument.is-apparatus .value { font-size: 14px; }
-.instrument.is-apparatus .label { font-size: 10px; color: var(--ink-3); }
-.instrument.is-apparatus .qualifier { font-size: 10px; font-family: var(--font-machine); }
-
-/* --- Boxes off ---------------------------------------------------------- */
-
-/* Two bordered cards side by side is the shape of a dashboard. A rule and space
-   say the same thing without drawing a frame around every thought. */
-.panels { grid-template-columns: 1.05fr 1fr; gap: 56px; margin-top: 64px; }
-.panel {
-  border: none; background: transparent; padding: 0;
-  border-top: 2px solid var(--ink); padding-top: 20px;
-}
-.panel h2 { letter-spacing: 0.14em; }
-.panel .lede { max-width: 46ch; }
-
-/* --- Masthead: the document says what it is ----------------------------- */
-
-.masthead { align-items: baseline; }
-.exhibit {
-  font-family: var(--font-machine); font-size: 10px; letter-spacing: 0.14em;
-  color: var(--ink-3); text-transform: uppercase; margin-top: 6px;
-}
-
-/* --- Two bands, not one ragged row --------------------------------------- */
-
-/* The leads and the apparatus were flowing in the same flex line, so BORDER
-   ESCAPE was pulled up beside the two figures and CREDITS was orphaned on a line
-   of its own. Giving each lead a 46% basis forces the apparatus to wrap as a
-   block, which produces two bands: what the project claims, then how it knows. */
-.instruments { row-gap: 0; }
-.instrument.is-lead { flex: 0 1 46%; min-width: 300px; }
-.instrument.is-apparatus { flex: 0 1 auto; }
-
-/* The apparatus band sits on its own ground so the eye reads it as machinery
-   rather than as more findings. */
-.instrument.is-apparatus {
-  border-top: 1px solid var(--rule); margin-top: -1px;
-}
-
-/* --- The bar is a gauge, not a rule -------------------------------------- */
-
-/* At 3px and 300px wide the duration bar read as a stray horizontal rule under
-   the row. Narrowing the column lets the number lead and gives the bar back its
-   job, which is the staircase silhouette down the page. */
-.wall-head, .row {
-  grid-template-columns: 28px 300px minmax(340px, 1fr) 108px 168px 96px;
-}
-.track { height: 4px; background: var(--rule); }
-.days { min-width: 84px; }
-
-/* Wrapping plus a right border on every item left dangling verticals at the end
-   of each line. Space separates them; a rule is not needed twice. */
-.instrument.is-apparatus { border-right: none; margin-right: 40px; }
-.instrument.is-lead { border-right: 1px solid var(--rule); }
-.instrument.is-lead + .instrument.is-lead { border-right: none; }
-
-/* --- The row says that it opens ------------------------------------------ */
-
-/* The evidence card was reachable only by guessing that rows were clickable.
-   A reader who never guesses sees a table of assertions and no evidence, which
-   inverts the point of the project: the acceptance test for a row is that
-   someone can check it, so the check has to be visible rather than found.
-
-   The mark sits in the gutter under the row number, because that column already
-   belongs to the row's identity rather than to its content. */
-.c-gutter { position: relative; }
+/* The row says that it opens. Without this the evidence card — the strongest
+   thing on the page — was reachable only by guessing. */
+.c-gutter { position: relative; font-size: 11px; }
 .open-mark {
-  display: block; width: 7px; height: 7px; margin: 6px 0 0 auto;
+  display: block; width: 7px; height: 7px; margin: 8px 0 0 auto;
   border-right: 1.5px solid var(--rule-strong);
   border-bottom: 1.5px solid var(--rule-strong);
   transform: rotate(45deg);
-  transition: transform 140ms ease, border-color 140ms ease;
+  transition: transform var(--t-state) var(--ease), border-color var(--t-state) var(--ease);
 }
-.row:hover .open-mark, .row:focus-visible .open-mark {
-  border-color: var(--ink);
+.row:hover .open-mark, .row:focus-visible .open-mark { border-color: var(--ink); }
+.row.is-open .open-mark { transform: rotate(-135deg); border-color: var(--hazard); }
+.row.is-open { background: var(--surface-raised); border-bottom-color: var(--rule-ink); }
+.row:focus-visible { outline: 2px solid var(--focus); outline-offset: -2px; }
+
+.sort-note {
+  font-family: var(--font-machine); font-size: 10px; letter-spacing: 0.08em;
+  text-transform: uppercase; color: var(--ink-3); margin: 0; padding: 10px 0 14px;
 }
-.row.is-open .open-mark {
-  transform: rotate(-135deg); border-color: var(--ink);
+
+/* --- ACT IV: apparatus --------------------------------------------------- */
+
+/* Six apparatus cells, three across, so the grid fills exactly two rows. An
+   auto-fit track left empty cells showing the 1px divider ground through, which
+   reads as a rendering fault rather than as space. */
+.instruments {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 1px; background: var(--rule); margin-top: 48px; border: none;
 }
-/* An open row is the head of the card below it, so it stops looking like a
-   sibling of the rows above. */
-.row.is-open { background: var(--surface-sunk); border-bottom-color: var(--ink); }
+@media (max-width: 1023px) { .instruments { grid-template-columns: repeat(2, 1fr) } }
+.instrument {
+  background: var(--surface); padding: 24px 24px 26px; margin: 0;
+  border: none; min-width: 0;
+}
+.instrument .label {
+  font-family: var(--font-machine); font-size: 10px; letter-spacing: 0.1em;
+  color: var(--ink-3); text-transform: uppercase;
+}
+.instrument .value {
+  font-family: var(--font-display); font-variation-settings: "wdth" 108;
+  font-size: 24px; font-weight: 700; margin-top: 10px; letter-spacing: -0.02em;
+}
+.instrument .qualifier {
+  margin-top: 10px; font-family: var(--font-machine); font-size: 10px;
+  line-height: 1.6; color: var(--ink-3);
+}
+.instrument.is-struck .value {
+  position: relative; color: transparent; text-decoration: none;
+  background: var(--void); display: inline-block; padding: 0 10px;
+  font-size: 18px; user-select: none;
+}
+.instrument.is-struck .value::after {
+  content: "WITHHELD"; position: absolute; inset: 0; display: grid;
+  place-items: center; font-family: var(--font-machine); font-size: 10px;
+  letter-spacing: 0.14em; color: var(--void-ink);
+}
+.instrument.is-struck .qualifier::after {
+  content: " · withheld, contaminated by an unhealed collector"; color: var(--ink-3);
+}
+.instrument.is-pending .value { color: var(--unknown); font-size: 18px; }
+
+.arm-rail { margin-top: 40px; border: none; }
+.arm { padding: 24px 24px 22px; min-height: 148px; }
+
+/* --- ACT V: gaps -------------------------------------------------------- */
+
+.panels { grid-template-columns: 1.05fr 1fr; gap: 64px; margin-top: 48px; }
+.panel {
+  border: none; background: transparent; padding: 0;
+  border-top: 2px solid var(--rule-ink); padding-top: 22px;
+}
+.panel h2 { font-family: var(--font-display); letter-spacing: 0.04em; }
+.panel .lede { max-width: 46ch; }
+
+/* --- foot ---------------------------------------------------------------- */
+
+.act-foot { border-top: 1px solid var(--rule); margin-top: 96px; }
+.legend { margin-top: 40px; border: none; padding: 0; }
+.legend .final { font-family: var(--font-display); font-variation-settings: "wdth" 104; }
+
+/* --- arrival ------------------------------------------------------------- */
+
+/* One orchestrated sequence rather than an effect per element. The hero states
+   the finding, the figures resolve, the ledger arrives. Everything below the
+   fold reveals on approach, once, and never animates again. */
+.reveal { opacity: 0; transform: translateY(14px); }
+.reveal.is-in {
+  opacity: 1; transform: none;
+  transition: opacity var(--t-arrive) var(--ease), transform var(--t-arrive) var(--ease);
+}
+.act-finding .withheld-mark,
+.act-finding h1,
+.act-finding .sub,
+.act-finding .clause,
+.act-finding .scroll-cue { animation: rise var(--t-arrive) var(--ease) both; }
+.act-finding h1 { animation-delay: 90ms }
+.act-finding .sub { animation-delay: 220ms }
+.act-finding .clause { animation-delay: 300ms }
+.act-finding .scroll-cue { animation-delay: 420ms }
+@keyframes rise {
+  from { opacity: 0; transform: translateY(18px) }
+  to { opacity: 1; transform: none }
+}
+
+/* The redaction wipes across the figure it covers, so a reader sees the decision
+   being taken rather than finding it already made. */
+.figure.is-withheld .figure-value::before {
+  content: ""; position: absolute; inset: 0; background: var(--void);
+  transform-origin: left; animation: wipe 520ms var(--ease) both;
+  animation-delay: 260ms;
+}
+@keyframes wipe { from { transform: scaleX(0) } to { transform: scaleX(1) } }
 
 @media (prefers-reduced-motion: reduce) {
-  .open-mark { transition: none; }
+  .reveal { opacity: 1; transform: none }
+  .withheld-mark::before, .scroll-cue::after { animation: none }
 }
 
-/* Keyboard reachability is the whole reason the rows carry tabindex. It has to
-   be visible. */
-.row:focus-visible { outline: 2px solid var(--focus); outline-offset: -2px; }
+/* --- narrow ------------------------------------------------------------- */
+
+@media (max-width: 1279px) {
+  .shell { padding: 0 24px 96px }
+  .mark { padding: 20px 24px; grid-template-columns: auto 1fr; }
+  .mark-independence { display: none }
+  .act { padding-top: 64px }
+  .panels { grid-template-columns: 1fr; gap: 48px }
+  .wall-head, .row { grid-template-columns: 28px minmax(180px,1fr) 108px 150px 84px; gap: 14px }
+  .wall-head span:nth-child(3), .c-hazard { display: none }
+  .days { font-size: 28px; min-width: 74px }
+}
+
+/* A redaction covers a value, so it is the width of that value. Stretching to
+   the column made it read as a banner rather than as something laid over a
+   number. */
+.figure.is-withheld .figure-value,
+.instrument.is-struck .value { align-self: flex-start; }
+.figure { align-items: flex-start; }
+.figure-claim, .figure-basis { align-self: stretch; }
+
+/* --- the audit trail, behind a door ------------------------------------- */
+
+/* The technical fields are not hidden, they are second. A reader who wants the
+   claim gets sentences; a reader who wants to reproduce it opens this. */
+.audit { margin-top: 24px; border-top: 1px solid var(--rule); padding-top: 14px; }
+.audit > summary {
+  cursor: pointer; list-style: none;
+  font-family: var(--font-machine); font-size: 10px; letter-spacing: 0.12em;
+  text-transform: uppercase; color: var(--ink-3);
+  display: flex; align-items: center; gap: 8px;
+  transition: color var(--t-state) var(--ease);
+}
+.audit > summary::-webkit-details-marker { display: none }
+.audit > summary::before {
+  content: ""; width: 6px; height: 6px;
+  border-right: 1.5px solid currentColor; border-bottom: 1.5px solid currentColor;
+  transform: rotate(-45deg);
+  transition: transform var(--t-state) var(--ease);
+}
+.audit[open] > summary::before { transform: rotate(45deg) }
+.audit > summary:hover { color: var(--ink) }
+.audit-why {
+  margin: 12px 0 16px; font-size: 12px; line-height: 1.55; color: var(--ink-3);
+  max-width: 52ch;
+}
+
+.receipt-pane h3 {
+  font-family: var(--font-display); font-variation-settings: "wdth" 104;
+  font-size: 13px; letter-spacing: 0.02em;
+}
+.attest-chip { line-height: 1.6 }

@@ -3,79 +3,122 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>CANON EVENT</title>
+<title>CANON EVENT — recall enforcement audit</title>
 <meta name="description" content="Recalled products, checked against live marketplace listings from three residential exit IPs. When the collector breaks, the verdict is withheld.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;700&family=IBM+Plex+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=Public+Sans:wght@400;600;700&family=IBM+Plex+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="wall.css">
 </head>
 <body>
+
+<!-- The corner mark, not a masthead.
+     A wordmark, a tagline and a disclaimer side by side is the shape of a blog
+     header, and it was competing with the finding for the first thing a reader
+     sees. The finding wins; the mark shrinks to a filing stamp. -->
+<header class="mark">
+  <div class="mark-name">CANON<span>·</span>EVENT</div>
+  <div class="mark-role">Recall enforcement audit</div>
+  <div class="mark-independence">
+    Independent. Not affiliated with, endorsed by, or operated by CPSC, the EU
+    Safety Gate, or any marketplace named here.
+  </div>
+</header>
+
+<!-- ACT I — the finding, and nothing else on screen.
+     Everything a stranger needs in five seconds. -->
+<section class="act act-finding" id="verdict"></section>
+
 <div class="shell">
 
-  <header class="masthead">
-    <div>
-      <div class="wordmark">CANON<span>·</span>EVENT</div>
-      <!-- The register, stated once. This is an audit of a regulator's own
-           recalls against live marketplaces, and it is filed rather than
-           published: every figure below names the sweep that produced it. -->
-      <div class="exhibit">Recall enforcement audit · filed against the sweep named below</div>
-    </div>
-    <div class="tagline">A recall is supposed to happen in every universe. It doesn't.</div>
-    <div class="spacer"></div>
-    <div class="affiliation">
-      Independent. Not affiliated with, endorsed by, or operated by CPSC, the EU
-      Safety Gate, or any marketplace named on this page.
-    </div>
-  </header>
-
-  <section class="verdict" id="verdict"></section>
-
-  <section class="instruments" id="instruments"></section>
-
-  <section class="arm-rail" id="armRail"></section>
-
-  <div class="wall-head">
-    <span class="num">#</span>
-    <span>Identifier</span>
-    <span>Hazard, as published</span>
-    <span>Arms</span>
-    <span>Days unremedied</span>
-    <span class="num">Tier</span>
-  </div>
-  <p class="sort-note" id="sortNote"></p>
-  <p class="historical-note" id="historicalNote"></p>
-
-  <main id="wall"></main>
-  <div class="pager" id="pager"></div>
-
-  <section class="curve" id="curve"></section>
-
-  <section class="panels">
-    <div class="panel" id="notSeen"></div>
-    <div class="panel" id="healLedger"></div>
+  <!-- ACT II — the two figures, in plain English.
+       The confidence intervals and the method names live in ACT IV. A reader who
+       does not know what a Wilson interval is should still be able to leave with
+       the finding. -->
+  <section class="act act-figures" aria-labelledby="figuresHead">
+    <h2 class="act-head" id="figuresHead">
+      <span class="act-num">01</span> What the sweep found
+    </h2>
+    <div class="figures" id="figures"></div>
+    <a class="act-jump" href="#method">How these were measured ↓</a>
   </section>
 
-  <section class="legend">
-    <ul>
-      <li><span class="swatch" style="background:var(--hazard);border-color:var(--hazard)"></span>
-        <span><b>RED.</b> A recalled product with an active buy control, identifier re-asserted from the fetched page.</span></li>
-      <li><span class="swatch"></span>
-        <span><b>Hollow.</b> Arm measured, product not found.</span></li>
-      <li><span class="swatch" style="background:#000;border-color:#000"></span>
-        <span><b>Black.</b> Arm withheld. Not measured, and not clean.</span></li>
-      <li><span class="swatch" style="background:repeating-linear-gradient(45deg,#fff,#fff 2px,var(--hatch) 2px,var(--hatch) 4px)"></span>
-        <span><b>Hatched.</b> Stale beyond the freshness bound. Day counters are frozen at last capture.</span></li>
-    </ul>
-    <p class="final">There is no green in this interface. The absence of a red row is not evidence of safety.</p>
+  <!-- ACT III — the ledger. Five columns, not ten. -->
+  <section class="act act-ledger" aria-labelledby="ledgerHead">
+    <h2 class="act-head" id="ledgerHead">
+      <span class="act-num">02</span> Every recall, and what we found on sale
+    </h2>
+    <p class="act-lede">
+      One row per government recall notice. Open any row to see the regulator's
+      record beside the listing we fetched, and the identifier we matched inside
+      that page's own text.
+    </p>
 
-    <div class="provenance" id="provenance"></div>
+    <div class="wall-head">
+      <span class="num">#</span>
+      <span>Product</span>
+      <span>Hazard, in the regulator's words</span>
+      <span>Found in</span>
+      <span>Days on sale since recall</span>
+      <span class="num">Verdict</span>
+    </div>
+    <p class="sort-note" id="sortNote"></p>
+    <p class="historical-note" id="historicalNote"></p>
 
-    <details class="machinery">
-      <summary>Machinery</summary>
-      <div id="machinery"></div>
-    </details>
+    <main id="wall"></main>
+    <div class="pager" id="pager"></div>
   </section>
+
+  <!-- ACT IV — how we know. Every figure that qualifies another figure, plus the
+       three collectors and their live state. This is where the apparatus lives,
+       so that ACT II can be read by someone who does not want it. -->
+  <section class="act act-method" id="method" aria-labelledby="methodHead">
+    <h2 class="act-head" id="methodHead">
+      <span class="act-num">03</span> How we know, and how sure we are
+    </h2>
+    <p class="act-lede">
+      Every proportion above carries a 95% confidence interval, and every figure
+      that depends on a broken collector is withheld rather than published. The
+      three collectors below are the only part of this that touches a marketplace.
+    </p>
+    <section class="instruments" id="instruments"></section>
+    <section class="arm-rail" id="armRail"></section>
+    <section class="curve" id="curve"></section>
+  </section>
+
+  <!-- ACT V — the other half of the measurement. -->
+  <section class="act act-gaps" aria-labelledby="gapsHead">
+    <h2 class="act-head" id="gapsHead">
+      <span class="act-num">04</span> What we did not see, and what we refused
+    </h2>
+    <div class="panels">
+      <div class="panel" id="notSeen"></div>
+      <div class="panel" id="healLedger"></div>
+    </div>
+  </section>
+
+  <footer class="act act-foot">
+    <section class="legend">
+      <ul>
+        <li><span class="swatch" style="background:var(--hazard);border-color:var(--hazard)"></span>
+          <span><b>Red.</b> Still on sale. The identifier was found in the fetched page's own text and an active buy control was present.</span></li>
+        <li><span class="swatch"></span>
+          <span><b>Hollow.</b> We looked in that country and did not find it.</span></li>
+        <li><span class="swatch" style="background:#000;border-color:#000"></span>
+          <span><b>Black.</b> Withheld. That collector was broken, so we do not know — and we will not guess.</span></li>
+        <li><span class="swatch" style="background:repeating-linear-gradient(45deg,#fff,#fff 2px,var(--hatch) 2px,var(--hatch) 4px)"></span>
+          <span><b>Hatched.</b> Older than the four-hour freshness bound. Day counters are frozen at last capture.</span></li>
+      </ul>
+      <p class="final">There is no green in this interface. The absence of a red row is not evidence of safety.</p>
+
+      <div class="provenance" id="provenance"></div>
+
+      <details class="machinery">
+        <summary>Machinery</summary>
+        <div id="machinery"></div>
+      </details>
+    </section>
+  </footer>
 
 </div>
 

@@ -124,7 +124,12 @@ for (const variant of VARIANTS) {
     check(/implausible_cleanliness/.test(html), "blackout names the detector that fired");
   }
   if (variant === "v1") {
-    check(/VERDICT WITHHELD/.test(html), "v1 renders the withheld verdict band");
+    // Case-insensitive, and paired with the class, because the assertion is that
+    // the withheld band renders — not that the copy is upper-cased in the markup.
+    // The band is now written in sentence case and upper-cased by the stylesheet,
+    // which is a typographic decision the test should not be able to veto.
+    check(/verdict withheld/i.test(html) && /withheld-mark/.test(html),
+          "v1 renders the withheld verdict band");
     check(/HEAL REJECTED/.test(html), "v1 renders the rejected heal, the hardest thing to fake");
     check(/prompt budget \d+ \/ 1000/.test(html), "prompt budget meter rendered");
     check(/Vodafone|Reliance|Comcast/.test(html), "exit attestation names a residential ASN");

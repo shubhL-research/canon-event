@@ -68,45 +68,101 @@
 
   // ------------------------------------------------------------ verdict band
 
+  /* The hero sentence, with the day count marked up so it can be counted.
+
+     A number that arrives already at 714 is a fact. A number that counts to 714
+     is a duration, which is what it actually is: the days this product stayed on
+     sale after a government told people it could kill a child. The animation is
+     not decoration, it is the unit. */
+  function heroSentence(sentence) {
+    if (!sentence) return "";
+    return esc(sentence).replace(/(\d[\d,]*)(\s*days)/,
+      function (_, n, tail) {
+        return '<span class="count" data-to="' + n.replace(/,/g, "") + '">0</span>' + tail;
+      });
+  }
+
   function renderVerdict(doc) {
     var node = el("verdict");
     var withheld = doc.arms.filter(function (a) { return a.state === "WITHHELD"; });
     var blackout = doc.global_blackout && doc.global_blackout.fired;
     var hero = doc.stats.hero;
+    var body;
 
     if (blackout) {
-      node.className = "verdict is-withheld";
-      node.innerHTML =
-        '<span class="withheld-mark">VERDICT WITHHELD · ALL ARMS</span>' +
+      body =
+        '<span class="withheld-mark">Verdict withheld · every collector</span>' +
         "<h1>We do not know, so we will not say.</h1>" +
         '<p class="sub">' + esc(doc.global_blackout.copy) + "</p>" +
         '<p class="clause">implausible_cleanliness fired: observed drop ' +
         pct(doc.global_blackout.observed_drop) + " against a " +
         pct(doc.global_blackout.threshold) + " threshold. " +
-        "Every figure on this page is struck until a sweep corroborates it.</p>";
-      return;
-    }
-
-    if (withheld.length) {
+        "Every figure on this page is withheld until a sweep corroborates it.</p>";
+    } else if (withheld.length) {
       var a = withheld[0];
-      node.className = "verdict is-withheld";
-      node.innerHTML =
-        '<span class="withheld-mark">VERDICT WITHHELD</span>' +
-        "<h1>" + esc(hero.sentence) + "</h1>" +
-        '<p class="sub">' + esc(a.code) + " collector unhealed since " +
-        esc(doc.swept_at.slice(11, 16)) + " UTC. We do not know, so we will not say.</p>" +
-        '<p class="clause">' + doc.stats.arms_measured.n + " of " + doc.stats.arms_measured.d +
-        " arms measured. Figures that depend on " + esc(a.code) +
-        " are struck. Figures computed from the seed corpus are not.</p>";
-      return;
+      body =
+        '<span class="withheld-mark">Verdict withheld · ' + esc(a.code) + "</span>" +
+        "<h1>" + heroSentence(hero.sentence) + "</h1>" +
+        '<p class="sub">Every one of these is a product a government recalled, ' +
+        "found on sale again from a residential connection in that country.</p>" +
+        '<p class="clause">The ' + esc(a.code) + " collector has been broken since " +
+        esc(doc.swept_at.slice(11, 16)) + " UTC, so anything that depends on it is " +
+        "withheld rather than published. " + doc.stats.arms_measured.n + " of " +
+        doc.stats.arms_measured.d + " countries measured.</p>";
+    } else {
+      body =
+        "<h1>" + heroSentence(hero.sentence) + "</h1>" +
+        '<p class="sub">Every one of these is a product a government recalled, ' +
+        "found on sale again from a residential connection in that country.</p>" +
+        '<p class="clause">' + doc.stats.arms_measured.n + " of " +
+        doc.stats.arms_measured.d + " countries measured.</p>";
     }
 
-    node.className = "verdict";
-    node.innerHTML =
-      "<h1>" + esc(hero.sentence) + "</h1>" +
-      '<p class="sub">Every row below is a government recall notice matched to a live marketplace listing, ' +
-      "with the product identifier re-asserted from the fetched page at capture time.</p>" +
-      '<p class="clause">' + doc.stats.arms_measured.n + " of " + doc.stats.arms_measured.d + " arms measured.</p>";
+    node.className = "act act-finding" + (blackout || withheld.length ? " is-withheld" : "");
+    node.innerHTML = '<div class="finding-inner">' + body +
+      '<p class="scroll-cue">What the sweep found</p></div>';
+  }
+
+  /* ------------------------------------------------------ ACT II: the figures
+
+     Two numbers, said in a sentence a reader can repeat. The intervals and the
+     method names are not removed, they move to ACT IV: a reader who does not
+     know what a Wilson interval is should still be able to leave with the
+     finding, and a reader who does should be able to check it. */
+  function figure(value, claim, basis, cls) {
+    return '<div class="figure ' + (cls || "") + '">' +
+      '<div class="figure-value">' + value + "</div>" +
+      '<p class="figure-claim">' + claim + "</p>" +
+      '<p class="figure-basis">' + basis + "</p></div>";
+  }
+
+  function renderFigures(doc) {
+    var s = doc.stats, out = [];
+
+    /* STILL ON SALE. Contaminated by any broken collector, so it is the figure
+       most often withheld — which is why it is not the only one here. */
+    out.push(figure(
+      s.survival.contaminated ? pct(s.survival.v) : '<span class="count" data-to="' +
+        (s.survival.v * 100).toFixed(1) + '" data-suffix="%">0</span>',
+      "of recalled products we could search for are still on sale today",
+      s.survival.n + " of " + s.survival.d + " searchable notices · 95% confidence " +
+        pct(s.survival.ci95[0]) + " to " + pct(s.survival.ci95[1]),
+      s.survival.contaminated ? "is-withheld" : ""));
+
+    /* NEVER CHECKABLE. Computed entirely from the free government corpus, so no
+       scraper can contaminate it and it survives every collector failing at
+       once. On the project's worst day this is the only publishable figure, and
+       that is exactly why it leads alongside the other one. */
+    out.push(figure(
+      '<span class="count" data-to="' + (s.unsearchable.v * 100).toFixed(1) +
+        '" data-suffix="%">0</span>',
+      "of recall notices name nothing a machine can search for, so nobody can " +
+        "check them at all",
+      s.unsearchable.n + " of " + s.unsearchable.d + " notices · 95% confidence " +
+        pct(s.unsearchable.ci95[0]) + " to " + pct(s.unsearchable.ci95[1]) +
+        " · no scraper touches this figure"));
+
+    el("figures").innerHTML = out.join("");
   }
 
   // --------------------------------------------------------- instrument line
@@ -122,24 +178,12 @@
     var s = doc.stats, out = [];
     var struck = function (stat) { return stat.contaminated ? "is-struck" : ""; };
 
-    // Two figures lead, six follow as apparatus.
-    //
-    // The eight instruments used to be rendered identically, which meant the
-    // headline finding and the credit count had the same claim on the reader. The
-    // two below are the ones the project is willing to be judged on: how much of
-    // what a regulator recalled is still buyable, and how much of it could never
-    // be checked at all. UNSEARCHABLE leads alongside SURVIVAL deliberately —
-    // it is computed from the free government corpus, so it is the one figure
-    // that survives every collector failing, and on the project's worst day it is
-    // the only thing still publishable.
-    out.push(instrument("Still buyable", pct(s.survival.v),
-      s.survival.n + " of " + s.survival.d + " searchable notices · " + ci(s.survival.ci95),
-      "is-lead " + struck(s.survival)));
-
-    out.push(instrument("Never checkable", pct(s.unsearchable.v),
-      s.unsearchable.n + " of " + s.unsearchable.d +
-      " notices name no identifier a matcher can search · " + ci(s.unsearchable.ci95),
-      "is-lead"));
+    // The two headline figures are NOT repeated here. ACT II publishes them in
+    // plain English; restating them in the apparatus strip is the same number
+    // twice, and it left this grid with a ragged row of empty cells. What belongs
+    // here is only what qualifies those two: the measures that are still pending,
+    // the precision that bounds them, the floor under what we missed, and what
+    // the sweep cost.
 
     if (s.border_escape.v === null) {
       out.push(instrument("Border escape", "PENDING",
@@ -354,41 +398,67 @@
     }
     var bc = e.buy_control || {};
 
+    /* Two doors, and the order is the point.
+       DOM path, response code, content hash and trace used to arrive first, in
+       mono, unexplained. They are the most technical things this project owns and
+       they were the first thing a reader met — which is the wrong way round. They
+       are proof, and proof is what you reach for after the claim, not before it.
+
+       So door one answers "why are you confident", in sentences. Door two is
+       closed, and holds everything an auditor would reopen the case with. */
+    var confidence =
+      '<div class="assertion">' + ctx +
+        '<span class="why">The recall names this identifier. We found that exact ' +
+        "string inside the product page we fetched, not in the URL and not in the " +
+        "search result — because a marketplace will quietly serve a different " +
+        "product on a stale link, and a live buy button on the wrong product is " +
+        "the worst mistake this system could make.</span>" +
+      "</div>" +
+      field("The buy control we found", bc.label, { mono: true }) +
+      field("In stock", bc.in_stock === undefined ? undefined : (bc.in_stock ? "yes" : "no")) +
+      field("Sold or shipped by", bc.ships_from) +
+      '<div class="attest-chip">fetched from <b>' +
+        esc(e.currency ? currencyCountry(e.currency) : "?") +
+        "</b> · the page priced itself in <b>" + esc(e.currency || "MISSING") +
+        "</b>, which is how we know which country answered</div>";
+
+    var audit =
+      '<details class="audit"><summary>Audit trail</summary>' +
+      '<p class="audit-why">Everything needed to reproduce or contest this row. ' +
+      "The hash pins the exact bytes we read, so a later change to the page cannot " +
+      "quietly rewrite what we claimed.</p>" +
+      field("Identifier searched", a.needle, { mono: true }) +
+      field("Where on the page", a.dom_path, { mono: true }) +
+      field("HTTP response", e.http, { mono: true }) +
+      field("Content hash", e.sha256, { mono: true }) +
+      field("Trace", e.trace, { mono: true }) +
+      field("Job", e.job_id, { mono: true }) +
+      "</details>";
+
     return '<div class="receipt"><div class="receipt-grid">' +
-      '<div class="receipt-pane"><h3>Regulator record</h3>' + regulatorPane(r) + "</div>" +
-      '<div class="receipt-pane"><h3>Live listing, captured ' + esc(e.captured_at) + "</h3>" +
-        field("Identifier searched", a.needle, { mono: true }) +
-        field("DOM path", a.dom_path, { mono: true }) +
-        '<div class="assertion">' + ctx +
-          '<span class="why">Identity re-assertion. Amazon substitutes ASINs on stale URLs, so a live ' +
-          "buy control on the wrong product would score as a hazard still on sale. That is the worst " +
-          "mistake this system could make, so the identifier must reappear on the fetched page itself.</span>" +
-        "</div>" +
-        field("Buy control", bc.label, { mono: true }) +
-        field("In stock", bc.in_stock === undefined ? undefined : String(bc.in_stock)) +
-        field("Ships from", bc.ships_from, { mono: true }) +
-        (bc.present ? '<div class="buy">' + esc(bc.label || "buy control present") + "</div>" : "") +
-        '<div class="attest-chip">exit country <b>' + esc(e.currency ? currencyCountry(e.currency) : "?") +
-          "</b> · page currency <b>" + esc(e.currency || "MISSING") + "</b></div>" +
-        field("Response", e.http, { mono: true }) +
-        field("Content hash", e.sha256, { mono: true }) +
-        field("Trace", e.trace, { mono: true }) +
+      '<div class="receipt-pane"><h3>What the regulator said</h3>' + regulatorPane(r) + "</div>" +
+      '<div class="receipt-pane"><h3>What we found, ' + esc(e.captured_at) + "</h3>" +
+        confidence + audit +
       "</div></div></div>";
   }
 
   function currencyCountry(c) { return { EUR: "DE", USD: "US", INR: "IN" }[c] || "?"; }
 
   function regulatorPane(r) {
-    return field("Authority", r.source.authority) +
-      field("Notice", r.source.ref, { mono: true }) +
-      field("Published", r.source.published, { mono: true }) +
+    // The hazard sentence first. It is the reason anyone is reading the row, and
+    // it was arriving sixth, under four lines of filing metadata.
+    return '<div class="assertion">“' + esc(r.hazard) + '”' +
+        '<span class="why">The regulator\'s own sentence, quoted exactly. Never ' +
+        "paraphrased, never summarised, never softened.</span></div>" +
       field("Product", r.name) +
+      field("Recalled by", r.source.authority === "CPSC"
+        ? "US Consumer Product Safety Commission"
+        : "EU Safety Gate") +
+      field("On", r.source.published, { mono: true }) +
+      field("Still on sale, days since", commas(r.days), { mono: true }) +
+      field("Notice", r.source.ref, { mono: true }) +
       field("Model", r.model, { mono: true }) +
-      field("GTIN", r.gtin, { mono: true }) +
-      '<div class="assertion">“' + esc(r.hazard) + '”' +
-        '<span class="why">The regulator\'s own sentence, quoted exactly. Never paraphrased, ' +
-        "never summarised, never softened.</span></div>" +
-      field("Days unremedied", commas(r.days), { mono: true });
+      field("Barcode", r.gtin, { mono: true });
   }
 
   function wireRows(doc) {
@@ -615,6 +685,7 @@
     var doc = all[variant] || all.v1;
 
     renderVerdict(doc);
+    renderFigures(doc);
     renderInstruments(doc);
     renderArms(doc);
     renderRows(doc);
@@ -623,8 +694,14 @@
     renderHeal(doc);
     renderProvenance(doc);
 
+    animate();
+
     if (doc.global_blackout && doc.global_blackout.fired) {
       document.querySelectorAll(".instrument").forEach(function (n) { n.classList.add("is-struck"); });
+      document.querySelectorAll(".figure").forEach(function (n) {
+        n.classList.remove("is-pending");
+        n.classList.add("is-withheld");
+      });
 
       // Every figure is struck, every arm is black — and the ledger underneath
       // was still rendering exactly as it does on a good day. A reader scrolling
@@ -643,6 +720,66 @@
           + "claim about what is on sale right now.";
       }
     }
+  }
+
+  // ------------------------------------------------------------------ motion
+
+  /* Two behaviours only, and both are about meaning rather than polish.
+
+     A count-up turns a number into a duration: 714 arriving instantly is a fact,
+     714 counting up is the time a recalled product stayed on sale. And a reveal
+     on approach is what makes five acts feel like a document being read rather
+     than a page being dumped.
+
+     Everything here degrades to nothing under prefers-reduced-motion, which the
+     stylesheet enforces independently — this only skips the work. */
+  function reducedMotion() {
+    return window.matchMedia &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  }
+
+  function countUp(node) {
+    var to = parseFloat(node.getAttribute("data-to"));
+    var suffix = node.getAttribute("data-suffix") || "";
+    var decimals = (node.getAttribute("data-to") || "").indexOf(".") > -1 ? 1 : 0;
+    if (isNaN(to)) return;
+    if (reducedMotion()) {
+      node.textContent = to.toFixed(decimals) + suffix;
+      return;
+    }
+    var start = null, dur = 1300;
+    function step(ts) {
+      if (start === null) start = ts;
+      var p = Math.min(1, (ts - start) / dur);
+      // Same easing curve as the stylesheet, so type and numbers move together.
+      var eased = 1 - Math.pow(1 - p, 3);
+      node.textContent = (to * eased).toFixed(decimals) + suffix;
+      if (p < 1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  }
+
+  function animate() {
+    if (!("IntersectionObserver" in window)) {
+      document.querySelectorAll(".count").forEach(countUp);
+      return;
+    }
+
+    // The hero is already on screen, so it counts immediately.
+    var hero = document.querySelector(".act-finding .count");
+    if (hero) setTimeout(function () { countUp(hero); }, 380);
+
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (!e.isIntersecting) return;
+        e.target.classList.add("is-in");
+        e.target.querySelectorAll(".count").forEach(countUp);
+        io.unobserve(e.target);      // reveal once, never again
+      });
+    }, { rootMargin: "-12% 0px -8% 0px", threshold: 0 });
+
+    document.querySelectorAll(".act:not(.act-finding), .figure, .arm, .instrument")
+      .forEach(function (n) { n.classList.add("reveal"); io.observe(n); });
   }
 
   if (document.readyState === "loading") {

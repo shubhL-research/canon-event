@@ -1,61 +1,110 @@
-/* CANON EVENT design tokens. Light only: a dark theme was cut for time, and a
-   hazard ledger that renders differently per viewer is harder to cite anyway.
-   There is no --green. Its absence is stated on screen in the legend. */
+/* CANON EVENT design tokens.
+   ---------------------------------------------------------------------------
+   Light only. A dark theme was cut for time, and a hazard ledger that renders
+   differently per viewer is harder to cite anyway — but there is a second reason
+   it has to stay light, and it outranks the first: the withheld state is BLACK.
+   A page that is already dark has nowhere left to go when it has to stop
+   reporting, and stopping is this project's whole argument.
+
+   There is no --green. Its absence is stated on screen in the legend.
+
+   THREE HUES, AND NOT ONE MORE
+   Ink, one safety red, one ochre for the excluded tier. Depth comes from
+   layering paper against surface and from two strengths of hairline, never from
+   a shadow and never from a gradient. A fourth hue is how an interface starts
+   looking decorative, and this one is evidence.
+   ---------------------------------------------------------------------------*/
 :root {
-  /* ground and surface, cool neutral, never warm cream */
-  --ground:        #F2F3F4;
+  /* Ground and surface. Cool paper, never cream: cream reads as editorial
+     nostalgia and this is a document filed this morning. */
+  --paper:         #EDEFF1;
+  --ground:        #EDEFF1;   /* alias, kept for existing selectors */
   --surface:       #FFFFFF;
-  --surface-sunk:  #E9EBED;
-  --rule:          #D6D9DC;
-  --rule-strong:   #B4B9BE;
+  --surface-raised:#F8F9FA;
+  --surface-sunk:  #E3E6E9;
 
-  /* ink, three levels only */
-  --ink:           #101418;
-  --ink-2:         #4A5157;
-  --ink-3:         #5F676E;
+  /* Two hairline strengths. One separates, one structures. */
+  --rule:          #DCE0E4;
+  --rule-strong:   #AEB5BB;
+  --rule-ink:      #080A0C;
 
-  /* hazard: ISO 3864 safety red, Pantone 485 C. 6.7:1 on white. */
+  /* Ink, three levels only. Deeper and cooler than a neutral grey so that the
+     hazard red beside it reads warm. */
+  --ink:           #080A0C;
+  --ink-2:         #464E55;
+  --ink-3:         #6B747C;
+  --ink-inv:       #FFFFFF;
+
+  /* Hazard: ISO 3864 safety red, Pantone 485 C. 6.7:1 on white.
+     Rationed. It marks an accusation and nothing else. */
   --hazard:        #DA291C;
   --hazard-deep:   #A81E14;
-  --hazard-wash:   #FBE7E4;
+  --hazard-wash:   #FDEEEC;
 
-  /* withheld */
+  /* Withheld. Black is not a shade here, it is a verdict. */
   --void:          #000000;
   --void-ink:      #FFFFFF;
 
-  /* unknown and unmeasured. grey is the honest colour for a withheld verdict. */
+  /* Unknown and unmeasured. Grey is the honest colour for a withheld verdict. */
   --unknown:       #6E767D;
   --hatch:         #C9CDD1;
 
-  /* excluded. quarantined to the discard drawer, never on the wall. */
+  /* Excluded. Quarantined to the discard drawer, never on the wall. */
   --amber:         #B26B00;
   --amber-mark:    #E8A33D;
 
-  /* in flight, and the only interface accent */
+  /* In flight, and the only interface accent. */
   --flux:          #2A5D8F;
   --focus:         #2A5D8F;
 
+  /* Type roles.
+     Display is Archivo with its width axis pushed wide: institutional,
+     signage-adjacent, and it holds together at 80px in a way a text face does
+     not. Body stays Public Sans, the US Web Design System face, as a visual
+     citation of the regulator being audited. Data stays monospaced because a
+     figure a reader may retype has to be unambiguous. */
+  --font-display:  "Archivo", "Public Sans", system-ui, sans-serif;
   --font-prose:    "Public Sans", system-ui, sans-serif;
   --font-machine:  "IBM Plex Mono", ui-monospace, monospace;
 
-  /* Display steps. Rationed: see the scale note below. */
+  /* Display steps, rationed. 56 and 40 are spent on the two figures the project
+     is willing to be judged on and on the day counter, which is the sentence the
+     whole project makes. Nothing else may use them. */
+  --type-hero:     clamp(38px, 5.4vw, 82px);
   --type-display:  56px;
   --type-figure:   40px;
+
+  /* Motion. One duration for state, one for arrival, one easing.
+     A single curve everywhere is what makes motion feel authored rather than
+     applied per element. */
+  --ease:          cubic-bezier(0.22, 0.61, 0.36, 1);
+  --t-state:       160ms;
+  --t-arrive:      620ms;
 }
 
 /* Scales, used without exception.
-   Type   10 11 12 14 15 16 20 28 · 40 56 for display only
-   Space  4 8 12 16 24 32 48
-   Weight 400 and 700 only. Nothing lighter than 400.
+   Type   10 11 12 14 15 16 20 28 · 40 56 hero for display only
+   Space  4 8 12 16 24 32 48 64 96
+   Weight 400 600 700. Nothing lighter than 400. */
 
-   The scale stopped at 28, which is why every figure on the page had the same
-   visual weight: the headline finding was set at the same size as the credit
-   count. A ledger needs somewhere for the eye to land, so two display steps are
-   added and rationed. 56 is spent only on the two figures the project is willing
-   to be judged on, and 40 only on the day counter, which is the sentence the
-   whole project is making: how long this has been on sale. */
-
-html { font-variant-numeric: tabular-nums; }
+html {
+  font-variant-numeric: tabular-nums;
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: smooth;
+}
 *, *::before, *::after { border-radius: 0; box-shadow: none; }
-button { border-radius: 4px; }
-body { background: var(--ground); color: var(--ink); font-family: var(--font-prose); }
+button { border-radius: 2px; }
+body {
+  background: var(--paper); color: var(--ink);
+  font-family: var(--font-prose);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
