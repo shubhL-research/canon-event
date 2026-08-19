@@ -601,3 +601,38 @@ body.is-blackout #wall .chip.v-RED { background: var(--unknown); border-color: v
 .instrument.is-apparatus { border-right: none; margin-right: 40px; }
 .instrument.is-lead { border-right: 1px solid var(--rule); }
 .instrument.is-lead + .instrument.is-lead { border-right: none; }
+
+/* --- The row says that it opens ------------------------------------------ */
+
+/* The evidence card was reachable only by guessing that rows were clickable.
+   A reader who never guesses sees a table of assertions and no evidence, which
+   inverts the point of the project: the acceptance test for a row is that
+   someone can check it, so the check has to be visible rather than found.
+
+   The mark sits in the gutter under the row number, because that column already
+   belongs to the row's identity rather than to its content. */
+.c-gutter { position: relative; }
+.open-mark {
+  display: block; width: 7px; height: 7px; margin: 6px 0 0 auto;
+  border-right: 1.5px solid var(--rule-strong);
+  border-bottom: 1.5px solid var(--rule-strong);
+  transform: rotate(45deg);
+  transition: transform 140ms ease, border-color 140ms ease;
+}
+.row:hover .open-mark, .row:focus-visible .open-mark {
+  border-color: var(--ink);
+}
+.row.is-open .open-mark {
+  transform: rotate(-135deg); border-color: var(--ink);
+}
+/* An open row is the head of the card below it, so it stops looking like a
+   sibling of the rows above. */
+.row.is-open { background: var(--surface-sunk); border-bottom-color: var(--ink); }
+
+@media (prefers-reduced-motion: reduce) {
+  .open-mark { transition: none; }
+}
+
+/* Keyboard reachability is the whole reason the rows carry tabindex. It has to
+   be visible. */
+.row:focus-visible { outline: 2px solid var(--focus); outline-offset: -2px; }

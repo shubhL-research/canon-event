@@ -308,8 +308,11 @@
       // for the expand handler, but printing it here after reordering produced a
       // column reading 29, 35, 30, 31, which looks like a rendering fault.
       return '<article class="row' + (r.tier === "AMBER" ? " is-amber" : "") +
-        '" data-rank="' + r.rank + '" tabindex="0">' +
-        '<div class="c-gutter">' + (i + 1) + "</div>" +
+        '" data-rank="' + r.rank + '" tabindex="0" role="button"' +
+        ' aria-expanded="false" aria-label="' + esc(r.name) +
+        ', open evidence chain">' +
+        '<div class="c-gutter">' + (i + 1) +
+          '<span class="open-mark" aria-hidden="true"></span></div>' +
         '<div class="c-id"><div class="name">' + esc(r.name) + "</div>" +
           '<div class="ident">' + esc(ident) + "</div></div>" +
         '<div class="c-hazard"><div class="quote">“' + esc(r.hazard) + "”</div>" +
@@ -392,6 +395,11 @@
     var byRank = {};
     doc.rows.forEach(function (r) { byRank[r.rank] = r; });
 
+    // Open the first row on arrival. The acceptance test for a row is that a
+    // reader can check it, so the check has to be visible without being found.
+    var first = document.querySelector("#wall .row");
+    if (first) toggle(first, byRank[first.dataset.rank]);
+
     el("wall").addEventListener("click", function (ev) {
       var row = ev.target.closest(".row");
       if (!row) return;
@@ -408,9 +416,20 @@
 
   function toggle(row, data) {
     var next = row.nextElementSibling;
-    if (next && next.classList.contains("receipt")) { next.remove(); return; }
+    if (next && next.classList.contains("receipt")) {
+      next.remove();
+      row.classList.remove("is-open");
+      row.setAttribute("aria-expanded", "false");
+      return;
+    }
     document.querySelectorAll(".receipt").forEach(function (n) { n.remove(); });
+    document.querySelectorAll(".row.is-open").forEach(function (n) {
+      n.classList.remove("is-open");
+      n.setAttribute("aria-expanded", "false");
+    });
     row.insertAdjacentHTML("afterend", receipt(data));
+    row.classList.add("is-open");
+    row.setAttribute("aria-expanded", "true");
   }
 
   // -------------------------------------------------------- survival curve

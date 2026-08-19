@@ -48,6 +48,10 @@ function run(variant) {
       readyState: "complete",
       body: makeNode("body"),
       getElementById: (id) => nodes[id] || makeNode(id),
+      // The stub holds no real elements, so a lookup finds nothing. The
+      // first-row-open behaviour is exercised in a real browser instead; this
+      // only has to not throw.
+      querySelector: () => null,
       querySelectorAll: () => [],
       addEventListener: () => {},
     },
