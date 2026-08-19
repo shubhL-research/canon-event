@@ -1,0 +1,261 @@
+{
+  "_STATUS": "FIXTURE DATA. Structure is final and enforced; the values are illustrative until the first live sweep. Every recall notice, hazard sentence, model number and GTIN below is real and quoted verbatim from the CPSC official API. The marketplace verdicts are not yet measured.",
+  "_generated_by": "examples/make_examples.py",
+  "_contract": "contract/row.schema.json",
+  "_validate": "python validate.py",
+  "headline": {
+    "n": 7,
+    "oldest_days": 722,
+    "oldest": {
+      "name": "Dumbbell toy sold with Baby Biceps Gift Set",
+      "ref": "24351",
+      "hazard": "The gray caps on the end of the dumbbell toy can come off, posing a choking hazard to infants.",
+      "rank_on_wall": 23
+    },
+    "sentence": "7 products recalled for burning or choking children are in a cart right now. The oldest has been buyable for 722 days.",
+    "method": "Transparent keyword rule over the regulator's verbatim hazard sentence. Matched terms are recorded per row so the classification is auditable. See hazard_class()."
+  },
+  "survival": {
+    "v": 0.25,
+    "n": 45,
+    "d": 180,
+    "ci95": [
+      0.1924,
+      0.318
+    ],
+    "contaminated": true
+  },
+  "survival_curve": {
+    "method": "isotonic regression (PAVA), nonparametric MLE for current-status data",
+    "assumption": "survival is monotone non-increasing in days since recall",
+    "confound": "Age is confounded with cohort: a 2024 recall is not exchangeable with a 2026 one. This is a cross-sectional age profile, not a within-product survival trajectory.",
+    "n": 37,
+    "n_still_buyable": 31,
+    "blocks": [
+      {
+        "from_day": 8,
+        "to_day": 8,
+        "survival": 1.0,
+        "n": 1
+      },
+      {
+        "from_day": 8,
+        "to_day": 8,
+        "survival": 1.0,
+        "n": 1
+      },
+      {
+        "from_day": 8,
+        "to_day": 750,
+        "survival": 0.8929,
+        "n": 28
+      },
+      {
+        "from_day": 750,
+        "to_day": 757,
+        "survival": 0.6667,
+        "n": 6
+      },
+      {
+        "from_day": 757,
+        "to_day": 757,
+        "survival": 0.0,
+        "n": 1
+      }
+    ],
+    "grid": [
+      {
+        "day": 8,
+        "survival": 0.8929,
+        "ci95": [
+          0.7727,
+          1.0
+        ],
+        "support": 37,
+        "thin": false,
+        "publishable": true
+      },
+      {
+        "day": 30,
+        "survival": 0.8929,
+        "ci95": [
+          0.7727,
+          1.0
+        ],
+        "support": 31,
+        "thin": false,
+        "publishable": true
+      },
+      {
+        "day": 90,
+        "survival": 0.8929,
+        "ci95": [
+          0.7727,
+          1.0
+        ],
+        "support": 31,
+        "thin": false,
+        "publishable": true
+      },
+      {
+        "day": 365,
+        "survival": 0.8929,
+        "ci95": [
+          0.7667,
+          1.0
+        ],
+        "support": 20,
+        "thin": false,
+        "publishable": true
+      },
+      {
+        "day": 730,
+        "survival": 0.8929,
+        "ci95": [
+          0.7667,
+          1.0
+        ],
+        "support": 15,
+        "thin": false,
+        "publishable": true
+      },
+      {
+        "day": 757,
+        "survival": 0.0,
+        "ci95": [
+          0.0,
+          0.9091
+        ],
+        "support": 5,
+        "thin": false,
+        "publishable": true
+      }
+    ],
+    "min_support": 5,
+    "bootstrap": {
+      "draws": 400,
+      "seed": 20260821,
+      "resample": "nonparametric, by item"
+    }
+  },
+  "border_escape": {
+    "v": null,
+    "n": 0,
+    "d": 0,
+    "ci95": null,
+    "contaminated": true,
+    "pending": "EU Safety Gate seeds are not yet in the corpus. Border escape is 'of EU-recalled products, what share are buyable from an Indian residential IP', and it cannot be computed from CPSC notices alone."
+  },
+  "unsearchable": {
+    "v": 0.2889,
+    "n": 52,
+    "d": 180,
+    "ci95": [
+      0.2276,
+      0.359
+    ],
+    "contaminated": false
+  },
+  "precision": {
+    "v": 0.94,
+    "n": 47,
+    "d": 50,
+    "ci95": [
+      0.8378,
+      0.9794
+    ],
+    "contaminated": false,
+    "recall": {
+      "n1_brand_model": 38,
+      "n2_model_only": 24,
+      "m_both": 17,
+      "observed": 45,
+      "n_hat": 53.17,
+      "missed_floor": 8.17,
+      "estimator": "Chapman (bias-corrected Lincoln-Petersen)",
+      "independence_violated": true,
+      "note": "The two query strategies share the model token and are positively correlated. N-hat is therefore biased downward, so missed_floor is a LOWER bound on what we failed to see."
+    }
+  },
+  "recall_floor": {
+    "estimator": "Chapman (bias-corrected Lincoln-Petersen)",
+    "n1_brand_model": 27,
+    "n2_model_only": 15,
+    "m_both": 11,
+    "observed": 31,
+    "n_hat": 36.33,
+    "se": 3.91,
+    "missed_floor": 5.33,
+    "independence_violated": true,
+    "bias_direction": "downward",
+    "note": "The two query strategies share the model token and are positively correlated, which inflates the overlap and deflates N-hat. The miss count is therefore a LOWER bound on what we failed to see, not an estimate of it. Always print it as 'at least'.",
+    "reportable": true,
+    "reportable_note": "With an overlap below 3 the estimator is too unstable to publish. Report the raw counts and say recall is unmeasured."
+  },
+  "discarded": {
+    "v": 0.0833,
+    "n": 45,
+    "d": 540,
+    "by_code": {
+      "AMBER": 12,
+      "dead_page": 9,
+      "blocked": 6,
+      "no_join_key": 14,
+      "identity_mismatch": 4
+    },
+    "contaminated": true
+  },
+  "adversarial_precision_set": {
+    "n": 6,
+    "all_discarded": true,
+    "note": "Deliberate near-misses fed to the matcher. Every one must land in DISCARDED. Any that reaches RED is a precision bug and blocks the freeze. Distinct from the heal loop's negative canaries, which are dead listings.",
+    "probes": [
+      {
+        "probe": "Papablic Archie Infant Swing (2025 revision, PAPABLIC61B)",
+        "against": "24325",
+        "kind": "successor_sku",
+        "expect": "identity_mismatch"
+      },
+      {
+        "probe": "HALO 2000 Portable Power Station PS-2000",
+        "against": "24350",
+        "kind": "same_brand_different_model",
+        "expect": "identity_mismatch"
+      },
+      {
+        "probe": "Generic 'PS-1000' bench power supply, unrelated brand",
+        "against": "24350",
+        "kind": "same_model_different_brand",
+        "expect": "identity_mismatch"
+      },
+      {
+        "probe": "Ambiano Single Serve Coffee Maker 708926",
+        "against": "24341",
+        "kind": "same_brand_adjacent_model",
+        "expect": "identity_mismatch"
+      },
+      {
+        "probe": "Fisher-Price Baby Biceps Gift Set (no dumbbell, GJD50)",
+        "against": "24351",
+        "kind": "successor_sku",
+        "expect": "identity_mismatch"
+      },
+      {
+        "probe": "Squeeze Plush Ball Toy, GTIN 810447020543",
+        "against": "24348",
+        "kind": "adjacent_gtin",
+        "expect": "identity_mismatch"
+      }
+    ]
+  },
+  "arithmetic": {
+    "corpus_seeds": 180,
+    "queries_per_seed_per_arm": 2,
+    "arms": 3,
+    "search_page_loads": 1080,
+    "pdp_promotions": 121,
+    "total_page_loads": 1201,
+    "working": "180 seeds x 2 queries x 3 arms = 1080 search loads, + 121 product-page promotions = 1201 page loads at 1 credit each.",
+    "note": "Promotion to a product page is decided outside Scraper Studio by the matcher, so only RED candidates cost a browser load. Chaining with next_stage would have promoted every discovered listing and multiplied this by roughly forty."
+  }
+}

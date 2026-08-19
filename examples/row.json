@@ -1,0 +1,55 @@
+{
+  "_STATUS": "FIXTURE DATA. Structure is final and enforced; the values are illustrative until the first live sweep. Every recall notice, hazard sentence, model number and GTIN below is real and quoted verbatim from the CPSC official API. The marketplace verdicts are not yet measured.",
+  "_generated_by": "examples/make_examples.py",
+  "_contract": "contract/row.schema.json",
+  "_validate": "python validate.py",
+  "rank": 1,
+  "name": "Lancaster Table & Seating Plastic Restaurant High Chairs",
+  "hazard": "The T-bar located at the front middle of the chair can become loose and fall or break off while the high chair is in use, posing a fall hazard to children.",
+  "source": {
+    "authority": "CPSC",
+    "ref": "24311",
+    "published": "2024-07-25",
+    "url": "https://www.cpsc.gov/Recalls/2026/24311"
+  },
+  "days": 757,
+  "days_frozen": false,
+  "tier": "RED",
+  "arms": {
+    "US": "RED",
+    "DE": "WITHHELD",
+    "IN": "RED"
+  },
+  "hazard_class": {
+    "qualifies": false,
+    "burn_terms": [],
+    "choke_terms": [],
+    "child_terms": [
+      "child",
+      "children"
+    ],
+    "child_scoped_standard": false
+  },
+  "model": "274HCBKWTASM",
+  "found_by_query": "both",
+  "evidence": {
+    "captured_at": "2026-08-21T09:14:22Z",
+    "assertion": {
+      "needle": "274HCBKWTASM",
+      "dom_path": "#productDetails > tr:nth-child(4)",
+      "context": "... Item model number 274HCBKWTASM Manufacturer recommended age ..."
+    },
+    "buy_control": {
+      "present": true,
+      "label": "Add to Cart",
+      "in_stock": true,
+      "ships_from": "IN"
+    },
+    "currency": "INR",
+    "http": 200,
+    "viewport": "1440x900",
+    "sha256": "3f9a0001c3d0",
+    "trace": "ce-2026-08-21-0001",
+    "job_id": "j_ma13y9ay1piehrso8r"
+  }
+}

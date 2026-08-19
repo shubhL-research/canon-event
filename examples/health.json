@@ -1,0 +1,82 @@
+{
+  "_STATUS": "FIXTURE DATA. Structure is final and enforced; the values are illustrative until the first live sweep. Every recall notice, hazard sentence, model number and GTIN below is real and quoted verbatim from the CPSC official API. The marketplace verdicts are not yet measured.",
+  "_generated_by": "examples/make_examples.py",
+  "_contract": "contract/row.schema.json",
+  "_validate": "python validate.py",
+  "sweep_id": "s_2026-08-21T14:02Z",
+  "swept_at": "2026-08-21T14:02:11Z",
+  "arms": {
+    "US": {
+      "state": "MEASURED",
+      "reason": null,
+      "rows": 164,
+      "fails": 0,
+      "exit_country": "US",
+      "exit_asn_org": "Comcast Cable Communications"
+    },
+    "DE": {
+      "state": "WITHHELD",
+      "reason": "zero_rows_uncorroborated",
+      "rows": 0,
+      "fails": 0,
+      "exit_country": "DE",
+      "exit_asn_org": "Vodafone GmbH"
+    },
+    "IN": {
+      "state": "DEGRADED",
+      "reason": "join_key_coverage_below_bound",
+      "rows": 139,
+      "fails": 41,
+      "exit_country": "IN",
+      "exit_asn_org": "Reliance Jio Infocomm"
+    }
+  },
+  "detectors": {
+    "identity_reassertion": {
+      "fired": false,
+      "scope": "per row",
+      "checked": 31,
+      "note": "Every RED row re-asserted its identifier on the fetched page."
+    },
+    "zero_is_a_fault": {
+      "fired": true,
+      "scope": "per claim",
+      "arm": "DE",
+      "note": "DE returned zero rows with no archived empty-result page to corroborate it. Zero is not published as a finding without an affirmative negative."
+    },
+    "join_key_coverage": {
+      "fired": true,
+      "scope": "per arm",
+      "arm": "IN",
+      "coverage": 0.7722,
+      "note": "Tracked separately from row count. An arm can return thousands of clean rows that match nothing, and a row-count check passes it happily."
+    },
+    "sibling_differential": {
+      "fired": true,
+      "scope": "across arms",
+      "note": "DE collapsed while US and IN held. Requires persistence across two sweeps."
+    },
+    "implausible_cleanliness": {
+      "fired": false,
+      "scope": "whole board",
+      "threshold": 0.4,
+      "note": "Did the world get suspiciously better? A drop beyond the threshold blacks the entire board."
+    },
+    "currency_fingerprint": {
+      "fired": false,
+      "scope": "per row",
+      "note": "Every DE row must carry EUR, every IN row INR, every US row USD. Kills a country-drift failure class that cross-arm comparison is blind to."
+    }
+  },
+  "heal": {
+    "status": "rejected",
+    "step": null,
+    "completed_steps": [],
+    "started_at": "2026-08-21T14:02:44Z",
+    "canary_pass": 2,
+    "canary_total": 3,
+    "ledger": "heals/2026-08-21-de-004.md",
+    "failed_canary": "GTIN 4006381333931 did not re-assert on the proposed template"
+  },
+  "verdict": "WITHHELD for DE. Figures depending on DE are struck. Figures computed from the seed corpus are unaffected and remain live."
+}
