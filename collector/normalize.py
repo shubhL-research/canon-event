@@ -62,9 +62,39 @@ FATAL_ERRORS = {
 }
 
 # Statuses the docs list as block-layer responses.
-BLOCK_STATUSES = {400, 401, 403, 404, 405, 409, 410, 418, 429, 500, 503}
+#
+# 404 and 410 are deliberately NOT in this set. They are split out below,
+# because "the page is gone" and "we were refused the page" are opposite claims
+# that a single `blocked` code would flatten into one. A delisted product is a
+# FINDING; a block is our own failure. Recording the first as the second
+# understates what we measured, and recording the second as the first invents a
+# result we never obtained.
+BLOCK_STATUSES = {400, 401, 403, 405, 409, 418, 429, 500, 503}
+DEAD_STATUSES = {404, 410}
 
 CURRENCY_FOR_ARM = {"US": "USD", "DE": "EUR", "IN": "INR"}
+
+# The language each arm's storefront must answer in.
+#
+# THIS OUTRANKS THE CURRENCY CHECK, and it was learned the hard way. A heal
+# preview on 2026-08-19 returned a fully Danish page from amazon.de quoting EUR:
+# "Pa lager", "Tilfoj til indkobskurv". The currency was right and the market
+# was wrong. amazon.de quotes EUR to every visitor from every exit, so currency
+# cannot separate a German session from a Danish one, and the three-arm
+# comparison rests on exactly that separation.
+#
+# The page's own `lang` attribute can, because the storefront writes it in
+# response to the session that reached it. See heals/2026-08-19-de-001.md.
+LANGUAGE_FOR_ARM = {"US": ("en",), "DE": ("de",), "IN": ("en", "hi")}
+
+# Buy-control wording, in each marketplace's own language. Matching the
+# marketplace's words rather than merely checking that SOME label is present is
+# what stops a valid buy control on a wrong-country page from earning RED.
+BUY_LABELS = {
+    "US": ("add to cart", "buy now", "add to basket"),
+    "DE": ("in den einkaufswagen", "in den warenkorb", "jetzt kaufen"),
+    "IN": ("add to cart", "buy now"),
+}
 
 
 def pick(row, key):
@@ -119,6 +149,113 @@ def needle_pattern(needle):
     return re.compile(r"(?<![A-Za-z0-9])" + body + r"(?![A-Za-z0-9])", re.I)
 
 
+def gtin_check_digit_ok(raw):
+    """Validate a GTIN-8/12/13/14 modulo-10 check digit.
+
+    A GTIN that fails its own check digit is either a typo in the notice or not
+    a GTIN at all, and either way it must not be trusted as an identity claim.
+
+    This is also the cheapest available detector for a mis-mapped collector
+    field. A heal preview returned the review star rating in the `ean` slot,
+    "4.1 ud af 5 stjerner", and the check digit is what refused it. The
+    arithmetic is short enough to redo on paper for any single case.
+    """
+    digits = re.sub(r"\D", "", "" if raw is None else str(raw))
+    if len(digits) not in (8, 12, 13, 14):
+        return False
+    body, check = digits[:-1], int(digits[-1])
+    total = sum(int(c) * (3 if i % 2 == 0 else 1)
+                for i, c in enumerate(reversed(body)))
+    return (10 - total % 10) % 10 == check
+
+
+def collapse_repeat(value):
+    """Collapse "X X" to "X" when both halves are byte-identical.
+
+    Observed on 25 of 28 real kaufland.de rows: the generated extractor matches
+    both a label node and its value node and concatenates them, so an EAN
+    arrives as "8721003407246 8721003407246". That is 26 digits, fails its own
+    check digit, and a usable identifier is thrown away.
+
+    Restricted to exact repetition of the whole string, which is the only case
+    where nothing can be lost: "X X" carries no information "X" does not. A
+    genuinely repetitive multi-value field like "A, B, A" is left alone. All 28
+    repaired EANs validated, which is the evidence the repair is right rather
+    than merely convenient.
+    """
+    if value is None:
+        return None
+    text = re.sub(r"\s+", " ", str(value)).strip()
+    if not text:
+        return text
+    parts = text.split(" ")
+    for halves in (2, 3):
+        if len(parts) % halves:
+            continue
+        size = len(parts) // halves
+        chunks = [" ".join(parts[i * size:(i + 1) * size]) for i in range(halves)]
+        if len(set(chunks)) == 1 and chunks[0]:
+            return chunks[0]
+    return text
+
+
+def needle_is_assertable(needle, is_gtin=False):
+    """May this identifier be used to assert identity from page text?
+
+    A GTIN with a valid check digit always may. Anything else must contain a
+    letter.
+
+    The bare-numeric refusal costs recall and is worth it. "113210" is a real
+    CPSC model value, and on a retail page it is also a price, a review count, a
+    dimension in millimetres and an unrelated part number. Boundary anchoring
+    stops PS-100 matching PS-1000, but it cannot stop a bare number matching a
+    bare number that happens to mean something else entirely. An AMBER row
+    excluded from the statistics is a survivable error; a RED row naming the
+    wrong seller is not.
+    """
+    if is_gtin:
+        return gtin_check_digit_ok(needle)
+    folded = norm_needle(needle)
+    if len(folded) < 4:
+        return False
+    return any(c.isalpha() for c in folded)
+
+
+def buy_control_present(raw):
+    """Is there an active buy control, in this arm's own language?
+
+    Presence of SOME label is not enough. The Danish "Tilfoj til indkobskurv"
+    observed on amazon.de is a perfectly valid buy control on a page that is not
+    in the DE arm's market, and counting it would redden a row whose geography
+    is wrong. Checking the wording against the arm's own languages turns that
+    from a lucky catch into a control.
+    """
+    arm, label = pick(raw, "arm"), pick(raw, "buy_label")
+    if not present(label):
+        return False
+    if pick(raw, "in_stock") is False:
+        # A disabled control still renders. Greyed out is not a way to buy.
+        return False
+    wanted = BUY_LABELS.get(arm, ())
+    if not wanted:
+        return False
+    return any(w in str(label).strip().lower() for w in wanted)
+
+
+def language_ok(raw):
+    """Does the page's own locale match the market this arm claims to measure?
+
+    MISSING when the collector did not emit `page_language`, which is not a
+    contradiction and must not be treated as one: plenty of pages omit the
+    attribute and an absent attestation is unproven rather than disproven.
+    """
+    arm, lang = pick(raw, "arm"), pick(raw, "page_language")
+    if not present(arm) or not present(lang):
+        return MISSING
+    prefixes = LANGUAGE_FOR_ARM.get(arm, ())
+    return any(str(lang).strip().lower().startswith(p) for p in prefixes)
+
+
 def reassert(page_text, needle):
     """Did the identifier actually reappear on the page we fetched?
 
@@ -155,6 +292,9 @@ def classify(raw):
         return "DISCARDED", [{"code": code, "reason": f"collector reported {err}"}]
 
     status = pick(raw, "http_status")
+    if present(status) and int(status) in DEAD_STATUSES:
+        return "DISCARDED", [{"code": "dead_page",
+                              "reason": f"HTTP {status} at capture: the listing is gone"}]
     if present(status) and int(status) in BLOCK_STATUSES:
         return "DISCARDED", [{"code": "blocked",
                               "reason": f"HTTP {status} from the fetch layer"}]
@@ -164,12 +304,34 @@ def classify(raw):
         return "DISCARDED", [{"code": "no_join_key",
                               "reason": "no machine-matchable identifier to search for"}]
 
-    matched = reassert(pick(raw, "page_text"), needle)
-    buy = pick(raw, "buy_label")
+    # A doubled value is a collector artifact, not the identifier. Repair it
+    # before deciding whether it can be asserted at all.
+    needle = collapse_repeat(needle)
+    is_gtin = gtin_check_digit_ok(needle)
+    if not needle_is_assertable(needle, is_gtin):
+        return "DISCARDED", [{"code": "no_join_key",
+                              "reason": "identifier is not distinctive enough to assert "
+                                        "identity from page text"}]
 
-    if matched and present(buy):
+    # Geography before hazard. An arm that cannot prove which market answered it
+    # has not found a foreign listing, and saying otherwise is the failure the
+    # three-arm design exists to avoid.
+    if language_ok(raw) is False:
+        return "DISCARDED", [{"code": "blocked",
+                              "reason": f"page language {pick(raw, 'page_language')!r} does not "
+                                        f"match arm {pick(raw, 'arm')}: exit market unproven"}]
+    if currency_ok(raw) is False:
+        return "DISCARDED", [{"code": "blocked",
+                              "reason": f"storefront quoted {pick(raw, 'currency')}, arm "
+                                        f"{pick(raw, 'arm')} expects "
+                                        f"{CURRENCY_FOR_ARM.get(pick(raw, 'arm'))}"}]
+
+    matched = reassert(pick(raw, "page_text"), needle)
+    buy = buy_control_present(raw)
+
+    if matched and buy:
         return "RED", []
-    if matched and not present(buy):
+    if matched and not buy:
         return "AMBER", [{"code": "AMBER",
                           "reason": "identifier re-asserted but no active buy control at capture time"}]
     return "AMBER", [{"code": "AMBER",

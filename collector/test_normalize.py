@@ -16,7 +16,9 @@ sys.path.insert(0, str(HERE))
 sys.path.insert(0, str(HERE.parent / "contract"))
 
 from normalize import (normalize, normalize_sweep, reassert, norm_needle,  # noqa: E402
-                       classify, currency_ok, pick, context_around)
+                       classify, currency_ok, pick, context_around,
+                       gtin_check_digit_ok, collapse_repeat, language_ok,
+                       needle_is_assertable, buy_control_present)
 from contract_keys import MISSING  # noqa: E402
 
 FAILURES = []
@@ -168,18 +170,106 @@ check(rep["orphaned"] == 1, "a row whose seed we do not recognise is counted, no
 check(rep["currency_mismatch"] == 1, "currency mismatch is counted")
 check("blocked" in rep["by_code"], "discard reasons are counted by code for the anti-dashboard")
 
+print("\nGTIN check digits, checkable on paper")
+# 4006381333931 is a published EAN-13: the weighted body sums to 89, so the
+# check digit must be (10 - 89 mod 10) mod 10 = 1.
+check(gtin_check_digit_ok("4006381333931"), "a real EAN-13 validates")
+check(not gtin_check_digit_ok("4006381333930"), "the same EAN with a wrong check digit fails")
+check(gtin_check_digit_ok("036000291452"), "a real UPC-12 validates")
+check(gtin_check_digit_ok("0 36000 29145 2"), "separators in a GTIN are tolerated")
+check(not gtin_check_digit_ok("3973500298"),
+      "a real Safety Gate 10-digit 'barcode' is not a GTIN")
+check(not gtin_check_digit_ok(None), "an absent GTIN fails rather than raising")
+
+print("\nWhat may assert identity at all")
+check(needle_is_assertable("BR-C708S"), "a model number containing letters is assertable")
+# Bare numerics collide with prices, review counts and millimetre dimensions on
+# any retail page. Boundary anchoring cannot save a number that means something
+# else entirely.
+check(not needle_is_assertable("113210"), "a bare numeric SKU is not assertable as a model")
+check(not needle_is_assertable("2024"), "a model year is not assertable")
+check(needle_is_assertable("4006381333931", is_gtin=True),
+      "a valid GTIN is assertable even though it is all digits")
+check(not needle_is_assertable("4006381333930", is_gtin=True),
+      "an invalid GTIN is not assertable, digits notwithstanding")
+
+print("\nDoubled values, a real collector artifact")
+# 25 of 28 live kaufland.de rows arrived like this.
+check(collapse_repeat("8721003407246 8721003407246") == "8721003407246",
+      "an exactly doubled EAN collapses to one usable barcode")
+check(gtin_check_digit_ok(collapse_repeat("8721003407246 8721003407246")),
+      "and the collapsed value passes its own check digit, which is the proof")
+check(collapse_repeat("6015-00-02 6015-00-02") == "6015-00-02",
+      "a doubled part number collapses too")
+check(collapse_repeat("A, B, A") == "A, B, A",
+      "a genuinely repetitive multi-value field is left alone")
+check(collapse_repeat(None) is None, "an absent value collapses to nothing, not a crash")
+
+print("\nGeography, which outranks the hazard")
+DE_ROW = {**GOOD, "arm": "DE", "currency": "EUR", "page_language": "de",
+          "buy_label": "In den Einkaufswagen"}
+check(language_ok(DE_ROW) is True, "a German page satisfies the DE arm")
+# The case that cost a heal: amazon.de answering in Danish, quoting EUR.
+check(language_ok({**DE_ROW, "page_language": "da"}) is False,
+      "a Danish page on amazon.de fails the DE arm even though EUR is correct")
+check(language_ok({**DE_ROW, "page_language": None}) is MISSING,
+      "an unemitted page_language is unproven, not disproven")
+check(classify({**DE_ROW, "page_language": "da"})[0] == "DISCARDED",
+      "a wrong-locale row is refused before its hazard is ever considered")
+
+print("\nBuy controls, in the marketplace's own language")
+check(buy_control_present(DE_ROW), "the German label counts on the DE arm")
+check(buy_control_present({**GOOD, "arm": "US", "buy_label": "Add to Cart"}),
+      "the US label counts on the US arm")
+check(not buy_control_present({**DE_ROW, "buy_label": "Tilfoj til indkobskurv"}),
+      "a Danish buy control does not count on the DE arm")
+check(not buy_control_present({**DE_ROW, "buy_label": "Add to Cart"}),
+      "an English buy control does not count on the DE arm")
+check(not buy_control_present({**DE_ROW, "in_stock": False}),
+      "an explicit out-of-stock revokes a present-looking control")
+
+print("\nGone is not the same as refused")
+check(classify({**GOOD, "http_status": 404})[1][0]["code"] == "dead_page",
+      "a 404 is a delisted product, which is a finding")
+check(classify({**GOOD, "http_status": 403})[1][0]["code"] == "blocked",
+      "a 403 is our own failure, which is not")
+
 print("\nagainst the real seed corpus")
 sf = HERE.parent / "data" / "seeds.json"
 if sf.exists():
     seeds_all = json.loads(sf.read_text(encoding="utf-8"))["seeds"]
     idx = {s["ref"]: s for s in seeds_all}
     sample = [s for s in seeds_all if s.get("gtin")][:25]
+    # A DE row carries DE wording. The fixture used to inherit "Add to Cart"
+    # from GOOD, which is a US label on a German arm: exactly the inconsistency
+    # buy_control_present() now refuses, and a row no real sweep can produce.
     raw = [{**GOOD, "seed_ref": s["ref"], "needle": s["gtin"],
             "page_text": f"EAN {s['gtin']} Marke {s.get('brand') or 'n/a'}",
-            "arm": "DE", "currency": "EUR"} for s in sample]
+            "arm": "DE", "currency": "EUR",
+            "buy_label": "In den Einkaufswagen", "page_language": "de"} for s in sample]
     rows, rep = normalize_sweep(raw, idx)
     check(len(rows) == len(sample), f"{len(rows)} real seeds normalised")
-    check(all(r["tier"] == "RED" for r in rows), "all resolve RED when the GTIN re-asserts")
+
+    # Not "all RED". Six of the 104 Safety Gate notices carrying a gtin field
+    # hold a value that fails its own check digit: lengths 9, 10, 12 and 14,
+    # entered by the notifying country into a free-text barcode box. Three of
+    # them land in this sample of 25.
+    #
+    # They are refused, and the refusal is the correct outcome. A ten-digit
+    # number is not a GTIN, and matching one against a retail page as though it
+    # were an exact identifier is how a false accusation gets made. This is the
+    # same class of error the identifier rule already found in CPSC model
+    # fields, now in the EU gtin field, and it moves the unsearchable rate the
+    # same direction: up, against our own headline.
+    reds = [r for r in rows if r["tier"] == "RED"]
+    refused = [r for r in rows if r["tier"] == "DISCARDED"]
+    valid = [s for s in sample if gtin_check_digit_ok(s["gtin"])]
+    check(len(reds) == len(valid),
+          f"{len(reds)} seeds with a check-digit-valid GTIN resolve RED")
+    check(all(d["code"] == "no_join_key"
+              for r in refused for d in r.get("discarded", [])),
+          f"{len(refused)} seeds whose 'GTIN' fails its own check digit are "
+          "refused as unassertable, not published")
     check(rep["currency_mismatch"] == 0, "no currency drift on a DE sweep carrying EUR")
 
     # Every produced row must satisfy the frozen contract.
