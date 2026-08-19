@@ -1,0 +1,257 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "canon-event/row.schema.json",
+  "title": "CANON EVENT wall row",
+  "type": "object",
+  "required": [
+    "rank",
+    "name",
+    "hazard",
+    "source",
+    "days",
+    "tier",
+    "arms"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "rank": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1
+    },
+    "model": {
+      "type": "string",
+      "description": "alphanumeric, contains a digit, length >= 4, not a bare year. SEE known-issue: real CPSC values include batch numbers, clothing sizes and model years that pass this rule and are not searchable identifiers."
+    },
+    "gtin": {
+      "type": "string",
+      "pattern": "^[0-9]{8,14}$"
+    },
+    "hazard": {
+      "type": "string",
+      "minLength": 1,
+      "description": "regulator verbatim. NEVER paraphrased. Rendered in typographic quotes."
+    },
+    "source": {
+      "type": "object",
+      "required": [
+        "authority",
+        "ref",
+        "published",
+        "url"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "authority": {
+          "enum": [
+            "CPSC",
+            "SAFETY_GATE"
+          ]
+        },
+        "ref": {
+          "type": "string"
+        },
+        "published": {
+          "type": "string",
+          "format": "date"
+        },
+        "url": {
+          "type": "string",
+          "format": "uri"
+        }
+      }
+    },
+    "days": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "days since published. FROZEN when the arm is not measured."
+    },
+    "days_frozen": {
+      "type": "boolean",
+      "default": false
+    },
+    "tier": {
+      "enum": [
+        "RED",
+        "AMBER",
+        "DISCARDED"
+      ]
+    },
+    "found_by_query": {
+      "enum": [
+        "brand_model",
+        "model_only",
+        "both"
+      ],
+      "description": "CAPTURE-RECAPTURE INPUT. Which of the two query strategies surfaced this listing. Both queries run for every recall on every arm; this records which one(s) hit. Chapman's estimator over these counts puts a FLOOR on what the matcher missed, turning 'recall unmeasured' into 'recall bounded below'. The engineer MUST log this on every hit or recall cannot be estimated. The two strategies share the model token so they are positively correlated: the estimate is a lower bound on blindness, not an upper bound."
+    },
+    "arms": {
+      "type": "object",
+      "required": [
+        "US",
+        "DE",
+        "IN"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "US": {
+          "$ref": "#/$defs/armVerdict"
+        },
+        "DE": {
+          "$ref": "#/$defs/armVerdict"
+        },
+        "IN": {
+          "$ref": "#/$defs/armVerdict"
+        }
+      }
+    },
+    "evidence": {
+      "$ref": "#/$defs/evidence"
+    },
+    "discarded": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "code"
+        ],
+        "properties": {
+          "code": {
+            "enum": [
+              "AMBER",
+              "dead_page",
+              "blocked",
+              "no_join_key",
+              "identity_mismatch"
+            ]
+          },
+          "reason": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "hazard_class": {
+      "type": "object",
+      "description": "Which terms in the regulator's verbatim hazard sentence qualify this row for the burning-or-choking-children hero statistic. A transparent keyword rule recorded per row so the classification is auditable. Deliberately NOT a classifier: an opaque model here would put a black box under the most quoted sentence in the project.",
+      "properties": {
+        "qualifies": {
+          "type": "boolean"
+        },
+        "burn_terms": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "choke_terms": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "child_terms": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "child_scoped_standard": {
+          "type": "boolean"
+        }
+      }
+    }
+  },
+  "$defs": {
+    "armVerdict": {
+      "enum": [
+        "RED",
+        "NOT_FOUND",
+        "WITHHELD",
+        "STALE"
+      ]
+    },
+    "evidence": {
+      "type": "object",
+      "required": [
+        "captured_at",
+        "assertion",
+        "buy_control"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "captured_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "http": {
+          "type": "integer"
+        },
+        "viewport": {
+          "type": "string"
+        },
+        "assertion": {
+          "type": "object",
+          "required": [
+            "needle",
+            "context"
+          ],
+          "description": "Identity re-assertion. Exists because Amazon substitutes ASINs on stale URLs. Without it a live buy button on the WRONG product scores as a hazard still on sale, which is the worst mistake this system can make.",
+          "properties": {
+            "needle": {
+              "type": "string"
+            },
+            "dom_path": {
+              "type": "string"
+            },
+            "context": {
+              "type": "string",
+              "description": "raw surrounding text, needle highlighted at render"
+            }
+          }
+        },
+        "buy_control": {
+          "type": "object",
+          "required": [
+            "present"
+          ],
+          "properties": {
+            "present": {
+              "type": "boolean"
+            },
+            "label": {
+              "type": "string",
+              "description": "the marketplace's own words, in its own language"
+            },
+            "in_stock": {
+              "type": "boolean"
+            },
+            "ships_from": {
+              "type": "string"
+            }
+          }
+        },
+        "currency": {
+          "enum": [
+            "EUR",
+            "USD",
+            "INR"
+          ],
+          "description": "SYMBOL ONLY. Price value is never recorded or displayed. This field is the currency-fingerprint detector."
+        },
+        "sha256": {
+          "type": "string"
+        },
+        "trace": {
+          "type": "string"
+        },
+        "job_id": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

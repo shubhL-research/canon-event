@@ -1,0 +1,72 @@
+{
+  "version": "0.9",
+  "arm_states": {
+    "MEASURED": {
+      "surface": "--surface", "telemetry": "full", "chip": "red_filled_or_hollow",
+      "stats": "live", "band": "white",
+      "copy": "Measured {t}Z. {returned} of {inputs} inputs returned rows. {fails} fails."
+    },
+    "DEGRADED": {
+      "surface": "--surface", "stamp": "PARTIAL", "telemetry": "full_plus_coverage_bar",
+      "chip": "red_or_hollow_plus_hatch_on_no_join_key", "stats": "live_partial_superscript",
+      "band": "white",
+      "copy": "Partial. {n} of {inputs} inputs returned no row and no archived empty-result page. Rows from this arm are shown. Counts carry a partial stamp."
+    },
+    "WITHHELD": {
+      "surface": "--void", "ink": "--void-ink", "telemetry": "suppressed_except_timestamp",
+      "chip": "black_square_white_dash", "stats": "struck_grey_with_scope_stamp",
+      "band": "full_bleed_black",
+      "copy_headline": "VERDICT WITHHELD.",
+      "copy_body": "{ARM} collector unhealed since {t} UTC. We do not know, so we will not say."
+    },
+    "HEALING": {
+      "surface": "--surface", "telemetry": "replaced_by_7_cell_step_track",
+      "chip": "frozen_hatched", "stats": "struck_arm_in_heal", "band": "white_healing_clause",
+      "copy": "Heal in flight. Step {step} of 7, {stage_name}. {elapsed} elapsed, budget 15m. Rows below are frozen at the {t}Z sweep."
+    },
+    "AWAITING_APPROVAL": {
+      "surface": "--surface", "expands_to": "gate_card_with_preview_rows",
+      "chip": "frozen_hatched", "stats": "struck", "band": "white_gate_clause",
+      "copy": "Proposed template awaiting approval. Canary {pass} of {total} resolving RED on version=dev. Approve is locked until {total} of {total}."
+    },
+    "STALE": {
+      "surface": "hatched_45deg_2px", "telemetry": "shown_greyed", "chip": "hatched",
+      "stats": "live_with_freshness_stamp", "band": "white_staleness_clause",
+      "copy": "Last sweep {t}Z, {ago} ago. Exceeds the {bound} freshness bound. Rows are historical. DAY counters are frozen at last capture, not counting."
+    }
+  },
+  "heal_status": {
+    "rejected": {
+      "renders": "louder_than_success",
+      "copy": "Heal rejected {t}Z. Canary GTIN {gtin} did not re-assert on the proposed template. Production template unchanged at {template}. Arm remains withheld. Ledger: {ledger}"
+    },
+    "approved": {
+      "renders": "one_line",
+      "copy": "Heal approved {t}Z. Template {template}. {pass} of {total} canaries resolved."
+    },
+    "in_flight": { "renders": "step_track" },
+    "none": { "renders": "nothing" }
+  },
+  "row_tiers": {
+    "RED":       { "counts_toward_stats": true,  "shown": true },
+    "AMBER":     { "counts_toward_stats": false, "shown": true, "label": "unconfirmed" },
+    "DISCARDED": { "counts_toward_stats": false, "shown": false, "counted_in": "discard_rate" }
+  },
+  "arm_chip_states": {
+    "RED":       "filled --hazard, white two-letter code",
+    "NOT_FOUND": "1px --rule-strong hollow, --ink-3 code",
+    "WITHHELD":  "filled #000000, white en dash",
+    "STALE":     "hatched"
+  },
+  "page_states": {
+    "LOADING": "full chrome, real headers, 12 skeleton rows at 64px, empty bar tracks, numerals as tabular dashes. No spinner, no shimmer, no progress bar.",
+    "GLOBAL_BLACKOUT": "implausible cleanliness fired, >40% sweep-over-sweep drop, whole board black",
+    "GLOBAL_DEGRADED": "{n} of {d} arms measured"
+  },
+  "structural_rules": [
+    "A rejected heal is a louder state than a successful one. More pixels, names the exact canary that failed, names the unchanged template version.",
+    "DAY N freezes when the arm is not measured, and says it froze. A counter that keeps incrementing on stale data is a lie about capture time.",
+    "Colour is always paired with a glyph. Deuteranopia and greyscale screenshots both survive.",
+    "No detector is allowed to be invisible. Every one writes its verdict into health.json."
+  ]
+}

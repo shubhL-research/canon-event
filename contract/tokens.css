@@ -1,0 +1,49 @@
+/* CANON EVENT design tokens. Light only: dark theme is cut (hackathon.md).
+   There is no --green. Its absence is stated on screen in the legend. */
+:root {
+  /* ground and surface, cool neutral, never warm cream */
+  --ground:        #F2F3F4;
+  --surface:       #FFFFFF;
+  --surface-sunk:  #E9EBED;
+  --rule:          #D6D9DC;
+  --rule-strong:   #B4B9BE;
+
+  /* ink, three levels only */
+  --ink:           #101418;
+  --ink-2:         #4A5157;
+  --ink-3:         #5F676E;
+
+  /* hazard: ISO 3864 safety red, Pantone 485 C. 6.7:1 on white. */
+  --hazard:        #DA291C;
+  --hazard-deep:   #A81E14;
+  --hazard-wash:   #FBE7E4;
+
+  /* withheld */
+  --void:          #000000;
+  --void-ink:      #FFFFFF;
+
+  /* unknown and unmeasured. grey is the honest colour for a withheld verdict. */
+  --unknown:       #6E767D;
+  --hatch:         #C9CDD1;
+
+  /* excluded. quarantined to the discard drawer, never on the wall. */
+  --amber:         #B26B00;
+  --amber-mark:    #E8A33D;
+
+  /* in flight, and the only interface accent */
+  --flux:          #2A5D8F;
+  --focus:         #2A5D8F;
+
+  --font-prose:    "Public Sans", system-ui, sans-serif;
+  --font-machine:  "IBM Plex Mono", ui-monospace, monospace;
+}
+
+/* Scales, used without exception.
+   Type   10 11 12 14 15 16 20 28
+   Space  4 8 12 16 24 32 48
+   Weight 400 and 700 only. Nothing lighter than 400. */
+
+html { font-variant-numeric: tabular-nums; }
+*, *::before, *::after { border-radius: 0; box-shadow: none; }
+button { border-radius: 4px; }
+body { background: var(--ground); color: var(--ink); font-family: var(--font-prose); }
