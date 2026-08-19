@@ -392,7 +392,7 @@ def chapman(n1, n2, m):
 
 
 # --- Corpus constants. Every headline denominator traces back to these. ---
-CORPUS_SEEDS = 180          # hackathon.md: reduced from 430 on credits
+CORPUS_SEEDS = 180          # reduced from 430: 3 arms x 2 queries exhausts the credit budget
 QUERIES_PER_SEED_PER_ARM = 2  # brand+model, then model alone
 ARM_COUNT = 3               # US, DE, IN. eBay cut before Day 1.
 

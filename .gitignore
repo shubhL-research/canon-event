@@ -4,3 +4,6 @@ __pycache__/
 Thumbs.db
 .venv/
 node_modules/
+
+# Internal status docs, not part of the submission
+CANON-EVENT-Status.pdf
