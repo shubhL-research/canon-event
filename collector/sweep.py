@@ -108,6 +108,29 @@ BLOCKING_CODES = {"blocked", "crawl_error", "detect_block", "captcha_timeout",
 # worst-case batch under a few MB while still collapsing the sweep by 40x.
 BATCH_SIZE = 40
 
+# Except that 40 is a property of the storefront, not of the sweep, and one global
+# number cost two hours for nothing.
+#
+# amazon.com is far slower per page than either regional marketplace. Three
+# consecutive 40-URL jobs against it hit the CLI's one-hour poll ceiling and
+# returned zero listings each time, while the same batch size on kaufland.de and
+# flipkart.com completed fine. The batch has to fit inside the timeout, and how
+# many pages fit in an hour is a fact about the site.
+#
+# Measured: kaufland returned 40 URLs in roughly twenty minutes, flipkart in
+# forty. amazon.com did not finish 40 in sixty. 10 leaves a wide margin, at the
+# cost of four times as many jobs, which is the correct trade — a job that times
+# out costs an hour and yields nothing, so a smaller job that returns is cheaper
+# in every sense.
+ARM_BATCH_SIZE = {"US": 10}
+
+
+def batch_size_for(arm, override=None):
+    """URLs per job for this arm. An override wins, then the arm, then the default."""
+    if override:
+        return override
+    return ARM_BATCH_SIZE.get(arm, BATCH_SIZE)
+
 # Batch jobs poll rather than stream, so the wait is per batch, not per URL.
 BATCH_TIMEOUT_S = 3600
 
@@ -421,7 +444,7 @@ def combine(seeds, per_arm):
 
 
 def run(seeds, collectors, runner=cli_batch, previous=None, now=None,
-        batch_size=BATCH_SIZE, on_batch=None, raw_sink=None):
+        batch_size=None, on_batch=None, raw_sink=None):
     """One full sweep across every configured arm. Returns (rows, health).
 
     Writes nothing and prints nothing itself, so a caller can drive it from saved
@@ -435,7 +458,8 @@ def run(seeds, collectors, runner=cli_batch, previous=None, now=None,
     per_arm, reports, arms = {}, [], {}
     for arm, collector_id in sorted(collectors.items()):
         rows, report = sweep_arm(arm, collector_id, seeds, runner=runner,
-                                 captured_at=captured_at, batch_size=batch_size,
+                                 captured_at=captured_at,
+                                 batch_size=batch_size_for(arm, batch_size),
                                  on_batch=on_batch, raw_sink=raw_sink)
         per_arm[arm] = rows
         reports.append(report)
@@ -604,10 +628,13 @@ def main(argv):
     limit = None
     dry = "--dry-run" in argv
     replay = "--from-raw" in argv
+    batch_override = None
     arms = dict(COLLECTORS)
     for i, a in enumerate(argv):
         if a == "--limit" and i + 1 < len(argv):
             limit = int(argv[i + 1])
+        if a == "--batch-size" and i + 1 < len(argv):
+            batch_override = int(argv[i + 1])
         if a == "--arms" and i + 1 < len(argv):
             wanted = argv[i + 1].split(",")
             arms = {k: v for k, v in COLLECTORS.items() if k in wanted}
@@ -624,17 +651,18 @@ def main(argv):
         return _write(rows, doc, seeds, limit, replayed=True)
 
     plans = {arm: plan_arm(arm, seeds) for arm in arms}
+    sizes = {arm: batch_size_for(arm, batch_override) for arm in arms}
     loads = sum(len(p) for p in plans.values())
-    batches = sum((len(p) + BATCH_SIZE - 1) // BATCH_SIZE for p in plans.values())
+    batches = sum((len(p) + sizes[a] - 1) // sizes[a] for a, p in plans.items())
 
     print("seeds     %d%s" % (len(seeds), " (TRIAL SLICE)" if limit else ""))
     print("arms      " + ", ".join("%s=%s" % kv for kv in sorted(arms.items())))
     print("loads     %d search loads, 2 queries per notice per arm" % loads)
-    print("batches   %d jobs at %d urls each" % (batches, BATCH_SIZE))
+    print("batches   %d jobs" % batches)
     for arm in sorted(plans):
-        print("  %-3s %4d loads -> %2d batches"
+        print("  %-3s %4d loads -> %2d batches at %d urls each"
               % (arm, len(plans[arm]),
-                 (len(plans[arm]) + BATCH_SIZE - 1) // BATCH_SIZE))
+                 (len(plans[arm]) + sizes[arm] - 1) // sizes[arm], sizes[arm]))
     if limit:
         print("\nTRIAL SLICE of %d notices. Not a full sweep, and stamped as such."
               % limit)
@@ -662,7 +690,8 @@ def main(argv):
             for row in rows:
                 fh.write(json.dumps(row, ensure_ascii=False) + "\n")
 
-    rows, doc = run(seeds, arms, on_batch=on_batch, raw_sink=raw_sink)
+    rows, doc = run(seeds, arms, on_batch=on_batch, raw_sink=raw_sink,
+                    batch_size=batch_override)
     return _write(rows, doc, seeds, limit)
 
 

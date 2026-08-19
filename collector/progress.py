@@ -47,7 +47,8 @@ HERE = pathlib.Path(__file__).parent
 ROOT = HERE.parent
 sys.path.insert(0, str(HERE))
 
-from sweep import ARM_SEARCH, COLLECTORS, BATCH_SIZE, load_seeds, plan_arm  # noqa: E402
+from sweep import (ARM_SEARCH, COLLECTORS, batch_size_for,  # noqa: E402
+                   load_seeds, plan_arm)
 
 RAW = ROOT / "data" / "sweeps" / "raw"
 
@@ -150,8 +151,11 @@ def render(limit=None, start_balance=None):
 
     total_planned = total_done = total_rows = 0
     for arm in sorted(ARM_SEARCH):
+        # The same per-arm batch size the sweep uses, or the denominator would be
+        # wrong for exactly the arm whose batch size had to change.
+        size = batch_size_for(arm)
         planned_loads = len(plan_arm(arm, seeds))
-        planned = (planned_loads + BATCH_SIZE - 1) // BATCH_SIZE
+        planned = (planned_loads + size - 1) // size
         done = batches_done(arm)
         rows = archived(arm)
         total_planned += planned
