@@ -103,16 +103,29 @@ check(err["error"] == "detect_block",
 # ----------------------------------------------------------- query strategies
 print("\nTwo queries per notice, or the recall floor is unrecoverable")
 
-check(S.query_for(SEED, S.BRAND_MODEL) == "Besrey 8721003407246",
-      "brand_model pairs the brand with the identifier")
-check(S.query_for(SEED, S.MODEL_ONLY) == "8721003407246",
-      "model_only searches the identifier alone")
-check(S.query_for({"name": "", "model": ""}, S.MODEL_ONLY) is None,
-      "a notice with no identifier yields no query rather than an empty search")
+# What we type is not what we assert. Both used to be the GTIN, which is why the
+# first live sweep returned 3,177 rows and zero findings: a marketplace search
+# indexes product text, not barcodes.
+check(S.query_for(SEED, S.BRAND_MODEL) == "Besrey BR-C708S",
+      "brand_model searches brand plus MODEL, never the barcode")
+check(S.query_for(SEED, S.MODEL_ONLY) == "BR-C708S",
+      "model_only searches the model number alone")
+check(S.needle_for(SEED) == SEED["gtin"],
+      "while the GTIN remains what gets asserted on the page")
+
+check(S.query_for({"brand": "Taf toys", "name": "Foam mat", "gtin": "605566127156"},
+                  S.MODEL_ONLY) == "605566127156",
+      "with no model number the barcode is the last resort, not the first choice")
+check(S.query_for({"brand": "Taf toys", "name": "Foam mat"}, S.BRAND_MODEL)
+      == "Taf toys Foam mat",
+      "with no model number the product NAME carries the query, because that is "
+      "what a shopper would type")
 check(S.query_for({"name": "Acme Thing", "model": "X-1"}, S.BRAND_MODEL)
       == "Acme X-1", "the brand falls back to the first word of the name")
-check(S.needle_for(SEED) == SEED["gtin"],
-      "the GTIN is preferred over the model as the needle")
+check(S.query_for({"name": "", "model": ""}, S.MODEL_ONLY) is None,
+      "a notice with no identifier yields no query rather than an empty search")
+check(S.query_for({"brand": "Acme", "name": "Acme"}, S.BRAND_MODEL) is None,
+      "a query that is only the brand is a catalogue, not a search, and is refused")
 
 
 # ------------------------------------------------------------------ batching

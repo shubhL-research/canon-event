@@ -200,21 +200,52 @@ def group_by_input(rows):
 def query_for(seed, strategy):
     """The search string for one notice under one strategy, or None.
 
+    WHAT WE TYPE IS NOT WHAT WE ASSERT
+    ----------------------------------
+    These were the same value, and that was why the first 30-seed sweep returned
+    3,177 rows and zero findings. `needle_for()` prefers the GTIN, because a
+    barcode is the strongest thing to re-assert on a page, and that same GTIN was
+    being handed to the search box:
+
+        brand_model  ->  "Taf toys 605566127156"
+        model_only   ->  "605566127156"
+
+    A marketplace search indexes product text, not barcodes. Neither query can
+    find the product, so the matcher was fed same-brand siblings and correctly
+    refused all of them. The seed had `name: "Foam mat"` and `model: "12715"`
+    sitting unused.
+
+    The two are different jobs. A query has to be findable by a search engine
+    built for shoppers; a needle has to be unambiguous on a page. So the query is
+    built from the model number and the product name, and the GTIN stays where it
+    belongs, in `needle_for()`.
+
     Returns None rather than falling back to the other strategy. A silent
     fallback would record a hit under a strategy that never ran, corrupting the
-    capture-recapture input and with it the only floor we have on what we
-    missed.
+    capture-recapture input and with it the only floor we have on what we missed.
     """
-    needle = (seed.get("gtin") or seed.get("model") or "").strip()
-    if not needle:
-        return None
-    if strategy == MODEL_ONLY:
-        return needle
+    model = (seed.get("model") or "").strip()
+    name = (seed.get("name") or "").strip()
     brand = (seed.get("brand") or "").strip()
+
+    if strategy == MODEL_ONLY:
+        # The identifier alone. A GTIN is the last resort rather than the first
+        # choice: some storefronts do index barcodes, so it is worth one of the
+        # two passes when there is no model number, but it is never the pass we
+        # rely on.
+        return model or (seed.get("gtin") or "").strip() or None
+
+    # brand_model: what a person looking for this product would actually type.
+    # The product name carries it when there is no model number, because "Taf
+    # toys Foam mat" is a real search and "Taf toys" alone is a catalogue.
+    if not brand and name:
+        brand = name.split()[0]
     if not brand:
-        name = (seed.get("name") or "").strip()
-        brand = name.split()[0] if name else ""
-    return ("%s %s" % (brand, needle)).strip() if brand else None
+        return None
+    tail = model or name
+    if not tail or tail == brand:
+        return None
+    return "%s %s" % (brand, tail)
 
 
 def needle_for(seed):
