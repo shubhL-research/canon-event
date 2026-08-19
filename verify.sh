@@ -21,6 +21,9 @@ echo
 echo "== collector normalizer =="
 python3 collector/test_normalize.py
 echo
+echo "== adversarial precision set =="
+python3 collector/adversarial.py
+echo
 echo "== wall renderer, headless =="
 node test_render.js
 echo

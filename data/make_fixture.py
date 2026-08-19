@@ -198,12 +198,34 @@ def identifier_strength(model, gtin):
     return "weak"
 
 
+def illustrative_survives(ref, days):
+    """ILLUSTRATIVE ONLY. Whether this seed is shown as still buyable.
+
+    THIS IS NOT A MEASUREMENT. No marketplace has been queried yet. The fixture
+    needs an age structure so the renderer has a real curve to draw and so the
+    isotonic fit is exercised before real data arrives; a fixture where every
+    searchable seed survives produces a flat line at 1.0 and tests nothing.
+
+    Deterministic, derived from the notice reference, so the fixture is
+    byte-identical on every run. Declining in age, which is the direction the
+    real measurement is expected to run, but the LEVEL here is invented and is
+    replaced wholesale by the first live sweep.
+    """
+    h = 0
+    for ch in str(ref):
+        h = (h * 131 + ord(ch)) % 100003
+    p = 0.85 - 0.55 * min(1.0, days / 750.0)
+    return (h % 1000) / 1000.0 < p
+
+
 def tier_of(e):
     """RED requires an exact identifier re-asserted on the fetched page plus a
     live buy control. Only a strong identifier can be re-asserted unambiguously;
     a weak or absent one cannot, so it caps out at AMBER and is excluded from
     every statistic."""
-    return "RED" if identifier_strength(e["model"], e["gtin"]) == "strong" else "AMBER"
+    if identifier_strength(e["model"], e["gtin"]) != "strong":
+        return "AMBER"
+    return "RED" if illustrative_survives(e["ref"], e["days"]) else "AMBER"
 
 
 def arms_of(e):
@@ -428,6 +450,24 @@ RC_N2_MODEL_ONLY = 24
 RC_M_BOTH = 17
 
 
+def build_curve(rows):
+    """Fit the monotone survival curve so the wall can draw it.
+
+    Computed here rather than in the browser: the wall renders decided values
+    and never does inference, so what is on screen is exactly what examples/
+    publishes and what a reader can recompute from the same numbers.
+    """
+    import importlib.util
+    spec = importlib.util.spec_from_file_location(
+        "survival", pathlib.Path(__file__).parent.parent / "stats" / "survival.py")
+    sv = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(sv)
+    obs = sv.observations_from_rows(rows)
+    if len(obs) < 8:
+        return {"insufficient": True, "n": len(obs)}
+    return sv.survival_curve(obs, n_boot=400)
+
+
 def build_hero(rows):
     """The hero sentence is a SUBSET statistic, not a wall-order claim.
 
@@ -519,6 +559,7 @@ def build_stats(rows):
         "discarded": {"v": round(discard_total / candidates, 4), "n": discard_total, "d": candidates,
                       "by_code": DISCARDED_COUNTS, "contaminated": True},
         "hero": build_hero(rows),
+        "survival_curve": build_curve(rows),
         "findings": {"red": corpus_red, "amber": corpus_amber,
                      "total": corpus_red + corpus_amber, "shown": min(len(rows), 40),
                      "footer": f"{min(len(rows), 40)} of {corpus_red + corpus_amber} shown, full set in examples/"},

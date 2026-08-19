@@ -151,10 +151,13 @@ days = sorted(g)
 check(all(g[days[i]] >= g[days[i + 1]] - 1e-9 for i in range(len(days) - 1)),
       "recovers a decaying curve as non-increasing across the reported grid")
 check(all(p["ci95"][0] <= p["survival"] <= p["ci95"][1] for p in curve["grid"]),
-      "every bootstrap band contains its own point estimate")
-check(survival_curve(truth, n_boot=60, seed=1)["grid"] ==
-      survival_curve(truth, n_boot=60, seed=1)["grid"],
-      "seeded bootstrap is reproducible, so a published band can be rechecked")
+      "every interval contains its own point estimate")
+check(all(p["thin"] for p in curve["grid"] if p["block_n"] < 5),
+      "a point resting on a block of fewer than 5 is flagged thin, whatever its support")
+check(all("block_n" in p for p in curve["grid"]),
+      "block_n is reported so a reader sees what the estimate actually rests on")
+check(survival_curve(truth)["grid"] == survival_curve(truth)["grid"],
+      "the fit is deterministic, so a published figure can be rechecked exactly")
 
 # ------------------------------------------------------- against real fixture
 

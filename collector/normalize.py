@@ -96,36 +96,54 @@ def norm_needle(s):
     return re.sub(r"[^a-z0-9]", "", str(s).lower())
 
 
+def needle_pattern(needle):
+    """A separator-tolerant, boundary-anchored pattern for an identifier.
+
+    Marketplaces render PS-1000 as "PS-1000", "PS 1000" or "PS1000", so the
+    match has to tolerate separators. But it must NOT tolerate extra characters
+    at either end, and that distinction is the difference between a correct
+    finding and a false accusation:
+
+        searching PS-100  against a page reading PS-1000  ->  MUST NOT match
+        searching PS-1000 against a page reading PS-1000  ->  must match
+
+    A naive substring test accepts the first, which means publishing a hazard
+    claim against a seller shipping a DIFFERENT product. The adversarial
+    precision set exists to catch exactly this, and it did.
+    """
+    chars = [c for c in str(needle) if c.isalnum()]
+    if not chars:
+        return None
+    sep = r"[\W_]*"
+    body = sep.join(re.escape(c) for c in chars)
+    return re.compile(r"(?<![A-Za-z0-9])" + body + r"(?![A-Za-z0-9])", re.I)
+
+
 def reassert(page_text, needle):
     """Did the identifier actually reappear on the page we fetched?
 
     This is the load-bearing check in the whole project. Amazon substitutes
     ASINs on stale URLs, so a live buy control on the WRONG product would score
     as a hazard still on sale. The identifier must be present in the fetched
-    page's own text, not merely in the URL we asked for.
+    page's own text, not merely in the URL we asked for, and it must appear as
+    a whole token rather than as a fragment of a longer one.
     """
     if not present(page_text) or not present(needle):
         return False
-    return norm_needle(needle) in norm_needle(page_text)
+    pat = needle_pattern(needle)
+    return bool(pat and pat.search(str(page_text)))
 
 
 def context_around(page_text, needle, width=90):
     """A short excerpt containing the needle, for the two-receipt card."""
     if not present(page_text) or not present(needle):
         return MISSING
-    hay, ned = norm_needle(page_text), norm_needle(needle)
-    i = hay.find(ned)
-    if i < 0:
+    pat = needle_pattern(needle)
+    m = pat.search(str(page_text)) if pat else None
+    if not m:
         return MISSING
-    # Map the normalised offset back onto the original text.
-    kept, orig_i = 0, 0
-    for orig_i, ch in enumerate(str(page_text)):
-        if re.match(r"[A-Za-z0-9]", ch):
-            if kept == i:
-                break
-            kept += 1
-    start = max(0, orig_i - width)
-    end = min(len(str(page_text)), orig_i + len(str(needle)) + width)
+    start = max(0, m.start() - width)
+    end = min(len(str(page_text)), m.end() + width)
     return ("..." if start else "") + str(page_text)[start:end] + ("..." if end < len(str(page_text)) else "")
 
 

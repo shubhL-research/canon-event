@@ -35,7 +35,7 @@
     "identity_reassertion": {
       "fired": false,
       "scope": "per row",
-      "checked": 111,
+      "checked": 62,
       "note": "Every RED row re-asserted its identifier on the fetched page."
     },
     "zero_is_a_fault": {

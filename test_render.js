@@ -38,7 +38,7 @@ function makeNode(id) {
 
 function run(variant) {
   const nodes = {};
-  const ids = ["verdict", "instruments", "armRail", "wall", "pager",
+  const ids = ["verdict", "instruments", "armRail", "wall", "pager", "curve",
                "notSeen", "healLedger", "provenance", "machinery"];
   ids.forEach((i) => (nodes[i] = makeNode(i)));
 
@@ -118,6 +118,9 @@ for (const variant of VARIANTS) {
     check(/MISSING/.test(html) === false, "MISSING only appears once a receipt is opened");
     check(/capture-recapture/i.test(html), "recall floor is stated");
     check(/of \d+ shown/.test(html), "pager reconciles displayed rows to the finding set");
+    check(/Survival by age/.test(html), "survival curve section rendered");
+    check(/isotonic regression/.test(html), "curve names the method it used");
+    check(/curve-band/.test(html), "curve bars drawn");
   }
   if (variant === "healing") {
     check(/Heal in flight/.test(html), "healing renders the step track copy");

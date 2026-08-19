@@ -57,6 +57,22 @@ check(not reassert("Item model number PS-2000 Batteries", "PS-1000"),
 check(not reassert(MISSING, "PS-1000"), "absent page text is not a match")
 check(norm_needle("KX-77B") == norm_needle("kx 77 b"), "normaliser is separator-insensitive")
 
+print("\nthe superstring trap (a real bug the adversarial set found)")
+check(not reassert("Item model number PS-1000 Batteries", "PS-100"),
+      "searching PS-100 does NOT match a page reading PS-1000")
+check(not reassert("EAN 7370522686759 Marke Replay", "737052268675"),
+      "a GTIN is not matched by a longer GTIN that starts with it")
+check(not reassert("Modellnummer KX-77BX", "KX-77B"),
+      "a trailing character defeats the match, as it must")
+check(reassert("Item model number PS-1000 Batteries", "PS-1000"),
+      "...while the exact identifier still matches")
+check(reassert("model: PS-1000.", "PS-1000"), "trailing punctuation is still a boundary")
+# A naive substring test accepts all three rejections above. Publishing on that
+# basis means accusing a seller of shipping a product they do not sell.
+naive = lambda hay, ned: norm_needle(ned) in norm_needle(hay)
+check(naive("Item model number PS-1000 Batteries", "PS-100"),
+      "confirming the naive test WOULD have leaked, so these probes are not vacuous")
+
 print("\ntiering")
 t, d = classify(GOOD)
 check(t == "RED" and not d, "identifier re-asserted + buy control = RED")

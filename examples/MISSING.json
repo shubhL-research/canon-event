@@ -4,22 +4,22 @@
   "_contract": "contract/row.schema.json",
   "_validate": "python validate.py",
   "_why": "evidence.assertion.dom_path and evidence.buy_control.ships_from are ABSENT, not null and not empty. A consumer runs row.get(k, MISSING) over contract/contract_keys.py and renders the field name struck through with the word MISSING. Rendering absence as 0 would turn a gap in our own measurement into a claim about the world.",
-  "rank": 27,
-  "name": "Happy Glow",
-  "hazard": "The soother's handle can break apart, releasing small parts. A small child may put them in the mouth and choke.",
+  "rank": 31,
+  "name": "Plush Toy",
+  "hazard": "The toy contains small parts (eye and suction cup) which can easily detach. A small child may put them in the mouth and choke. Moreover, the fibrous stuffing material of the toy is easily accessible due to the weakness of certain seams. A small child may put the filling material in the mouth and choke.",
   "source": {
     "authority": "SAFETY_GATE",
-    "ref": "A12/02462/24",
-    "published": "2024-08-30",
-    "url": "https://ec.europa.eu/safety-gate-alerts/screen/search?reference=A12/02462/24"
+    "ref": "A12/02546/24",
+    "published": "2024-09-06",
+    "url": "https://ec.europa.eu/safety-gate-alerts/screen/search?reference=A12/02546/24"
   },
-  "days": 721,
+  "days": 714,
   "days_frozen": false,
   "tier": "RED",
   "arms": {
     "US": "RED",
     "DE": "WITHHELD",
-    "IN": "NOT_FOUND"
+    "IN": "RED"
   },
   "hazard_class": {
     "qualifies": true,
@@ -33,20 +33,20 @@
     ],
     "child_scoped_standard": false
   },
-  "model": "123316",
-  "gtin": "7312507120307",
+  "model": "1138164123",
+  "gtin": "6932931853",
   "found_by_query": "brand_model",
   "evidence": {
     "captured_at": "2026-08-21T09:14:22Z",
     "assertion": {
-      "needle": "7312507120307",
-      "context": "... Item model number 7312507120307 Manufacturer recommended age ..."
+      "needle": "6932931853",
+      "context": "... Item model number 6932931853 Manufacturer recommended age ..."
     },
     "buy_control": {
       "present": true,
       "label": "Add to Cart",
       "in_stock": true
     },
-    "currency": "USD"
+    "currency": "INR"
   }
 }
