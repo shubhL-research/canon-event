@@ -18,6 +18,9 @@ echo
 echo "== identifier extractor =="
 python3 extract/test_identifier.py
 echo
+echo "== collector normalizer =="
+python3 collector/test_normalize.py
+echo
 echo "== wall renderer, headless =="
 node test_render.js
 echo
