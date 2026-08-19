@@ -228,12 +228,57 @@
 
   // ------------------------------------------------------------- the wall
 
+  // Display order: findings first, then by age within tier.
+  //
+  // The fixture generator sorts by DAY N descending alone, deliberately, so that
+  // "the oldest" in the hero sentence is unambiguous and nothing is reordered to
+  // flatter the claim. That reasoning holds for the hero, which is computed over
+  // the qualifying RED subset and is unaffected by wall order.
+  //
+  // It does not hold for the ledger. Measured on the fixture: the first RED row
+  // sat 2,623px down, past two and a half screens, behind 28 consecutive rows
+  // reading "no machine-matchable identifier / not captured". A hazard wall whose
+  // hazards are below the fold is a hazard wall nobody reads, and the headline
+  // claims a number the table appears to contradict.
+  //
+  // Reordering here cannot flatter anything, because no row changes tier and no
+  // figure is computed from this order. What would be dishonest is hiding the
+  // order, so it is printed in the table header instead.
+  var TIER_RANK = { RED: 0, AMBER: 1, DISCARDED: 2 };
+
+  function displayOrder(rows) {
+    return rows.slice().sort(function (a, b) {
+      var ta = TIER_RANK[a.tier], tb = TIER_RANK[b.tier];
+      if (ta !== tb) return ta - tb;
+      if (b.days !== a.days) return b.days - a.days;
+      return String(a.source.ref).localeCompare(String(b.source.ref));
+    });
+  }
+
   function renderRows(doc) {
-    var rows = doc.rows;
+    var rows = displayOrder(doc.rows);
     var maxDays = Math.max.apply(null, rows.map(function (r) { return r.days; }));
     var shown = rows.slice(0, PAGE_CAP);
 
-    el("wall").innerHTML = shown.map(function (r) {
+    // Name the sort where the columns are named. A reader who can see the order
+    // can check it; a reader who cannot has to trust it.
+    // Findings-first ordering means a full page of RED can push every AMBER row
+    // out of view, and the AMBER rows are the ones carrying "we could not check
+    // this". The blindness is still reported in WHAT WE DID NOT SEE, but the
+    // ledger must not imply the reader has seen the tier mix. So the header
+    // states it: what is shown, out of what, and how it splits.
+    var sortNote = el("sortNote");
+    if (sortNote) {
+      var mix = {};
+      doc.rows.forEach(function (r) { mix[r.tier] = (mix[r.tier] || 0) + 1; });
+      var parts = ["RED", "AMBER", "DISCARDED"].filter(function (t) { return mix[t]; })
+        .map(function (t) { return mix[t] + " " + t; });
+      sortNote.textContent = "sorted: confirmed first, then longest unremedied · "
+        + "showing " + shown.length + " of " + doc.rows.length
+        + " · " + parts.join(", ") + " · full set in the structured output";
+    }
+
+    el("wall").innerHTML = shown.map(function (r, i) {
       var ident = [r.model, r.gtin ? "GTIN " + r.gtin : null].filter(Boolean).join(" · ")
         || "no machine-matchable identifier";
       var chips = ARM_ORDER.map(function (code) {
@@ -242,9 +287,13 @@
         return '<span class="chip v-' + v + '" title="' + code + " " + v + '">' + glyph + "</span>";
       }).join("");
 
+      // The gutter shows the reader's position in the ledger, not r.rank. Rank is
+      // a stable row identity assigned by the sweep and it survives on data-rank
+      // for the expand handler, but printing it here after reordering produced a
+      // column reading 29, 35, 30, 31, which looks like a rendering fault.
       return '<article class="row' + (r.tier === "AMBER" ? " is-amber" : "") +
         '" data-rank="' + r.rank + '" tabindex="0">' +
-        '<div class="c-gutter">' + r.rank + "</div>" +
+        '<div class="c-gutter">' + (i + 1) + "</div>" +
         '<div class="c-id"><div class="name">' + esc(r.name) + "</div>" +
           '<div class="ident">' + esc(ident) + "</div></div>" +
         '<div class="c-hazard"><div class="quote">“' + esc(r.hazard) + "”</div>" +
@@ -541,6 +590,23 @@
 
     if (doc.global_blackout && doc.global_blackout.fired) {
       document.querySelectorAll(".instrument").forEach(function (n) { n.classList.add("is-struck"); });
+
+      // Every figure is struck, every arm is black — and the ledger underneath
+      // was still rendering exactly as it does on a good day. A reader scrolling
+      // past the masthead met forty rows that looked current, in the one state
+      // that exists to say we do not know.
+      //
+      // The rows stay on the page, because deleting them would be a different lie
+      // and because a reader needs to see what the last trustworthy sweep found.
+      // They are marked historical instead, which is the same treatment STALE
+      // already gives them, and the reason is stated rather than implied.
+      if (document.body) document.body.classList.add("is-blackout");
+      var note = el("historicalNote");
+      if (note) {
+        note.textContent = "Rows below are frozen at the last sweep that "
+          + "corroborated them and are historical, not current. No row here is a "
+          + "claim about what is on sale right now.";
+      }
     }
   }
 

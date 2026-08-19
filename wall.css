@@ -397,3 +397,49 @@ details.machinery th { color: var(--ink-3); font-weight: 400; }
   border-left: 2px solid var(--rule-strong); padding-left: 12px; max-width: 78ch;
   line-height: 1.5;
 }
+
+/* ------------------------------------------------ sort order, stated on screen
+
+   The ledger is sorted findings-first rather than by age alone. Printing the
+   order where the columns are named is the condition on reordering at all: a
+   reader who can see the sort can check it, and one who cannot has to trust it. */
+.sort-note {
+  font-family: var(--font-machine); font-size: 10px; letter-spacing: 0.08em;
+  text-transform: uppercase; color: var(--ink-3);
+  margin: 0; padding: 6px 32px 10px;
+}
+
+/* ------------------------------------------------------- blackout, the ledger
+
+   When implausible cleanliness fires, every figure is struck and every arm goes
+   black. The rows used to keep rendering as though nothing had happened, which
+   is the one thing this state exists to prevent.
+
+   They are not deleted: a reader needs to see what the last corroborated sweep
+   found, and removing them would be a different kind of lie. They are hatched
+   and desaturated, the same treatment STALE gives historical rows, with the
+   reason written out above them rather than left to be inferred. */
+.historical-note {
+  display: none; margin: 0; padding: 10px 32px 14px;
+  font-family: var(--font-machine); font-size: 11px; line-height: 1.5;
+  color: var(--ink-2); border-top: 1px solid var(--rule);
+  background: var(--surface-sunk);
+}
+body.is-blackout .historical-note { display: block; }
+
+body.is-blackout #wall .row {
+  background-image: repeating-linear-gradient(45deg,
+    var(--surface), var(--surface) 2px, var(--hatch) 2px, var(--hatch) 4px);
+}
+/* The tier chip is the strongest claim on a row, so it is the one that must stop
+   asserting. Struck, not hidden: the row still says what it once found. */
+body.is-blackout #wall .tier-box {
+  color: var(--unknown); border-color: var(--unknown);
+  text-decoration: line-through; background: transparent;
+}
+body.is-blackout #wall .name,
+body.is-blackout #wall .quote { color: var(--ink-2); }
+/* A filled red day bar reads as a live measurement at a glance. Nothing on this
+   page is live while the board is black. */
+body.is-blackout #wall .track > i { background: var(--hatch); }
+body.is-blackout #wall .chip.v-RED { background: var(--unknown); border-color: var(--unknown); }
