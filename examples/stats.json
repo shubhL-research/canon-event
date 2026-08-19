@@ -4,24 +4,25 @@
   "_contract": "contract/row.schema.json",
   "_validate": "python validate.py",
   "headline": {
-    "n": 7,
-    "oldest_days": 722,
+    "n": 17,
+    "oldest_days": 714,
     "oldest": {
-      "name": "Dumbbell toy sold with Baby Biceps Gift Set",
-      "ref": "24351",
-      "hazard": "The gray caps on the end of the dumbbell toy can come off, posing a choking hazard to infants.",
-      "rank_on_wall": 23
+      "name": "Toy slime",
+      "ref": "A12/02545/24",
+      "authority": "SAFETY_GATE",
+      "hazard": "The migration of boron from the toy slime is too high (measured value: 590 mg/kg). Ingestion or contact with an excessive quantity of boron may harm the health of children by damaging their reproductive system.",
+      "rank_on_wall": 30
     },
-    "sentence": "7 products recalled for burning or choking children are in a cart right now. The oldest has been buyable for 722 days.",
+    "sentence": "17 products recalled for burning or choking children are in a cart right now. The oldest has been buyable for 714 days.",
     "method": "Transparent keyword rule over the regulator's verbatim hazard sentence. Matched terms are recorded per row so the classification is auditable. See hazard_class()."
   },
   "survival": {
-    "v": 0.25,
-    "n": 45,
-    "d": 180,
+    "v": 0.2995,
+    "n": 62,
+    "d": 207,
     "ci95": [
-      0.1924,
-      0.318
+      0.2412,
+      0.3651
     ],
     "contaminated": true
   },
@@ -29,130 +30,344 @@
     "method": "isotonic regression (PAVA), nonparametric MLE for current-status data",
     "assumption": "survival is monotone non-increasing in days since recall",
     "confound": "Age is confounded with cohort: a 2024 recall is not exchangeable with a 2026 one. This is a cross-sectional age profile, not a within-product survival trajectory.",
-    "n": 37,
-    "n_still_buyable": 31,
+    "n": 111,
+    "n_still_buyable": 62,
     "blocks": [
       {
-        "from_day": 8,
-        "to_day": 8,
+        "from_day": 21,
+        "to_day": 21,
         "survival": 1.0,
         "n": 1
       },
       {
-        "from_day": 8,
-        "to_day": 8,
+        "from_day": 21,
+        "to_day": 21,
         "survival": 1.0,
         "n": 1
       },
       {
-        "from_day": 8,
-        "to_day": 750,
-        "survival": 0.8929,
-        "n": 28
+        "from_day": 21,
+        "to_day": 21,
+        "survival": 1.0,
+        "n": 1
       },
       {
-        "from_day": 750,
-        "to_day": 757,
-        "survival": 0.6667,
-        "n": 6
+        "from_day": 21,
+        "to_day": 21,
+        "survival": 1.0,
+        "n": 1
       },
       {
-        "from_day": 757,
-        "to_day": 757,
+        "from_day": 21,
+        "to_day": 21,
+        "survival": 1.0,
+        "n": 1
+      },
+      {
+        "from_day": 21,
+        "to_day": 21,
+        "survival": 1.0,
+        "n": 1
+      },
+      {
+        "from_day": 21,
+        "to_day": 21,
+        "survival": 1.0,
+        "n": 1
+      },
+      {
+        "from_day": 21,
+        "to_day": 21,
+        "survival": 1.0,
+        "n": 1
+      },
+      {
+        "from_day": 21,
+        "to_day": 21,
+        "survival": 1.0,
+        "n": 1
+      },
+      {
+        "from_day": 21,
+        "to_day": 21,
+        "survival": 1.0,
+        "n": 1
+      },
+      {
+        "from_day": 21,
+        "to_day": 21,
+        "survival": 1.0,
+        "n": 1
+      },
+      {
+        "from_day": 22,
+        "to_day": 22,
+        "survival": 1.0,
+        "n": 1
+      },
+      {
+        "from_day": 35,
+        "to_day": 35,
+        "survival": 1.0,
+        "n": 1
+      },
+      {
+        "from_day": 35,
+        "to_day": 35,
+        "survival": 1.0,
+        "n": 1
+      },
+      {
+        "from_day": 35,
+        "to_day": 35,
+        "survival": 1.0,
+        "n": 1
+      },
+      {
+        "from_day": 35,
+        "to_day": 35,
+        "survival": 1.0,
+        "n": 1
+      },
+      {
+        "from_day": 35,
+        "to_day": 35,
+        "survival": 1.0,
+        "n": 1
+      },
+      {
+        "from_day": 35,
+        "to_day": 35,
+        "survival": 1.0,
+        "n": 1
+      },
+      {
+        "from_day": 35,
+        "to_day": 35,
+        "survival": 1.0,
+        "n": 1
+      },
+      {
+        "from_day": 35,
+        "to_day": 35,
+        "survival": 1.0,
+        "n": 1
+      },
+      {
+        "from_day": 35,
+        "to_day": 35,
+        "survival": 1.0,
+        "n": 1
+      },
+      {
+        "from_day": 35,
+        "to_day": 35,
+        "survival": 1.0,
+        "n": 1
+      },
+      {
+        "from_day": 35,
+        "to_day": 70,
+        "survival": 0.9231,
+        "n": 26
+      },
+      {
+        "from_day": 70,
+        "to_day": 714,
+        "survival": 0.3556,
+        "n": 45
+      },
+      {
+        "from_day": 714,
+        "to_day": 714,
+        "survival": 0.0,
+        "n": 1
+      },
+      {
+        "from_day": 714,
+        "to_day": 714,
+        "survival": 0.0,
+        "n": 1
+      },
+      {
+        "from_day": 714,
+        "to_day": 714,
+        "survival": 0.0,
+        "n": 1
+      },
+      {
+        "from_day": 714,
+        "to_day": 714,
+        "survival": 0.0,
+        "n": 1
+      },
+      {
+        "from_day": 714,
+        "to_day": 714,
+        "survival": 0.0,
+        "n": 1
+      },
+      {
+        "from_day": 714,
+        "to_day": 714,
+        "survival": 0.0,
+        "n": 1
+      },
+      {
+        "from_day": 714,
+        "to_day": 714,
+        "survival": 0.0,
+        "n": 1
+      },
+      {
+        "from_day": 714,
+        "to_day": 714,
+        "survival": 0.0,
+        "n": 1
+      },
+      {
+        "from_day": 714,
+        "to_day": 714,
+        "survival": 0.0,
+        "n": 1
+      },
+      {
+        "from_day": 714,
+        "to_day": 714,
+        "survival": 0.0,
+        "n": 1
+      },
+      {
+        "from_day": 714,
+        "to_day": 714,
+        "survival": 0.0,
+        "n": 1
+      },
+      {
+        "from_day": 714,
+        "to_day": 714,
+        "survival": 0.0,
+        "n": 1
+      },
+      {
+        "from_day": 714,
+        "to_day": 714,
+        "survival": 0.0,
+        "n": 1
+      },
+      {
+        "from_day": 714,
+        "to_day": 714,
+        "survival": 0.0,
+        "n": 1
+      },
+      {
+        "from_day": 714,
+        "to_day": 714,
+        "survival": 0.0,
+        "n": 1
+      },
+      {
+        "from_day": 721,
+        "to_day": 721,
+        "survival": 0.0,
+        "n": 1
+      },
+      {
+        "from_day": 721,
+        "to_day": 721,
+        "survival": 0.0,
+        "n": 1
+      },
+      {
+        "from_day": 721,
+        "to_day": 721,
         "survival": 0.0,
         "n": 1
       }
     ],
     "grid": [
       {
-        "day": 8,
-        "survival": 0.8929,
+        "day": 21,
+        "survival": 1.0,
         "ci95": [
-          0.7727,
+          0.2065,
           1.0
         ],
-        "support": 37,
-        "thin": false,
-        "publishable": true
+        "support": 111,
+        "block_n": 1,
+        "thin": true,
+        "publishable": false
       },
       {
         "day": 30,
-        "survival": 0.8929,
+        "survival": 1.0,
         "ci95": [
-          0.7727,
+          0.2065,
           1.0
         ],
-        "support": 31,
-        "thin": false,
-        "publishable": true
+        "support": 99,
+        "block_n": 1,
+        "thin": true,
+        "publishable": false
       },
       {
         "day": 90,
-        "survival": 0.8929,
+        "survival": 0.3556,
         "ci95": [
-          0.7727,
-          1.0
+          0.2322,
+          0.5016
         ],
-        "support": 31,
+        "support": 54,
+        "block_n": 45,
         "thin": false,
         "publishable": true
       },
       {
         "day": 365,
-        "survival": 0.8929,
+        "survival": 0.3556,
         "ci95": [
-          0.7667,
-          1.0
+          0.2322,
+          0.5016
         ],
-        "support": 20,
+        "support": 27,
+        "block_n": 45,
         "thin": false,
         "publishable": true
       },
       {
-        "day": 730,
-        "survival": 0.8929,
-        "ci95": [
-          0.7667,
-          1.0
-        ],
-        "support": 15,
-        "thin": false,
-        "publishable": true
-      },
-      {
-        "day": 757,
+        "day": 721,
         "survival": 0.0,
         "ci95": [
           0.0,
-          0.9091
+          0.7935
         ],
-        "support": 5,
-        "thin": false,
-        "publishable": true
+        "support": 3,
+        "block_n": 1,
+        "thin": true,
+        "publishable": false
       }
     ],
     "min_support": 5,
-    "bootstrap": {
-      "draws": 400,
-      "seed": 20260821,
-      "resample": "nonparametric, by item"
-    }
+    "interval_method": "Wilson score interval on the isotonic block supporting each grid point. A percentile bootstrap is deliberately NOT used: it is known to be inconsistent for Grenander-type monotone estimators at a fixed point, and on this corpus it returned intervals that excluded their own point estimate. These intervals condition on the fitted block structure, so they describe uncertainty in the level within a block, not uncertainty in where the block boundaries fall."
   },
   "border_escape": {
     "v": null,
     "n": 0,
-    "d": 0,
+    "d": 104,
     "ci95": null,
     "contaminated": true,
-    "pending": "EU Safety Gate seeds are not yet in the corpus. Border escape is 'of EU-recalled products, what share are buyable from an Indian residential IP', and it cannot be computed from CPSC notices alone."
+    "pending": "Denominator ready: 104 EU-recalled products carry a searchable identifier. The numerator requires a live sweep from an Indian residential exit IP, which has not run yet.",
+    "eu_seeds": 104,
+    "eu_searchable": 104
   },
   "unsearchable": {
-    "v": 0.2889,
-    "n": 52,
-    "d": 180,
+    "v": 0.4638,
+    "n": 96,
+    "d": 207,
     "ci95": [
-      0.2276,
-      0.359
+      0.3971,
+      0.5317
     ],
     "contaminated": false
   },
@@ -166,12 +381,12 @@
     ],
     "contaminated": false,
     "recall": {
-      "n1_brand_model": 38,
-      "n2_model_only": 24,
-      "m_both": 17,
-      "observed": 45,
-      "n_hat": 53.17,
-      "missed_floor": 8.17,
+      "n1_brand_model": 54,
+      "n2_model_only": 29,
+      "m_both": 21,
+      "observed": 62,
+      "n_hat": 74.0,
+      "missed_floor": 12.0,
       "estimator": "Chapman (bias-corrected Lincoln-Petersen)",
       "independence_violated": true,
       "note": "The two query strategies share the model token and are positively correlated. N-hat is therefore biased downward, so missed_floor is a LOWER bound on what we failed to see."
@@ -179,13 +394,13 @@
   },
   "recall_floor": {
     "estimator": "Chapman (bias-corrected Lincoln-Petersen)",
-    "n1_brand_model": 27,
-    "n2_model_only": 15,
-    "m_both": 11,
-    "observed": 31,
-    "n_hat": 36.33,
-    "se": 3.91,
-    "missed_floor": 5.33,
+    "n1_brand_model": 54,
+    "n2_model_only": 29,
+    "m_both": 21,
+    "observed": 62,
+    "n_hat": 74.0,
+    "se": 6.26,
+    "missed_floor": 12.0,
     "independence_violated": true,
     "bias_direction": "downward",
     "note": "The two query strategies share the model token and are positively correlated, which inflates the overlap and deflates N-hat. The miss count is therefore a LOWER bound on what we failed to see, not an estimate of it. Always print it as 'at least'.",
@@ -193,9 +408,9 @@
     "reportable_note": "With an overlap below 3 the estimator is too unstable to publish. Report the raw counts and say recall is unmeasured."
   },
   "discarded": {
-    "v": 0.0833,
+    "v": 0.0725,
     "n": 45,
-    "d": 540,
+    "d": 621,
     "by_code": {
       "AMBER": 12,
       "dead_page": 9,
@@ -249,13 +464,13 @@
     ]
   },
   "arithmetic": {
-    "corpus_seeds": 180,
+    "corpus_seeds": 207,
     "queries_per_seed_per_arm": 2,
     "arms": 3,
-    "search_page_loads": 1080,
-    "pdp_promotions": 121,
-    "total_page_loads": 1201,
-    "working": "180 seeds x 2 queries x 3 arms = 1080 search loads, + 121 product-page promotions = 1201 page loads at 1 credit each.",
+    "search_page_loads": 1242,
+    "pdp_promotions": 62,
+    "total_page_loads": 1304,
+    "working": "207 seeds x 2 queries x 3 arms = 1242 search loads, + 62 product-page promotions = 1304 page loads at 1 credit each.",
     "note": "Promotion to a product page is decided outside Scraper Studio by the matcher, so only RED candidates cost a browser load. Chaining with next_stage would have promoted every discovered listing and multiplied this by roughly forty."
   }
 }

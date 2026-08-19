@@ -348,6 +348,50 @@
     row.insertAdjacentHTML("afterend", receipt(data));
   }
 
+  // -------------------------------------------------------- survival curve
+
+  /* The curve is FITTED UPSTREAM, in stats/survival.py, and rendered here from
+     decided values. The wall never performs inference: what is on screen is
+     exactly what examples/stats.json publishes, so a reader can recompute it. */
+  function renderCurve(doc) {
+    var c = doc.stats.survival_curve;
+    var node = el("curve");
+    if (!c || c.insufficient) {
+      node.innerHTML = "<h2>Survival by age</h2>" +
+        '<p class="lede">Not enough observations to fit a curve yet' +
+        (c ? " (" + c.n + ")" : "") + ". A shape fitted to a handful of products " +
+        "is a picture, not a finding.</p>";
+      return;
+    }
+
+    var cols = c.grid.map(function (g) {
+      var lo = g.ci95[0], hi = g.ci95[1];
+      // Bar spans the interval, so its HEIGHT is the uncertainty. A single
+      // value drawn as a point would hide how little some of these rest on.
+      var top = Math.max(2, (hi - lo) * 100);
+      return '<div class="curve-col' + (g.thin ? " is-thin" : "") + '">' +
+        '<div class="v">' + (g.thin ? "&mdash;" : pct(g.survival)) + "</div>" +
+        '<div class="curve-band" style="height:' + top.toFixed(1) + "%;margin-bottom:" +
+          (lo * 100).toFixed(1) + '%" title="day ' + g.day + ": " + pct(g.survival) +
+          ", CI " + pct(lo) + " to " + pct(hi) + ", block n=" + g.block_n + '"></div>' +
+      "</div>";
+    }).join("");
+
+    var axis = c.grid.map(function (g) {
+      return "<span>day " + g.day + (g.thin ? "" : " · n=" + g.block_n) + "</span>";
+    }).join("");
+
+    node.innerHTML =
+      "<h2>Survival by age</h2>" +
+      '<p class="lede">Share of recalled products still buyable, by how long ago the ' +
+      "notice was published. Each bar spans the 95% interval, so its height is the " +
+      "uncertainty. Hatched bars rest on too few observations to publish.</p>" +
+      '<div class="curve-plot">' + cols + "</div>" +
+      '<div class="curve-axis">' + axis + "</div>" +
+      '<div class="curve-note"><b>' + esc(c.method) + ".</b> " + esc(c.confound) +
+      " " + esc(c.interval_method) + "</div>";
+  }
+
   // ---------------------------------------------------------------- panels
 
   function renderNotSeen(doc) {
@@ -490,6 +534,7 @@
     renderInstruments(doc);
     renderArms(doc);
     renderRows(doc);
+    renderCurve(doc);
     renderNotSeen(doc);
     renderHeal(doc);
     renderProvenance(doc);

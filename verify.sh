@@ -18,6 +18,12 @@ echo
 echo "== identifier extractor =="
 python3 extract/test_identifier.py
 echo
+echo "== collector normalizer =="
+python3 collector/test_normalize.py
+echo
+echo "== adversarial precision set =="
+python3 collector/adversarial.py
+echo
 echo "== collection: the RED gate and the contract boundary =="
 python3 collect/test_adjudicate.py
 echo

@@ -362,3 +362,38 @@ details.machinery th { color: var(--ink-3); font-weight: 400; }
   .c-hazard, .c-tier { display: none; }
   .panels, .receipt-grid { grid-template-columns: 1fr; }
 }
+
+/* ------------------------------------------------------- survival curve */
+
+.curve { margin-top: 48px; border-top: 1px solid var(--rule-strong); padding-top: 24px; }
+.curve h2 {
+  font-family: var(--font-machine); font-size: 11px; letter-spacing: 0.12em;
+  text-transform: uppercase; margin-bottom: 4px;
+}
+.curve .lede { font-size: 12px; color: var(--ink-3); max-width: 70ch; line-height: 1.45; }
+.curve-plot { display: flex; align-items: flex-end; gap: 1px; height: 180px; margin: 20px 0 0; }
+.curve-col { flex: 1; display: flex; flex-direction: column; justify-content: flex-end; height: 100%; }
+.curve-band {
+  width: 100%; background: var(--hazard-wash); position: relative;
+  border-top: 2px solid var(--hazard); border-bottom: 1px solid var(--rule);
+}
+.curve-col.is-thin .curve-band {
+  background: repeating-linear-gradient(45deg,
+    var(--surface), var(--surface) 2px, var(--hatch) 2px, var(--hatch) 4px);
+  border-top-color: var(--unknown);
+}
+.curve-col .v {
+  font-family: var(--font-machine); font-size: 12px; font-weight: 700;
+  text-align: center; padding-bottom: 4px;
+}
+.curve-col.is-thin .v { color: var(--unknown); }
+.curve-axis { display: flex; gap: 1px; margin-top: 6px; }
+.curve-axis span {
+  flex: 1; text-align: center; font-family: var(--font-machine);
+  font-size: 10px; color: var(--ink-3);
+}
+.curve-note {
+  margin-top: 14px; font-size: 11px; color: var(--ink-3);
+  border-left: 2px solid var(--rule-strong); padding-left: 12px; max-width: 78ch;
+  line-height: 1.5;
+}

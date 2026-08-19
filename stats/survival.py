@@ -71,6 +71,30 @@ def pava_non_increasing(points):
     return [(b[0], b[1], b[2] / b[3], b[3]) for b in blocks]
 
 
+def block_at(blocks, x):
+    """The isotonic block covering age x. This block is the local sample the
+    interval conditions on."""
+    found = blocks[0] if blocks else None
+    for b in blocks:
+        if x >= b[0]:
+            found = b
+        else:
+            break
+    return found
+
+
+def wilson(k, n, z=1.959963984540054):
+    """Wilson score interval. Duplicated from stats/wilson.py deliberately so
+    this module has no intra-package import and runs standalone."""
+    if n <= 0:
+        return (0.0, 1.0)
+    p = k / n
+    d = 1 + z * z / n
+    centre = (p + z * z / (2 * n)) / d
+    half = z * math.sqrt(p * (1 - p) / n + z * z / (4 * n * n)) / d
+    return (round(max(0.0, centre - half), 4), round(min(1.0, centre + half), 4))
+
+
 def step_at(blocks, x):
     """Evaluate the fitted survival step function at age x."""
     value = blocks[0][2] if blocks else float("nan")
@@ -82,16 +106,16 @@ def step_at(blocks, x):
     return value
 
 
-def survival_curve(observations, grid=None, n_boot=400, seed=20260821, alpha=0.05):
-    """Fit the monotone survival curve with a pointwise bootstrap band.
+def survival_curve(observations, grid=None, n_boot=None, seed=None, alpha=0.05):
+    """Fit the monotone survival curve with a pointwise interval per grid point.
 
     observations: iterable of (age_days:int, still_buyable:bool)
     grid:         ages at which to report. Defaults to the plan's four checkpoints
                   plus the observed range.
 
-    The bootstrap is a plain nonparametric resample of items. It is seeded, so
-    the published figure is reproducible from the committed data. Do not remove
-    the seed: an unreproducible confidence band is not evidence.
+    n_boot and seed are accepted and ignored: they existed when this used a
+    percentile bootstrap, which was removed for the reason documented below.
+    They stay in the signature so existing callers do not break.
     """
     obs = [(int(a), 1.0 if b else 0.0) for a, b in observations]
     if not obs:
@@ -108,27 +132,35 @@ def survival_curve(observations, grid=None, n_boot=400, seed=20260821, alpha=0.0
 
     fitted = {g: step_at(blocks, g) for g in grid}
 
-    rng = random.Random(seed)
-    draws = {g: [] for g in grid}
-    n = len(obs)
-    for _ in range(n_boot):
-        sample = [obs[rng.randrange(n)] for _ in range(n)]
-        b = pava_non_increasing([(a, y, 1.0) for a, y in sample])
-        for g in grid:
-            draws[g].append(step_at(b, g))
-
-    band = {}
-    lo_i = int(math.floor((alpha / 2) * n_boot))
-    hi_i = min(n_boot - 1, int(math.ceil((1 - alpha / 2) * n_boot)) - 1)
+    # INTERVALS: block-wise Wilson, NOT a percentile bootstrap.
+    #
+    # The obvious move is to resample and take percentiles. Do not. The naive
+    # bootstrap is known to be INCONSISTENT for Grenander-type monotone
+    # estimators at a fixed point: the block boundaries move between resamples,
+    # so the percentile interval does not converge to the right thing. In this
+    # corpus it produced a point estimate of 0.356 sitting outside its own
+    # reported interval of [0.50, 0.89], which is indefensible on screen and
+    # would be the first thing a careful reader noticed.
+    #
+    # Instead each grid point reports a Wilson interval computed from the
+    # isotonic BLOCK that supports it: k successes out of the n observations
+    # PAVA pooled into that block. It always contains its own point estimate
+    # (the block value is exactly k/n), it is transparent, and it is honest
+    # about what it conditions on, which is stated in `interval_method` below.
+    band, block_n = {}, {}
     for g in grid:
-        d = sorted(draws[g])
-        band[g] = [round(d[lo_i], 4), round(d[hi_i], 4)]
+        blk = block_at(blocks, g)
+        n_b = int(blk[3]) if blk else 0
+        k_b = int(round(blk[2] * n_b)) if blk else 0
+        band[g] = list(wilson(k_b, n_b)) if n_b else [0.0, 1.0]
+        block_n[g] = n_b
 
-    # Support guard. An isotonic fit is at its least stable at the boundaries,
-    # where a single observation can drag the last block to 0 or 1 and render a
-    # cliff that looks like a finding. Count how many observations actually sit
-    # at or beyond each grid age, and flag the thin ones so the wall can grey
-    # them out instead of publishing a cliff driven by one product.
+    # Support guard, on BOTH counts, because they answer different questions.
+    # `support` is how many observations sit at or beyond this age. `block_n` is
+    # how many the isotonic fit actually pooled to produce this value. A grid
+    # point can have 111 observations beyond it and still rest on a block of
+    # ONE, which is a cliff driven by a single product dressed up as a finding.
+    # A point is thin if either count is small.
     support = {g: sum(1 for a, _ in obs if a >= g) for g in grid}
 
     return {
@@ -137,15 +169,24 @@ def survival_curve(observations, grid=None, n_boot=400, seed=20260821, alpha=0.0
         "confound": ("Age is confounded with cohort: a 2024 recall is not exchangeable with a "
                      "2026 one. This is a cross-sectional age profile, not a within-product "
                      "survival trajectory."),
-        "n": n,
+        "n": len(obs),
         "n_still_buyable": int(sum(y for _, y in obs)),
         "blocks": [{"from_day": int(b[0]), "to_day": int(b[1]),
                     "survival": round(b[2], 4), "n": int(b[3])} for b in blocks],
         "grid": [{"day": g, "survival": round(fitted[g], 4), "ci95": band[g],
-                  "support": support[g], "thin": support[g] < MIN_SUPPORT,
-                  "publishable": support[g] >= MIN_SUPPORT} for g in grid],
+                  "support": support[g], "block_n": block_n[g],
+                  "thin": min(support[g], block_n[g]) < MIN_SUPPORT,
+                  "publishable": min(support[g], block_n[g]) >= MIN_SUPPORT}
+                 for g in grid],
         "min_support": MIN_SUPPORT,
-        "bootstrap": {"draws": n_boot, "seed": seed, "resample": "nonparametric, by item"},
+        "interval_method": (
+            "Wilson score interval on the isotonic block supporting each grid point. "
+            "A percentile bootstrap is deliberately NOT used: it is known to be "
+            "inconsistent for Grenander-type monotone estimators at a fixed point, and "
+            "on this corpus it returned intervals that excluded their own point "
+            "estimate. These intervals condition on the fitted block structure, so they "
+            "describe uncertainty in the level within a block, not uncertainty in where "
+            "the block boundaries fall."),
     }
 
 

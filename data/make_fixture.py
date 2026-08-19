@@ -150,6 +150,22 @@ ADVERSARIAL = [
 ]
 
 
+def load_seeds():
+    """Prefer the pulled corpus; fall back to the inline sample.
+
+    data/seeds.json is produced by pull_seeds.py from BOTH regulators. The
+    inline SEEDS list stays as a committed fallback so the fixture still builds
+    with no network, which the clean-clone check depends on.
+    """
+    f = pathlib.Path(__file__).parent / "seeds.json"
+    if not f.exists():
+        return SEEDS, "inline sample"
+    raw = json.loads(f.read_text(encoding="utf-8"))["seeds"]
+    out = [(s["name"], s["model"], s["gtin"], s["authority"],
+            s["ref"], s["published"], s["hazard"]) for s in raw]
+    return out, f"seeds.json ({len(out)} seeds, US + EU)"
+
+
 def days_since(published: str) -> int:
     d = datetime.date.fromisoformat(published)
     return (SWEPT.date() - d).days
@@ -182,12 +198,34 @@ def identifier_strength(model, gtin):
     return "weak"
 
 
+def illustrative_survives(ref, days):
+    """ILLUSTRATIVE ONLY. Whether this seed is shown as still buyable.
+
+    THIS IS NOT A MEASUREMENT. No marketplace has been queried yet. The fixture
+    needs an age structure so the renderer has a real curve to draw and so the
+    isotonic fit is exercised before real data arrives; a fixture where every
+    searchable seed survives produces a flat line at 1.0 and tests nothing.
+
+    Deterministic, derived from the notice reference, so the fixture is
+    byte-identical on every run. Declining in age, which is the direction the
+    real measurement is expected to run, but the LEVEL here is invented and is
+    replaced wholesale by the first live sweep.
+    """
+    h = 0
+    for ch in str(ref):
+        h = (h * 131 + ord(ch)) % 100003
+    p = 0.85 - 0.55 * min(1.0, days / 750.0)
+    return (h % 1000) / 1000.0 < p
+
+
 def tier_of(e):
     """RED requires an exact identifier re-asserted on the fetched page plus a
     live buy control. Only a strong identifier can be re-asserted unambiguously;
     a weak or absent one cannot, so it caps out at AMBER and is excluded from
     every statistic."""
-    return "RED" if identifier_strength(e["model"], e["gtin"]) == "strong" else "AMBER"
+    if identifier_strength(e["model"], e["gtin"]) != "strong":
+        return "AMBER"
+    return "RED" if illustrative_survives(e["ref"], e["days"]) else "AMBER"
 
 
 def arms_of(e):
@@ -213,8 +251,10 @@ def build_rows():
     Deterministic by index. No randomness anywhere: the fixture must be
     byte-identical on every run or 'swap day is cp' stops being true.
     """
+    seeds, origin = load_seeds()
+    build_rows.origin = origin
     enriched = []
-    for i, (name, model, gtin, auth, ref, pub, hazard) in enumerate(SEEDS):
+    for i, (name, model, gtin, auth, ref, pub, hazard) in enumerate(seeds):
         enriched.append({
             "i": i, "name": name, "model": model, "gtin": gtin,
             "authority": auth, "ref": ref, "published": pub,
@@ -256,7 +296,9 @@ def build_rows():
                 "authority": e["authority"],
                 "ref": e["ref"],
                 "published": e["published"],
-                "url": f"https://www.cpsc.gov/Recalls/2026/{e['ref']}",
+                "url": (f"https://www.cpsc.gov/Recalls/{e['ref']}"
+                        if e["authority"] == "CPSC" else
+                        f"https://ec.europa.eu/safety-gate-alerts/screen/search?reference={e['ref']}"),
             },
             "days": e["days"],
             "days_frozen": False,
@@ -392,7 +434,9 @@ def chapman(n1, n2, m):
 
 
 # --- Corpus constants. Every headline denominator traces back to these. ---
-CORPUS_SEEDS = 180          # reduced from 430: 3 arms x 2 queries exhausts the credit budget
+_seed_file = pathlib.Path(__file__).parent / "seeds.json"
+CORPUS_SEEDS = (len(json.loads(_seed_file.read_text(encoding="utf-8"))["seeds"])
+                if _seed_file.exists() else 180)
 QUERIES_PER_SEED_PER_ARM = 2  # brand+model, then model alone
 ARM_COUNT = 3               # US, DE, IN. eBay cut before Day 1.
 
@@ -404,6 +448,24 @@ CORPUS_UNSEARCHABLE = 52    # notices published with no machine-matchable identi
 RC_N1_BRAND_MODEL = 38
 RC_N2_MODEL_ONLY = 24
 RC_M_BOTH = 17
+
+
+def build_curve(rows):
+    """Fit the monotone survival curve so the wall can draw it.
+
+    Computed here rather than in the browser: the wall renders decided values
+    and never does inference, so what is on screen is exactly what examples/
+    publishes and what a reader can recompute from the same numbers.
+    """
+    import importlib.util
+    spec = importlib.util.spec_from_file_location(
+        "survival", pathlib.Path(__file__).parent.parent / "stats" / "survival.py")
+    sv = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(sv)
+    obs = sv.observations_from_rows(rows)
+    if len(obs) < 8:
+        return {"insufficient": True, "n": len(obs)}
+    return sv.survival_curve(obs, n_boot=400)
 
 
 def build_hero(rows):
@@ -429,6 +491,7 @@ def build_hero(rows):
         "n": len(qualifying),
         "oldest_days": oldest["days"],
         "oldest": {"name": oldest["name"], "ref": oldest["source"]["ref"],
+                   "authority": oldest["source"]["authority"],
                    "hazard": oldest["hazard"], "rank_on_wall": oldest["rank"]},
         "sentence": (f"{len(qualifying)} products recalled for burning or choking children "
                      f"are in a cart right now. The oldest has been buyable for "
@@ -447,15 +510,24 @@ def build_stats(rows):
     The `arithmetic` block below shows the working so a judge who checks finds it
     already checked.
     """
-    shown_red = sum(1 for r in rows if r["tier"] == "RED")
-    shown_amber = sum(1 for r in rows if r["tier"] == "AMBER")
-    assert RC_N1_BRAND_MODEL + RC_N2_MODEL_ONLY - RC_M_BOTH == CORPUS_RED, \
+    # Derived from the data, never hardcoded. A constant that has to agree with a
+    # computed figure is a contradiction waiting to be published, and CRITIC.md
+    # already killed one artifact for exactly that.
+    corpus_red = sum(1 for r in rows if r["tier"] == "RED")
+    corpus_amber = sum(1 for r in rows if r["tier"] == "AMBER")
+    corpus_unsearchable = sum(1 for r in rows
+                              if not r.get("model") and not r.get("gtin"))
+    eu_rows = [r for r in rows if r["source"]["authority"] == "SAFETY_GATE"]
+    eu_total = len(eu_rows)
+    eu_searchable = sum(1 for r in eu_rows if r.get("model") or r.get("gtin"))
+    n1 = sum(1 for r in rows if r.get("found_by_query") in ("brand_model", "both"))
+    n2 = sum(1 for r in rows if r.get("found_by_query") in ("model_only", "both"))
+    m = sum(1 for r in rows if r.get("found_by_query") == "both")
+    assert n1 + n2 - m == corpus_red, \
         "capture-recapture counts must reconcile to the RED total"
-    assert shown_red <= CORPUS_RED and shown_amber <= CORPUS_AMBER, \
-        "displayed rows cannot exceed the corpus finding set"
 
     search_loads = CORPUS_SEEDS * QUERIES_PER_SEED_PER_ARM * ARM_COUNT
-    pdp_promotions = 121   # only RED candidates are promoted to a product-page load
+    pdp_promotions = corpus_red   # only RED candidates cost a product-page load
     total_loads = search_loads + pdp_promotions
     discard_total = sum(DISCARDED_COUNTS.values())
     candidates = CORPUS_SEEDS * ARM_COUNT
@@ -471,21 +543,26 @@ def build_stats(rows):
             "working": f"{CORPUS_SEEDS} seeds x {QUERIES_PER_SEED_PER_ARM} queries x {ARM_COUNT} arms = {search_loads} search loads, + {pdp_promotions} product-page promotions = {total_loads} page loads at 1 credit each.",
             "note": "Promotion to a product page is decided outside Scraper Studio by the matcher, so only RED candidates cost a browser load. Chaining with next_stage would have promoted every discovered listing and multiplied this by roughly forty.",
         },
-        "survival": {"v": round(CORPUS_RED / CORPUS_SEEDS, 4), "n": CORPUS_RED, "d": CORPUS_SEEDS,
-                     "ci95": wilson(CORPUS_RED, CORPUS_SEEDS), "contaminated": True},
-        "border_escape": {"v": None, "n": 0, "d": 0, "ci95": None, "contaminated": True,
-                          "pending": "EU Safety Gate seeds are not yet in the corpus. Border escape is 'of EU-recalled products, what share are buyable from an Indian residential IP', and it cannot be computed from CPSC notices alone."},
-        "unsearchable": {"v": round(CORPUS_UNSEARCHABLE / CORPUS_SEEDS, 4),
-                         "n": CORPUS_UNSEARCHABLE, "d": CORPUS_SEEDS,
-                         "ci95": wilson(CORPUS_UNSEARCHABLE, CORPUS_SEEDS), "contaminated": False},
+        "survival": {"v": round(corpus_red / CORPUS_SEEDS, 4), "n": corpus_red, "d": CORPUS_SEEDS,
+                     "ci95": wilson(corpus_red, CORPUS_SEEDS), "contaminated": True},
+        "border_escape": {"v": None, "n": 0, "d": eu_searchable, "ci95": None,
+                          "contaminated": True,
+                          "pending": (f"Denominator ready: {eu_searchable} EU-recalled products carry a "
+                                      f"searchable identifier. The numerator requires a live sweep from an "
+                                      f"Indian residential exit IP, which has not run yet."),
+                          "eu_seeds": eu_total, "eu_searchable": eu_searchable},
+        "unsearchable": {"v": round(corpus_unsearchable / CORPUS_SEEDS, 4),
+                         "n": corpus_unsearchable, "d": CORPUS_SEEDS,
+                         "ci95": wilson(corpus_unsearchable, CORPUS_SEEDS), "contaminated": False},
         "precision": {"v": 0.94, "n": 47, "d": 50, "ci95": wilson(47, 50), "contaminated": False,
-                      "recall": chapman(RC_N1_BRAND_MODEL, RC_N2_MODEL_ONLY, RC_M_BOTH)},
+                      "recall": chapman(n1, n2, m)},
         "discarded": {"v": round(discard_total / candidates, 4), "n": discard_total, "d": candidates,
                       "by_code": DISCARDED_COUNTS, "contaminated": True},
         "hero": build_hero(rows),
-        "findings": {"red": CORPUS_RED, "amber": CORPUS_AMBER,
-                     "total": CORPUS_RED + CORPUS_AMBER, "shown": len(rows),
-                     "footer": f"{len(rows)} of {CORPUS_RED + CORPUS_AMBER} shown, full set in examples/"},
+        "survival_curve": build_curve(rows),
+        "findings": {"red": corpus_red, "amber": corpus_amber,
+                     "total": corpus_red + corpus_amber, "shown": min(len(rows), 40),
+                     "footer": f"{min(len(rows), 40)} of {corpus_red + corpus_amber} shown, full set in examples/"},
         "arms_measured": {"n": 2, "d": 3},
         "credits": {"used": total_loads, "cap": 5000, "code": search_loads, "browser": pdp_promotions},
         "adversarial_precision_set": {
@@ -614,12 +691,12 @@ def main():
     print(f"\n  displayed rows {len(rows)}  RED {red}  AMBER {amber}")
     print(f"  wall leads with: DAY {rows[0]['days']}  {rows[0]['name']}")
     print(f"\n  HERO: {h['sentence']}")
-    print(f"        {h['oldest']['name']}  (CPSC {h['oldest']['ref']}, wall row {h['oldest']['rank_on_wall']})")
+    print(f"        {h['oldest']['name']}  ({h['oldest']['authority']} {h['oldest']['ref']}, wall row {h['oldest']['rank_on_wall']})")
     print(f"        {h['oldest']['hazard'][:88]}")
     print(f"\n  survival     {stats['survival']['v']}  {stats['survival']['n']}/{stats['survival']['d']}   CI {stats['survival']['ci95']}")
     print(f"  unsearchable {stats['unsearchable']['v']}  {stats['unsearchable']['n']}/{stats['unsearchable']['d']}  CI {stats['unsearchable']['ci95']}")
     print(f"  precision    {stats['precision']['v']}  47/50   CI {stats['precision']['ci95']}")
-    print(f"  border esc   PENDING, Safety Gate seeds not pulled")
+    print(f"  border esc   denominator {stats['border_escape']['eu_searchable']} EU seeds ready, numerator needs the sweep")
     print(f"\n  recapture    n1={rc['n1_brand_model']} n2={rc['n2_model_only']} m={rc['m_both']} observed={rc['observed']}")
     print(f"               N-hat {rc['n_hat']} -> at least {rc['missed_floor']:.0f} listings we never saw")
     print(f"\n  arithmetic   {a['working']}")
