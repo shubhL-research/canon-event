@@ -280,8 +280,19 @@ def query_for(seed, strategy):
         return model or (seed.get("gtin") or "").strip() or None
 
     # brand_model: what a person looking for this product would actually type.
-    # The product name carries it when there is no model number, because "Taf
-    # toys Foam mat" is a real search and "Taf toys" alone is a catalogue.
+    #
+    # CPSC's brand field is the RECALLING FIRM'S LEGAL NAME, not the consumer
+    # brand. Used verbatim it produces queries no shopper would ever type:
+    #
+    #   Zhongshanboshangkedianzishangwuyouxiangongsi, dba beberoadlove, of China TB999-1
+    #   Samsung Electronics America Inc., of Ridgefield Park, N.J. NE58K9430SS
+    #
+    # The consumer brand is in the product title, which CPSC writes as brand
+    # first: "Beberoad New Moon Travel Bassinets", "ECHO gas-powered backpack
+    # blowers". So a legal-entity brand is replaced by the title's first token,
+    # and a short brand field is trusted as given.
+    if _is_legal_entity(brand):
+        brand = name.split()[0] if name else brand.split()[0]
     if not brand and name:
         brand = name.split()[0]
     if not brand:
@@ -290,6 +301,21 @@ def query_for(seed, strategy):
     if not tail or tail == brand:
         return None
     return "%s %s" % (brand, tail)
+
+
+# Markers of a corporate registration rather than a shelf brand. Any of these,
+# or more than three words, and the field is a filing rather than a name.
+_ENTITY_MARKERS = (", of ", " inc", " inc.", " llc", " ltd", " co.", " corp",
+                   " gmbh", " company", " dba ", " l.p.", " s.a.", " b.v.")
+
+
+def _is_legal_entity(brand):
+    if not brand:
+        return False
+    low = " " + brand.lower().strip()
+    if any(m in low for m in _ENTITY_MARKERS):
+        return True
+    return len(brand.split()) > 3
 
 
 def needle_for(seed):
@@ -616,6 +642,33 @@ def adjudicate_from_raw(seeds, arms=None, now=None):
     return rows, doc
 
 
+def already_swept():
+    """Refs the raw archive already holds rows for, per arm and pooled.
+
+    A notice is only worth re-fetching if something about the query changed. The
+    archive is committed to disk and --from-raw re-scores it for free, so
+    sweeping a notice we already own rows for spends money to learn nothing.
+    """
+    raw = pathlib.Path(__file__).parent.parent / "data" / "sweeps" / "raw"
+    seen = set()
+    for path in sorted(raw.glob("*.jsonl")):
+        arm = path.stem
+        seeds = load_seeds()
+        by_url = {url: ref for url, ref, _s, _n in plan_arm(arm, seeds)}
+        for line in path.read_text(encoding="utf-8", errors="replace").splitlines():
+            if not line.strip():
+                continue
+            try:
+                row = json.loads(line)
+            except ValueError:
+                continue
+            src = row.get("input")
+            url = src.get("url") if isinstance(src, dict) else None
+            if url in by_url:
+                seen.add(by_url[url])
+    return seen
+
+
 def load_seeds(limit=None, authority=None):
     """Read the corpus. `limit` exists for trial sweeps, and says so on the run.
 
@@ -661,6 +714,11 @@ def main(argv):
             arms = {k: v for k, v in collectors().items() if k in wanted}
 
     seeds = load_seeds(limit=limit)
+
+    if "--unswept" in argv:
+        done = already_swept()
+        seeds = [s for s in seeds if s["ref"] not in done]
+        print("skipping %d notices already in the archive" % len(done))
 
     if replay:
         # Re-score the archive. Costs nothing and needs no network, so it is the

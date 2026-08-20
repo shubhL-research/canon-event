@@ -122,6 +122,27 @@ check(S.query_for({"brand": "Taf toys", "name": "Foam mat"}, S.BRAND_MODEL)
       "what a shopper would type")
 check(S.query_for({"name": "Acme Thing", "model": "X-1"}, S.BRAND_MODEL)
       == "Acme X-1", "the brand falls back to the first word of the name")
+
+# CPSC's brand field is the recalling firm's legal name, not the shelf brand.
+# Used verbatim it produces queries no shopper would type, and no marketplace
+# would answer. Real values from the corpus.
+check(S.query_for({"brand": "Zhongshanboshangkedianzishangwuyouxiangongsi, dba "
+                            "beberoadlove, of China",
+                   "name": "Beberoad New Moon Travel Bassinets",
+                   "model": "TB999-1"}, S.BRAND_MODEL) == "Beberoad TB999-1",
+      "a legal entity in the brand field is replaced by the product title's brand")
+check(S.query_for({"brand": "Samsung Electronics America Inc., of Ridgefield "
+                            "Park, N.J.",
+                   "name": "Slide-in Electric Ranges",
+                   "model": "NE58K9430SS"}, S.BRAND_MODEL)
+      == "Slide-in NE58K9430SS",
+      "and an entity with no brand in the title still loses the filing text")
+check(S.query_for({"brand": "Taf toys", "name": "Foam mat", "model": "12715"},
+                  S.BRAND_MODEL) == "Taf toys 12715",
+      "while a short brand field is trusted exactly as the regulator gave it")
+check(S._is_legal_entity("ECHO Inc., of Lake Zurich, Illinois")
+      and not S._is_legal_entity("Besrey"),
+      "the entity test keys on registration markers, not on length alone")
 check(S.query_for({"name": "", "model": ""}, S.MODEL_ONLY) is None,
       "a notice with no identifier yields no query rather than an empty search")
 check(S.query_for({"brand": "Acme", "name": "Acme"}, S.BRAND_MODEL) is None,
