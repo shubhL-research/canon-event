@@ -10,3 +10,6 @@ CANON-EVENT-Status.pdf
 
 # Live sweep output, written by collector/sweep.py
 data/sweeps/
+
+# Internal planning, not a submission artifact
+PLAN.md
