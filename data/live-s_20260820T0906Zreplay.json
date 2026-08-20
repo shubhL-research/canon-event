@@ -3123,7 +3123,7 @@
    "n": 0,
    "oldest_days": 0,
    "oldest": null,
-   "sentence": "27 of 207 recall notices name nothing a machine can search for. Nobody can check whether those products ever left the shelves.",
+   "sentence": "The US recall feed has a model-number field. It is empty on 183 of 183 product records. Every one of 104 EU alerts carries a barcode.",
    "basis": "unsearchable_fallback",
    "fallback_reason": "No listing reached RED in this sweep: no recalled identifier was re-asserted on a fetched page carrying an active buy control. The headline is therefore the figure computed from the regulators' own corpus, which no collector failure can affect."
   },
