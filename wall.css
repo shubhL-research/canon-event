@@ -900,36 +900,40 @@ body.rail-on .rail { opacity: 1; pointer-events: auto; }
   border-left: 2px solid var(--rule-strong); max-width: 72ch;
 }
 
-/* --- black is a verdict, not a style ------------------------------------ */
+/* ------------------------------------------------- act 04, the platform */
 
-/* The finding section was black unconditionally, which quietly spent the one
-   signal this interface cannot afford to spend. tokens.css says the page stays
-   light because the withheld state is black and a page already dark has nowhere
-   left to go when it has to stop reporting — and then the largest element on it
-   was black on a good day and a bad one alike.
-
-   So the ground is now the verdict. Paper when the sweep stands behind what it
-   says; void when a collector is withheld or the board is blacked out. A reader
-   who has seen the page once knows which they are looking at before reading a
-   word, which is what a colour is for. */
-.act-finding {
-  background: var(--paper-hero); color: var(--ink);
+.platform-table { width: 100%; border-collapse: collapse; margin: 24px 0 16px; }
+.platform-table th, .platform-table td {
+  font-family: var(--font-machine); font-size: 12px; text-align: left;
+  padding: 8px 16px 8px 0; border-bottom: 1px solid var(--rule);
 }
-.act-finding h1 { color: var(--ink-display); }
-.act-finding .withheld-mark { color: var(--hazard); }
-.act-finding .sub { color: var(--ink-2); }
-.act-finding .clause { color: var(--ink-3); }
-.act-finding .scroll-cue { color: var(--ink-3); }
-.act-finding .scroll-cue::after { background: var(--rule-strong); }
-.act-finding h1 .count { color: var(--hazard); }
-
-.act-finding.is-withheld {
-  background: var(--void); color: var(--ink-inv);
+.platform-table th {
+  font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--ink-3); font-weight: 400;
 }
-.act-finding.is-withheld .sub { color: #C9CDD1; }
-.act-finding.is-withheld .clause { color: #7C858D; }
-.act-finding.is-withheld .scroll-cue { color: #6B747C; }
-.act-finding.is-withheld .scroll-cue::after { background: #3A4148; }
-
-/* The corner mark reads over either ground without a second rule, because
-   difference blending inverts against whatever is behind it. */
+.cli-strip { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 32px; }
+.cli-strip code {
+  font-family: var(--font-machine); font-size: 11px;
+  border: 1px solid var(--rule-strong); padding: 4px 10px; color: var(--ink-2);
+}
+.platform-sub {
+  font-family: var(--font-machine); font-size: 12px; letter-spacing: 0.08em;
+  text-transform: uppercase; margin: 32px 0 8px;
+}
+.heal-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 16px; }
+.heal-card { border: 1px solid var(--rule); padding: 14px 16px; }
+/* A refusal is louder than a success. Nobody fakes a rejection, so the two
+   refused heals get the hazard rule and the approved one does not. */
+.heal-card.is-refused { border-color: var(--hazard); border-left-width: 3px; }
+.heal-verdict {
+  font-family: var(--font-machine); font-size: 11px; letter-spacing: 0.08em;
+  color: var(--ink-2); margin-bottom: 8px;
+}
+.heal-card.is-refused .heal-verdict { color: var(--hazard); }
+.heal-why { font-size: 13px; color: var(--ink-2); line-height: 1.45; margin: 8px 0; }
+.heal-meta { font-family: var(--font-machine); font-size: 10px; color: var(--ink-3); }
+.platform-foot {
+  font-size: 13px; color: var(--ink-2); line-height: 1.5; max-width: 74ch;
+  border-left: 2px solid var(--rule-strong); padding-left: 14px; margin-top: 24px;
+}
+@media (max-width: 1279px) { .heal-grid { grid-template-columns: 1fr; } }
