@@ -37,27 +37,32 @@ quotes the figures as they stand today:
 
 | Where | Figure as scripted |
 |---|---|
-| Hero sentence | `27 of 207 recall notices name nothing a machine can search for` |
-| Figure 1 | `0.0%` still on sale, `0 of 58 searchable notices`, CI `0.0% to 6.2%` |
+| Hero sentence | `The US recall feed has a model-number field. It is empty on 183 of 183 product records. Every one of 104 EU alerts carries a barcode.` |
+| Figure 1 | `0.0%` still on sale, `0 of 120 searchable notices`, CI `0.0% to 3.1%` |
 | Figure 2 | `13.0%` unsearchable, `27 of 207 notices` |
-| Discard panel | `AMBER 16025` |
-| Ledger row 2 | `Foam mat`, `719` days, `SAFETY_GATE A12/02404/24` |
-| Arm rail | `DE` MEASURED, `IN` MEASURED, `US` DEGRADED at 55% coverage |
-
-The pooled figure is 27 of 207 rather than 21 because the wall refuses six EU
-barcodes that fail their own check digit, and a value that is not a barcode is not
-a searchable identifier. Both numbers are in the README with the reason. If asked
-on camera, the figure to quote is the US one: **20.4%**, 21 of 103 CPSC notices,
-because pooling a US parsing failure with an EU typing failure averages two
-different problems.
+| Discard panel | `identifier not reasserted 194`, `brand conflict 15`, `no join key 3` |
+| Ledger | `40 of 207 shown`, `121 AMBER`, `0 RED` |
+| Arm rail | all three `DEGRADED`. US reached 95 of 207 notices, DE 59, IN 55 |
+| Every arm | `exit not attested on this sweep` |
 
 If a re-sweep has moved any of these, **say the number that is on the screen**,
 not the number printed here. A voiceover that disagrees with its own frame is the
 single worst thing this video could do.
 
-One hard gate. If the hero sentence reads `96 of 207` and Figure 2 reads `46.4%`,
-the payload on disk predates the identifier correction and those numbers are
-known to be wrong. Do not film it. `data/live.js` needs republishing first.
+Two hard gates, both meaning the payload on disk is stale. Do not film either;
+republish `data/live.js` first.
+
+- Hero reads `96 of 207` or Figure 2 reads `46.4%`. That payload predates the
+  identifier correction and those numbers are known to be wrong.
+- Hero reads `27 of 207 recall notices name nothing a machine can search for`.
+  That sentence was retired: the repository's own AMBER tier forms queries for
+  exactly those notices, so it asserts something the code refutes.
+
+**Say `exit not attested` out loud if the arm rail is on screen.** Three heals
+tried to make the collectors report their own exit IP and all three were refused
+for stripping the extraction, which is in `heals/`. The README says geo-accurate
+rather than residential because the exits measured from the CLI resolve to hosting
+companies, not carriers. Do not narrate "residential" over any frame.
 
 ### 4. Windows and tabs, opened before the camera rolls
 
