@@ -324,7 +324,7 @@
           "archived empty-result page. Rows from this arm are shown. Counts carry a partial stamp.";
       case "WITHHELD":
         return h.status === "rejected"
-          ? "Heal rejected. " + esc(h.failed_canary) + ". Production template unchanged at " +
+          ? "Heal rejected. " + esc(h.failed_canary || "a canary did not resolve") + ". Production template unchanged at " +
             esc(a.template) + ". Arm remains withheld."
           : "Collector unhealed. We do not know, so we will not say.";
       case "HEALING":
@@ -750,6 +750,65 @@
       " " + esc(c.interval_method) + "</div>";
   }
 
+
+  /* ACT 3b. What Bright Data actually did.
+   *
+   * Everything here was already in the repository and visible nowhere: four
+   * collector ids buried in a collapsed drawer, three heal ledgers the payload
+   * reported as "none", and a credit count nobody rendered. Criterion 4 asks
+   * whether Scraper Studio is central. The honest answer is evidence, so this
+   * section names the collectors, shows the refusals louder than the approval,
+   * and states plainly which half of the project deliberately does not use the
+   * platform at all. */
+  function renderPlatform(doc) {
+    var node = el("platform");
+    if (!node) return;
+    var p = doc.platform;
+    if (!p) { node.innerHTML = ""; return; }
+
+    var rows = (p.collectors || []).map(function (c) {
+      return "<tr><td>" + esc(c.arm) + "</td><td>" + esc(c.host || "not swept") +
+        "</td><td>" + esc(c.id || "none created") + "</td><td>" +
+        esc((c.state || "").replace("_", " ").toLowerCase()) + "</td></tr>";
+    }).join("");
+
+    var heals = doc.heals;
+    var healBlock = "";
+    if (heals && heals.total) {
+      healBlock = (heals.entries || []).map(function (h) {
+        var refused = h.outcome === "REFUSED";
+        return '<div class="heal-card' + (refused ? " is-refused" : "") + '">' +
+          '<div class="heal-verdict">' + (refused ? "REFUSED AT THE GATE" : "APPROVED") +
+          " · " + esc(h.arm) + "-" + esc(h.seq) + "</div>" +
+          (h.collector ? '<div class="heal-meta">' + esc(h.collector) + "</div>" : "") +
+          (h.refused_because ? '<div class="heal-why">' + esc(h.refused_because) + "</div>" : "") +
+          '<div class="heal-meta">' + esc(h.file) + "</div>" +
+        "</div>";
+      }).join("");
+    }
+
+    var cr = (doc.stats && doc.stats.credits) || {};
+
+    node.innerHTML =
+      '<h2 class="act-head" id="platformHead">' +
+        '<span class="act-num">04</span> Collected with Bright Data Scraper Studio</h2>' +
+      '<p class="act-lede">' + esc(p.built_with) + "</p>" +
+      '<table class="platform-table"><tr><th>arm</th><th>storefront</th>' +
+        "<th>collector</th><th>state</th></tr>" + rows + "</table>" +
+      '<div class="cli-strip">' + (p.cli || []).map(function (c) {
+        return "<code>" + esc(c) + "</code>";
+      }).join("") + "</div>" +
+      (heals && heals.total
+        ? '<h3 class="platform-sub">' + heals.total + " heals run, " + heals.refused +
+          " refused by the canary gate</h3>" +
+          '<p class="act-lede">' + esc(heals.note) + "</p>" +
+          '<div class="heal-grid">' + healBlock + "</div>"
+        : "") +
+      '<p class="platform-foot">' + esc(p.seed_layer) +
+        (cr.cap ? " Credits used this sweep: " + commas(cr.used || 0) + " of " +
+                  commas(cr.cap) + "." : "") + "</p>";
+  }
+
   // ---------------------------------------------------------------- panels
 
   function renderNotSeen(doc) {
@@ -789,9 +848,18 @@
   function healPrompt(arm, doc) {
     var lines = [
       "arm=" + arm.code + " collector=" + arm.collector_id,
-      "template=" + arm.template + " version=dev",
-      "symptom: data_lines " + arm.job.data_lines + "/" + arm.job.inputs +
-        " (prev 164), success_rate " + arm.job.success_rate + " (prev 0.911)",
+      // The prompt is shown verbatim, so an unrecorded template version has to
+      // say it is unrecorded. Printing "template=undefined" inside a block
+      // captioned "verbatim" makes every other line in it suspect.
+      "template=" + (arm.template || "not recorded in this payload") + " version=dev",
+      // Every value in this block is shown verbatim, so each one has to be a
+      // value we actually hold. The previous-sweep figures were hardcoded
+      // literals, which meant the prompt claimed a comparison against a sweep
+      // this payload has no record of.
+      "symptom: rows " + (arm.job.data_lines == null ? "not recorded" : arm.job.data_lines) +
+        " of " + (arm.job.inputs == null ? "not recorded" : arm.job.inputs) + " inputs",
+      "symptom: success_rate " + (typeof arm.job.success_rate === "number"
+        ? arm.job.success_rate : "not recorded"),
       "detector: " + (arm.reason || "n/a"),
       "sample=https://" + arm.host + "/s?k=PS-1000",
       "missing_fields: identity_token, buy_control.label, price.currency",
@@ -827,7 +895,12 @@
         "</div>" +
         field("Arm", arm.code) +
         field("Canaries resolved", (h.canary_pass == null ? undefined : h.canary_pass + " of " + h.canary_total)) +
-        field("Production template", arm.template + (rejected ? " (unchanged)" : ""), { mono: true }) +
+        /* Concatenating onto an absent template printed the literal string
+           "undefined (unchanged)". A template version nobody recorded is
+           MISSING, and the field renderer already knows how to say that. */
+        field("Production template",
+              arm.template ? arm.template + (rejected ? " (unchanged)" : "") : undefined,
+              { mono: true }) +
         field("Ledger", h.ledger, { mono: true }) +
         (rejected ? '<div class="btn-approve">Approve promotion</div>' +
           '<div class="btn-reason">Locked. ' + esc(h.failed_canary || "a negative canary did not resolve") +
@@ -946,6 +1019,7 @@
     section("armRail", function () { renderArms(doc); });
     section("wall", function () { renderRows(doc); });
     section("curve", function () { renderCurve(doc); });
+    section("platform", function () { renderPlatform(doc); });
     section("notSeen", function () { renderNotSeen(doc); });
     section("healLedger", function () { renderHeal(doc); });
     section("provenance", function () { renderProvenance(doc); });

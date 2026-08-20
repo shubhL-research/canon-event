@@ -30,6 +30,12 @@ echo
 echo "== hand-verification worksheet =="
 python3 golden/grade.py
 echo
+echo "== heal ledger =="
+python3 collector/ledger.py
+echo
+echo "== republish the wall payload =="
+python3 collector/republish.py
+echo
 echo "== wall renderer, headless =="
 node test_render.js
 echo

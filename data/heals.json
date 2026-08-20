@@ -1,0 +1,94 @@
+{
+  "total": 3,
+  "refused": 2,
+  "approved": 1,
+  "entries": [
+    {
+      "file": "heals/2026-08-19-de-001.md",
+      "arm": "DE",
+      "seq": "001",
+      "outcome": "REFUSED",
+      "outcome_raw": "REFUSED",
+      "collector": "c_mt000dde2qdd6uln7z",
+      "raised": "2026-08-19 11:34 UTC",
+      "resolved": "2026-08-19 11:58 UTC",
+      "outcome_detail": "REJECTED at the approval gate",
+      "production": "unchanged",
+      "error_code": "wait_element_timeout",
+      "refused_because": "canary found **The reported fault was genuinely fixed."
+    },
+    {
+      "file": "heals/2026-08-19-de-002.md",
+      "arm": "DE",
+      "seq": "002",
+      "outcome": "APPROVED",
+      "outcome_raw": "APPROVED",
+      "collector": "c_mt000dde2qdd6uln7z",
+      "raised": "2026-08-19 12:04 UTC",
+      "resolved": "2026-08-19 12:31 UTC",
+      "outcome_detail": "APPROVED, promoted to production",
+      "canaries": "3 of 3"
+    },
+    {
+      "file": "heals/2026-08-19-us-001.md",
+      "arm": "US",
+      "seq": "001",
+      "outcome": "REFUSED",
+      "outcome_raw": "REFUSED",
+      "collector": "c_mt01usw31e8y5ubqjs",
+      "raised": "2026-08-19 13:12 UTC",
+      "resolved": "2026-08-19 13:29 UTC",
+      "outcome_detail": "REJECTED at the approval gate",
+      "production": "unchanged",
+      "note": "the diagnosed break was our own query bug. See the",
+      "refused_because": "canary found The proposed template no longer times out."
+    }
+  ],
+  "by_arm": {
+    "DE": [
+      {
+        "file": "heals/2026-08-19-de-001.md",
+        "arm": "DE",
+        "seq": "001",
+        "outcome": "REFUSED",
+        "outcome_raw": "REFUSED",
+        "collector": "c_mt000dde2qdd6uln7z",
+        "raised": "2026-08-19 11:34 UTC",
+        "resolved": "2026-08-19 11:58 UTC",
+        "outcome_detail": "REJECTED at the approval gate",
+        "production": "unchanged",
+        "error_code": "wait_element_timeout",
+        "refused_because": "canary found **The reported fault was genuinely fixed."
+      },
+      {
+        "file": "heals/2026-08-19-de-002.md",
+        "arm": "DE",
+        "seq": "002",
+        "outcome": "APPROVED",
+        "outcome_raw": "APPROVED",
+        "collector": "c_mt000dde2qdd6uln7z",
+        "raised": "2026-08-19 12:04 UTC",
+        "resolved": "2026-08-19 12:31 UTC",
+        "outcome_detail": "APPROVED, promoted to production",
+        "canaries": "3 of 3"
+      }
+    ],
+    "US": [
+      {
+        "file": "heals/2026-08-19-us-001.md",
+        "arm": "US",
+        "seq": "001",
+        "outcome": "REFUSED",
+        "outcome_raw": "REFUSED",
+        "collector": "c_mt01usw31e8y5ubqjs",
+        "raised": "2026-08-19 13:12 UTC",
+        "resolved": "2026-08-19 13:29 UTC",
+        "outcome_detail": "REJECTED at the approval gate",
+        "production": "unchanged",
+        "note": "the diagnosed break was our own query bug. See the",
+        "refused_because": "canary found The proposed template no longer times out."
+      }
+    ]
+  },
+  "note": "Every heal here was run against a live collector through Scraper Studio's refactor_template flow. Two were refused by the canary gate: the repair worked and the gate rejected it anyway, because a fix that passes the reported fault can still break a field it was never asked about. There is no rollback endpoint, so verification sits before promotion rather than after it."
+}
