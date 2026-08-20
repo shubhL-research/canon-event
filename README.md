@@ -403,7 +403,7 @@ There is no `--country`. That matters because it means the country we requested 
 configuration, and a config file is not evidence. See the currency weakness above: the page's own
 `lang` attribute is the attestation.
 
-### Three heals, two of them refused
+### Four heals, three of them refused
 
 All three are on real breaks that nobody staged. They are in `heals/`, written up in full.
 

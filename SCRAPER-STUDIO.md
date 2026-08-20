@@ -61,7 +61,7 @@ separable.
 Full corpus, three arms, one sweep:
 
 ```
-207 notices x 2 query strategies x 3 arms   =  348 search page loads
+207 notices x 2 query strategies x 3 arms   =  1,107 search page loads
 listings adjudicated                        =  23,771
 US amazon.com    14,632 listings,  95 of 207 notices joined
 DE kaufland.de    1,037 listings,  59 of 207 notices joined
@@ -75,10 +75,11 @@ block or a missing grid. The collectors are deliberately **not** chained with
 load and multiplies spend by roughly forty. Promotion is decided outside Studio
 by the matcher, so only candidates that could reach RED cost a browser load.
 
-## Self-healing, including the two that were refused
+## Self-healing, including the three that were refused
 
-Three heals were run against live collectors through `refactor_template`. Ledgers
-are in `heals/`, with the verbatim prompt, the canary result and the decision.
+Four heals were run against live collectors through `refactor_template` and three
+of them were refused. Ledgers are in `heals/`, each with the verbatim prompt, the
+canary result and the decision.
 
 **DE-001, REFUSED.** The collector was built from a search URL and waited for
 `.s-main-slot`, which does not exist on a product page, so every product page
@@ -91,7 +92,18 @@ unchanged, arm left withheld.
 
 **US-001, REFUSED.** Same shape, different fields.
 
+**US-002, REFUSED, and this one was verified differently.** The gate did not read
+the preview row. It ran the healed template with `version=dev` and adjudicated the
+output, then refused it and confirmed production was unchanged afterwards rather
+than assuming it. A preview tells you what the agent thinks it produced. Running
+the draft tells you what it actually produces.
+
 **DE-002, APPROVED.**
+
+Three refusals against one approval is not a tuning failure. The gate is
+two-sided by design: a heal that makes everything match is exactly as broken as
+one that matches nothing, so a repair has to satisfy the canaries that must
+resolve AND the negatives that must stay dead.
 
 There is no rollback endpoint, so verification sits **before** promotion rather
 than after it. That is not a workaround: `version=dev` exists on every trigger
