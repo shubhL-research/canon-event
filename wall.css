@@ -1033,9 +1033,34 @@ body.rail-on .rail { opacity: 1; pointer-events: auto; }
 
   /* A wide table on a phone scrolls inside its own box rather than dragging the
      document sideways with it. */
-  details.machinery > div { overflow-x: auto; -webkit-overflow-scrolling: touch; }
-  details.machinery table { min-width: 460px; }
+  details.machinery > div {
+    overflow-x: auto; -webkit-overflow-scrolling: touch;
+    /* Without this a grid or flex child refuses to shrink below its content, so
+       overflow-x never engages and the table pushes the document instead of
+       scrolling inside its own box. */
+    min-width: 0; max-width: 100%;
+  }
+  details.machinery table { min-width: 440px; }
+  .curve, .platform-table { max-width: 100%; }
 
   .curve { overflow-x: auto; }
   .legend li { font-size: 12px; }
 }
+
+
+/* --- nothing scrolls sideways -------------------------------------------- */
+
+/* Measured at 1440, 1280, 1024, 768, 430, 390 and 360: the document is within a
+   pixel of the viewport at every one, and the only element wider than the screen
+   is the machinery table, which scrolls inside its own box.
+
+   This is the backstop, not the fix. Sub-pixel rounding on a fractional layout
+   is enough to arm a horizontal scrollbar, and a page that can be dragged
+   sideways by one pixel reads as broken however small the number is. `clip`
+   rather than `hidden` because hidden makes the element a scroll container and
+   would break `position: sticky` inside it.
+
+   If a real overflow is ever introduced this will hide it, so the widths above
+   are checked by measuring the document rather than by looking at the page. */
+html { overflow-x: clip; }
+body { overflow-x: clip; max-width: 100%; }
