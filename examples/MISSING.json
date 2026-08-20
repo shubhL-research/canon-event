@@ -4,14 +4,14 @@
   "_contract": "contract/row.schema.json",
   "_validate": "python validate.py",
   "_why": "evidence.assertion.dom_path and evidence.buy_control.ships_from are ABSENT, not null and not empty. A consumer runs row.get(k, MISSING) over contract/contract_keys.py and renders the field name struck through with the word MISSING. Rendering absence as 0 would turn a gap in our own measurement into a claim about the world.",
-  "rank": 31,
-  "name": "COOL COLORS!",
-  "hazard": "According to the list of ingredients, the product contains 2-(4-tert-butylbenzyl) propionaldehyde (BMHCA), which is prohibited in cosmetic products. BMHCA may harm the reproductive system, may harm the health of the unborn child and may cause skin sensitisation.",
+  "rank": 30,
+  "name": "Amore Di Mamma / Baby Toys FUN AND PUZZLE",
+  "hazard": "The plastic material of the doll contains an amount of bis(2-ethylhexyl) phthalate (DEHP) and dibutyl phthalate (DBP) (measured values: 21% and 0.8% by weight, respectively). These phthalates may harm the health of children, causing possible damage to their reproductive system.",
   "source": {
     "authority": "SAFETY_GATE",
-    "ref": "A12/02552/24",
+    "ref": "A12/02549/24",
     "published": "2024-09-06",
-    "url": "https://ec.europa.eu/safety-gate-alerts/screen/search?reference=A12/02552/24"
+    "url": "https://ec.europa.eu/safety-gate-alerts/screen/search?reference=A12/02549/24"
   },
   "days": 714,
   "days_frozen": false,
@@ -26,18 +26,19 @@
     "burn_terms": [],
     "choke_terms": [],
     "child_terms": [
-      "child"
+      "child",
+      "children"
     ],
     "child_scoped_standard": false
   },
-  "model": "47 copper",
-  "gtin": "5907813184475",
+  "model": "1739-1",
+  "gtin": "6845789988682",
   "found_by_query": "brand_model",
   "evidence": {
     "captured_at": "2026-08-21T09:14:22Z",
     "assertion": {
-      "needle": "5907813184475",
-      "context": "... Item model number 5907813184475 Manufacturer recommended age ..."
+      "needle": "6845789988682",
+      "context": "... Item model number 6845789988682 Manufacturer recommended age ..."
     },
     "buy_control": {
       "present": true,

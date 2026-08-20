@@ -42,7 +42,7 @@ GOOD = {
     "seed_ref": "24350", "arm": "US", "query_kind": "brand_model",
     "needle": "PS-1000", "url": "https://www.amazon.com/dp/B0XXXX",
     "http_status": 200, "captured_at": "2026-08-21T09:14:22Z",
-    "page_text": "Product details Item model number PS-1000 Batteries included Yes",
+    "page_text": "Product details Brand ZAGG Item model number PS-1000 Batteries included Yes",
     "dom_path": "#productDetails > tr:nth-child(4)",
     "buy_label": "Add to Cart", "in_stock": True, "ships_from": "US",
     "currency": "USD", "sha256": "3f9ac3d0", "trace": "ce-0001", "job_id": "j_ma13",

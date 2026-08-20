@@ -3,56 +3,50 @@
   "_generated_by": "examples/make_examples.py",
   "_contract": "contract/row.schema.json",
   "_validate": "python validate.py",
-  "rank": 29,
-  "name": "Toy slime",
-  "hazard": "The migration of boron from the toy slime is too high (measured value: 590 mg/kg). Ingestion or contact with an excessive quantity of boron may harm the health of children by damaging their reproductive system.",
+  "rank": 13,
+  "name": "Berkley Jensen Gazebos",
+  "hazard": "The gazebo's roof panels can dislodge in high winds, posing an injury hazard.",
   "source": {
-    "authority": "SAFETY_GATE",
-    "ref": "A12/02545/24",
-    "published": "2024-09-06",
-    "url": "https://ec.europa.eu/safety-gate-alerts/screen/search?reference=A12/02545/24"
+    "authority": "CPSC",
+    "ref": "24745",
+    "published": "2024-08-15",
+    "url": "https://www.cpsc.gov/Recalls/24745"
   },
-  "days": 714,
+  "days": 736,
   "days_frozen": false,
   "tier": "RED",
   "arms": {
     "US": "RED",
     "DE": "WITHHELD",
-    "IN": "RED"
+    "IN": "NOT_FOUND"
   },
   "hazard_class": {
-    "qualifies": true,
+    "qualifies": false,
     "burn_terms": [],
-    "choke_terms": [
-      "ingest"
-    ],
-    "child_terms": [
-      "child",
-      "children"
-    ],
+    "choke_terms": [],
+    "child_terms": [],
     "child_scoped_standard": false
   },
-  "model": "783476",
-  "gtin": "5101667834764",
+  "model": "A102008010",
   "found_by_query": "both",
   "evidence": {
     "captured_at": "2026-08-21T09:14:22Z",
     "assertion": {
-      "needle": "5101667834764",
+      "needle": "A102008010",
       "dom_path": "#productDetails > tr:nth-child(4)",
-      "context": "... Item model number 5101667834764 Manufacturer recommended age ..."
+      "context": "... Item model number A102008010 Manufacturer recommended age ..."
     },
     "buy_control": {
       "present": true,
       "label": "Add to Cart",
       "in_stock": true,
-      "ships_from": "IN"
+      "ships_from": "US"
     },
-    "currency": "INR",
+    "currency": "USD",
     "http": 200,
     "viewport": "1440x900",
-    "sha256": "3f9a0029c3d0",
-    "trace": "ce-2026-08-21-0029",
+    "sha256": "3f9a0013c3d0",
+    "trace": "ce-2026-08-21-0013",
     "job_id": "j_ma13y9ay1piehrso8r"
   }
 }

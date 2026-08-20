@@ -125,7 +125,8 @@
               "dead_page",
               "blocked",
               "no_join_key",
-              "identity_mismatch"
+              "identity_mismatch",
+              "brand_conflict"
             ]
           },
           "reason": {
