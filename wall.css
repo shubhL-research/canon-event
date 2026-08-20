@@ -899,3 +899,36 @@ body.rail-on .rail { opacity: 1; pointer-events: auto; }
   color: var(--ink-2); padding: 20px 22px; background: var(--surface-sunk);
   border-left: 2px solid var(--rule-strong); max-width: 72ch;
 }
+
+/* --- black is a verdict, not a style ------------------------------------ */
+
+/* The finding section was black unconditionally, which quietly spent the one
+   signal this interface cannot afford to spend. tokens.css says the page stays
+   light because the withheld state is black and a page already dark has nowhere
+   left to go when it has to stop reporting — and then the largest element on it
+   was black on a good day and a bad one alike.
+
+   So the ground is now the verdict. Paper when the sweep stands behind what it
+   says; void when a collector is withheld or the board is blacked out. A reader
+   who has seen the page once knows which they are looking at before reading a
+   word, which is what a colour is for. */
+.act-finding {
+  background: var(--paper); color: var(--ink);
+}
+.act-finding .withheld-mark { color: var(--hazard); }
+.act-finding .sub { color: var(--ink-2); }
+.act-finding .clause { color: var(--ink-3); }
+.act-finding .scroll-cue { color: var(--ink-3); }
+.act-finding .scroll-cue::after { background: var(--rule-strong); }
+.act-finding h1 .count { color: var(--hazard); }
+
+.act-finding.is-withheld {
+  background: var(--void); color: var(--ink-inv);
+}
+.act-finding.is-withheld .sub { color: #C9CDD1; }
+.act-finding.is-withheld .clause { color: #7C858D; }
+.act-finding.is-withheld .scroll-cue { color: #6B747C; }
+.act-finding.is-withheld .scroll-cue::after { background: #3A4148; }
+
+/* The corner mark reads over either ground without a second rule, because
+   difference blending inverts against whatever is behind it. */
