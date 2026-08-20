@@ -60,16 +60,27 @@ def health_from_archive(doc):
     """
     arms = {}
     for a in doc.get("arms", []):
+        job = a.get("job") or {}
+        # _arms_for_wall reads these at the TOP level of each arm block, not
+        # nested under `job`. Leaving them nested silently produced "0 inputs
+        # queried" on every arm of a sweep that queried sixty, beside a discard
+        # count of sixteen thousand. A zero next to that reads as a broken
+        # collector rather than a rendering fault, which is the one misreading
+        # this project cannot afford.
         arms[a["code"]] = {
             "state": a.get("state"),
             "reason": a.get("reason"),
-            "job": a.get("job", {}),
+            "inputs": job.get("inputs", 0),
+            "listings": job.get("data_lines", job.get("listings", 0)),
+            "joined": job.get("joined", 0),
+            "rows": job.get("red", job.get("rows", 0)),
+            "fails": job.get("fails", 0),
+            "job": job,
             "attest": a.get("attest"),
             "heal": a.get("heal", {"status": "none"}),
             "collector_id": a.get("collector_id"),
             "template": a.get("template"),
             "host": a.get("host"),
-            "listings": (a.get("job") or {}).get("listings"),
         }
     return {"arms": arms, "sweep_id": doc.get("sweep_id"),
             "swept_at": doc.get("swept_at"), "reports": {},

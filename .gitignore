@@ -9,7 +9,8 @@ node_modules/
 CANON-EVENT-Status.pdf
 
 # Live sweep output, written by collector/sweep.py
-data/sweeps/
+# data/sweeps/ is NOT ignored. It is the only primary evidence that a scrape
+# happened, and the wall points readers at it by name.
 
 # Internal planning, not a submission artifact
 PLAN.md

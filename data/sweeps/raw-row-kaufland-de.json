@@ -1,0 +1,33 @@
+{
+  "_what": "One unmodified row as Bright Data Scraper Studio returned it.",
+  "_why": "Criterion 4 asks whether Scraper Studio is central. Every other artifact in this repository is our own derived shape, so this is the only place a reader can see what the platform actually hands back, field names and all. The collector's field names were chosen by the Scraper Studio AI Agent, not by us, which is itself the evidence that the collector is custom rather than a library scraper.",
+  "_collector": "c_mt00jidz6zhqjbpew",
+  "_arm": "DE",
+  "_storefront": "kaufland.de",
+  "_captured": "2026-08-19",
+  "_read_this_row_against": "data/sweeps/sweep-2026-08-20.csv, which is the same pipeline's output after adjudication. The gap between the two is the matcher.",
+  "_three_things_this_row_shows": [
+    "brand and manufacturer_part_number both hold '9.161225.12.25.11 9.161225.12.25.11', the same value doubled. The collector duplicates a field it read once, which is why collapse_repeat() exists in collector/normalize.py.",
+    "ean holds '8721003407246 8721003407246', doubled the same way. It passes its modulo-10 check digit once collapsed, and would fail as written.",
+    "The notice this was matched against is a Besrey stroller; the page returned a MamaLoes buggy from a reseller. The EAN matches, the brand does not. That is the case brand_conflict() deliberately does NOT reject, because a GTIN is globally unique and settles identity on its own."
+  ],
+  "row": {
+    "title": "MamaLoes Milan Taupe 1-Personen-Buggy",
+    "brand": "9.161225.12.25.11 9.161225.12.25.11",
+    "price": {
+      "value": 44,
+      "currency": "EUR",
+      "symbol": "€"
+    },
+    "currency_symbol": "€",
+    "availability_text": "Do. 20. – Fr. 21. August",
+    "add_to_cart_button_text": "In den Warenkorb",
+    "seller_name": "MamaLoes",
+    "ean": "8721003407246 8721003407246",
+    "manufacturer_part_number": "9.161225.12.25.11 9.161225.12.25.11",
+    "product_page_url": "https://www.kaufland.de/product/568730910/",
+    "input": {
+      "url": "https://www.kaufland.de/s/?search_value=Besrey"
+    }
+  }
+}
