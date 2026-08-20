@@ -485,7 +485,7 @@
       doc.rows.forEach(function (r) { mix[r.tier] = (mix[r.tier] || 0) + 1; });
       var parts = ["RED", "AMBER", "DISCARDED"].filter(function (t) { return mix[t]; })
         .map(function (t) { return mix[t] + " " + t; });
-      sortNote.textContent = "sorted: confirmed first, then longest unremedied · "
+      sortNote.textContent = "sorted: confirmed first, then oldest recall · "
         + "showing " + shown.length + " of " + doc.rows.length
         + " · " + parts.join(", ") + " · full set in the structured output";
     }
@@ -612,7 +612,12 @@
         ? "US Consumer Product Safety Commission"
         : "EU Safety Gate") +
       field("On", r.source.published, { mono: true }) +
-      field("Still on sale, days since", commas(r.days), { mono: true }) +
+      // Same correction as the column header: this is time since the notice was
+      // published. Only a RED row has been shown to be on sale at all, so the
+      // label says which claim is being made.
+      field(r.tier === "RED" ? "Recalled, and still on sale, days"
+                             : "Days since the recall was published",
+            commas(r.days), { mono: true }) +
       field("Notice", r.source.ref, { mono: true }) +
       field("Model", r.model, { mono: true }) +
       field("Barcode", r.gtin, { mono: true });
