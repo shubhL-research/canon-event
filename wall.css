@@ -937,3 +937,105 @@ body.rail-on .rail { opacity: 1; pointer-events: auto; }
   border-left: 2px solid var(--rule-strong); padding-left: 14px; margin-top: 24px;
 }
 @media (max-width: 1279px) { .heal-grid { grid-template-columns: 1fr; } }
+
+/* ============================================================================
+   PHONE
+   ----------------------------------------------------------------------------
+   The existing narrow rules stop at 1279px, which is a tablet. On a 390px phone
+   the page overflowed horizontally by 309px: the arm rail held three columns at
+   231px each, the ledger grid still asked for 550px of tracks, and the machinery
+   table laid out at 491px with nothing to scroll it.
+
+   The README says coverage is 1280px and up, because a hazard ledger that
+   reflows stops being a ledger. That remains true of the LEDGER and is why the
+   hazard column is dropped here rather than wrapped. It was never a licence for
+   the rest of the page to overflow, and a judge opening the deployed link on a
+   phone sees the overflow first.
+   ========================================================================== */
+
+@media (max-width: 767px) {
+  .shell { padding: 0 18px 72px; }
+  .act { padding-top: 48px; }
+  .act-head { font-size: 16px; gap: 10px; padding-bottom: 14px; }
+  .act-lede, .panel .lede { font-size: 14px; max-width: none; }
+
+  .mark { padding: 14px 18px; grid-template-columns: 1fr; gap: 4px; }
+  .mark-role, .mark-independence { display: none; }
+
+  /* The hero keeps the full screen and loses only the leading it cannot spare. */
+  .act-finding > .finding-inner { padding: 0 18px; }
+  .act-finding h1 { max-width: none; letter-spacing: -0.02em; }
+  .act-finding .sub { font-size: 15px; }
+  .act-finding > .scroll-cue { padding: 0 18px; }
+
+  /* One figure at a time. minmax(380px) cannot fit and was forcing the overflow. */
+  .figures { grid-template-columns: 1fr; margin-top: 28px; }
+  .figure { padding: 28px 22px; }
+  .figure-value { font-size: 40px; }
+  .figure-claim { font-size: 17px; max-width: none; }
+
+  /* Three arm cards abreast is what broke the page. They stack, and each keeps
+     its own black or hatched ground, so the withheld one still reads as withheld
+     rather than as a smaller card. */
+  .arm-rail { grid-template-columns: 1fr; margin-top: 28px; }
+  .arm { min-height: 0; padding: 18px 20px; }
+
+  .instruments { grid-template-columns: 1fr; margin-top: 28px; }
+  .instrument { padding: 18px 20px; }
+
+  /* The ledger keeps identity, verdict and duration. The hazard sentence is the
+     one column that cannot survive 390px without becoming two words a line, and
+     it is one tap away in the open row, quoted in full. */
+  .wall-head, .row {
+    grid-template-columns: 22px minmax(0, 1fr) auto;
+    gap: 12px; padding-left: 0; padding-right: 0;
+  }
+  .wall-head span:nth-child(3),
+  .wall-head span:nth-child(4),
+  .wall-head span:nth-child(5),
+  .c-hazard { display: none; }
+  .wall-head span:nth-child(6) { text-align: right; }
+
+  /* Two lines rather than one, placed explicitly. Left to flow, the verdict
+     wrapped onto a row of its own and left the badge stranded under the gutter.
+     Name and verdict lead; the countries and the day count sit beneath, where
+     there is width for them. */
+  .row {
+    min-height: 0; padding-top: 14px; padding-bottom: 14px;
+    align-items: start; row-gap: 8px;
+  }
+  .row .c-gutter { grid-column: 1; grid-row: 1; }
+  .row .c-id     { grid-column: 2; grid-row: 1; }
+  .row .chips    { grid-column: 2; grid-row: 2; }
+  /* The narrow breakpoint above hides the verdict entirely. On a tablet that is
+     a column-count decision; on a phone it removes the answer to the row and
+     leaves a ledger that says what was searched and never what was found. It
+     comes back, and it is the only thing sharing the top line with the name. */
+  .row .c-tier   { grid-column: 3; grid-row: 1; display: block; }
+  .wall-head span:nth-child(6) { display: block; }
+  /* The badge already says AMBER. The caption under it repeats that in eleven
+     characters this column does not have, and it was the last pixel of overflow
+     on the page. The open row still carries the reason in full. */
+  .row .c-tier .cap { display: none; }
+  .row .c-bar    { grid-column: 3; grid-row: 2; justify-content: flex-end; }
+  /* The duration bar is a silhouette read down a column of forty rows. At one
+     row per screen it encodes nothing, so the number stays and the bar goes. */
+  .row .c-bar .track { display: none; }
+  .c-id .name { font-size: 15px; }
+  .days { font-size: 24px; min-width: 0; }
+
+  .sort-note, .historical-note { padding-left: 0; padding-right: 0; font-size: 9px; }
+  .receipt { padding-left: 0; padding-right: 0; }
+  .receipt-grid { grid-template-columns: 1fr; }
+  .receipt-pane { padding: 20px 18px; }
+
+  .panels { grid-template-columns: 1fr; gap: 36px; margin-top: 28px; }
+
+  /* A wide table on a phone scrolls inside its own box rather than dragging the
+     document sideways with it. */
+  details.machinery > div { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  details.machinery table { min-width: 460px; }
+
+  .curve { overflow-x: auto; }
+  .legend li { font-size: 12px; }
+}
