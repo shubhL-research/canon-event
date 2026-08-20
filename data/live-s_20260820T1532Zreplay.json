@@ -8360,7 +8360,7 @@
    "search_page_loads": 1107,
    "batches": 0,
    "total_page_loads": 1107,
-   "working": "180 searchable of 207 notices x 2 queries x 3 arms = 1107 search loads, submitted as 0 batch jobs.",
+   "working": "180 searchable of 207 notices x 2 queries x 3 arms = 1107 search loads.",
    "note": "Only searchable notices are queried. 27 of 207 notices in this plan carry no usable identifier and were never submitted, so they cost nothing. Batching is what makes a full sweep possible: one job per 40 urls rather than one job per url."
   },
   "findings": {
