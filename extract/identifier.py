@@ -69,6 +69,23 @@ STRONG = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._/\-]{2,}$")
 GTIN = re.compile(r"^\d{8,14}$")
 
 
+def gtin_check_digit_ok(raw):
+    """Validate a GTIN-8/12/13/14 modulo-10 check digit.
+
+    Mirrors collector/normalize.py so the same arithmetic decides searchability
+    at seed time and identity at adjudication time. If these two ever disagree,
+    a notice can be counted as searchable and then be unassertable, which is a
+    contradiction the wall has no way to render.
+    """
+    digits = re.sub(r"\D", "", "" if raw is None else str(raw))
+    if len(digits) not in (8, 12, 13, 14):
+        return False
+    body, check = digits[:-1], int(digits[-1])
+    total = sum(int(c) * (3 if i % 2 == 0 else 1)
+                for i, c in enumerate(reversed(body)))
+    return (10 - total % 10) % 10 == check
+
+
 def classify(model, gtin=None, product_name=""):
     """Decide whether a notice carries a machine-searchable identifier.
 
@@ -77,7 +94,20 @@ def classify(model, gtin=None, product_name=""):
     reporting one opaque count.
     """
     if gtin and GTIN.match(str(gtin).strip()):
-        return _v(SEARCHABLE, "gtin", str(gtin).strip(),
+        g = str(gtin).strip()
+        # Shape is not validity. A GTIN carries a modulo-10 check digit, and a
+        # number that fails it is either a typo in the notice or not a GTIN at
+        # all. Accepting it on digit-count alone would count a broken barcode as
+        # searchable and inflate our own coverage.
+        #
+        # This check used to live in collector/publish.py, which meant two rules
+        # for one question and two different published rates. There is one rule
+        # and it is here. Six EU alerts fail it.
+        if not gtin_check_digit_ok(g):
+            return _v(UNSEARCHABLE, "gtin_check_digit_failed", g,
+                      "The barcode fails its own modulo-10 check digit, so it is "
+                      "either mistyped in the notice or is not a GTIN.")
+        return _v(SEARCHABLE, "gtin", g,
                   "A GTIN is globally unique and survives a marketplace search intact.")
 
     raw = "" if model is None else str(model).strip()

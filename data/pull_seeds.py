@@ -80,6 +80,56 @@ MODEL_IN_NAME = re.compile(
 STOP_AT = re.compile(r"\s+(?:and|or|sold|with|in|for)\b", re.I)
 
 
+# The identifier is in the feed. We were not opening the key it lives in.
+#
+# Products[].Model is empty on 183 of 183 product records across all four date
+# windows, checked live. The top-level
+# Description is non-empty on 57 of 57 and names the model in prose:
+#   "This recall involves CuberShop's Magnetic Stickerless Speed Cubes,
+#    model YJ MGC 5x5."
+# Reading only Products[].Model and the product name produced a 96% unsearchable
+# rate for CPSC. That is a claim about our own parser, not about the regulator,
+# and publishing it would have been false by more than its confidence interval.
+CUE = re.compile(
+    r"\b(?:model|models|catalog|catalogue|sku|item|style|part|series)\b"
+    r"(?:\s*(?:numbers?|nos?\.?|#|code)\b)?\s*:?\s*([^.;)]{2,60})", re.I)
+
+
+def mine_identifier(*texts):
+    """Recover an identifier from regulator prose, conservatively.
+
+    Requires a cue word, then takes the first token carrying BOTH a letter and a
+    digit. Anything recovered is then gated through extract.identifier.classify(),
+    the same rule the wall publishes, so this can widen coverage but can never
+    invent a searchable identifier the project would not otherwise accept.
+    """
+    for t in texts:
+        if not t:
+            continue
+        for m in CUE.finditer(str(t)):
+            for tok in re.split(r"[ ,;/]+", m.group(1).strip(" \"'")):
+                tok = tok.strip(" \".,;:()'")
+                if (len(tok) >= 4 and any(c.isalpha() for c in tok)
+                        and any(c.isdigit() for c in tok)):
+                    if _classify(tok)["verdict"] == "searchable":
+                        return tok
+    return None
+
+
+def _classify(tok):
+    import importlib.util
+    global _CLS
+    try:
+        return _CLS(tok)
+    except NameError:
+        spec = importlib.util.spec_from_file_location(
+            "identifier", pathlib.Path(__file__).parent.parent / "extract" / "identifier.py")
+        mod = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(mod)
+        _CLS = mod.classify
+        return _CLS(tok)
+
+
 def model_from_name(name):
     """Mine a model token out of a CPSC product name.
 
@@ -146,8 +196,11 @@ def pull_cpsc(days):
             "published": date,
             "name": pname,
             "brand": firm or brand_from_name(pname),
-            "model": clean(p.get("Model")) or model_from_name(pname),
-            "gtin": None,
+            "model": (clean(p.get("Model")) or model_from_name(pname)
+                      or mine_identifier(r.get("Description"), r.get("Title"),
+                                         p.get("Description"))),
+            "gtin": next((u for u in (r.get("ProductUPCs") or [])
+                          if str(u).isdigit() and 8 <= len(str(u)) <= 14), None),
             "category": clean(p.get("Type")) or None,
             "hazard": hazard,
             "url": clean(r.get("URL")) or f"https://www.cpsc.gov/Recalls/{r.get('RecallNumber')}",

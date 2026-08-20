@@ -343,7 +343,30 @@ def context_around(page_text, needle, width=90):
     return ("..." if start else "") + str(page_text)[start:end] + ("..." if end < len(str(page_text)) else "")
 
 
-def classify(raw):
+def brand_conflict(page_text, expected_brand):
+    """Does the page name a DIFFERENT manufacturer than the notice does?
+
+    Identity re-assertion checks that the identifier appears on the fetched page.
+    It says nothing about whose product it is. Model strings are not globally
+    unique: PB-5810H can belong to two manufacturers, and a page carrying that
+    string for the wrong brand re-asserts perfectly while publishing a hazard
+    claim against a company that never made the recalled product.
+
+    The adversarial precision set caught exactly this leak, which is the second
+    real false-positive it has found.
+
+    Absent brand on either side is NOT a conflict. Unknown is not disagreement,
+    and treating it as one would silently discard correct findings.
+    """
+    if not present(page_text) or not expected_brand:
+        return False
+    want = norm_needle(expected_brand)
+    if len(want) < 3:
+        return False
+    return want not in norm_needle(page_text)
+
+
+def classify(raw, expected_brand=None):
     """RED, AMBER or DISCARDED, with the reason recorded either way."""
     err = pick(raw, "error")
     if present(err):
@@ -388,6 +411,22 @@ def classify(raw):
     matched = reassert(pick(raw, "page_text"), needle)
     buy = buy_control_present(raw)
 
+    # Identity is not identity of MAKER, but only when the identifier is weak.
+    #
+    # A GTIN is globally unique by construction, so it settles identity on its
+    # own and the brand on the page is irrelevant: a live kaufland.de row for
+    # EAN 8721003407246 carried the reseller's name and a part number in the
+    # brand slot, and refusing it would have discarded a correct finding.
+    #
+    # A model number is NOT globally unique. Two manufacturers can ship the same
+    # string, so there the page must also name the maker or the claim could land
+    # on a company that never built the recalled product.
+    if matched and not is_gtin and brand_conflict(pick(raw, "page_text"), expected_brand):
+        return "AMBER", [{"code": "brand_conflict",
+                          "reason": "identifier re-asserted but the page does not name the "
+                                    "manufacturer on the notice. Model strings are not "
+                                    "globally unique, so this may be another maker's product."}]
+
     if matched and buy:
         return "RED", []
     if matched and not buy:
@@ -417,7 +456,7 @@ def normalize(raw, seed):
     never taken from the marketplace: the hazard sentence, reference and
     publication date come from the notice, always.
     """
-    tier, discarded = classify(raw)
+    tier, discarded = classify(raw, seed.get("brand"))
     needle = pick(raw, "needle")
 
     row = {

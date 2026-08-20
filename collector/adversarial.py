@@ -129,9 +129,13 @@ def build(seeds, limit=24):
     with_model = [s for s in seeds if s.get("model")]
     for a, b in zip(with_model, with_model[1:]):
         if norm_needle(a["model"]) != norm_needle(b["model"]):
+            other_brand = b.get("brand") or "Unrelated Co"
             probes.append(_p(a, a["model"], "same_model_diff_brand",
-                             f"the right model string on an unrelated product's page ({b['ref']})",
-                             page_from=b))
+                             f"the right model string on a page naming a different "
+                             f"manufacturer ({other_brand}). Model strings are not "
+                             f"globally unique, so identity alone is not enough.",
+                             page_override=f"Product details Item model number {a['model']} "
+                                           f"Brand {other_brand} In stock"))
             break
 
     # Spread across classes rather than taking the first N of one kind.
@@ -162,6 +166,7 @@ def _p(seed, probe_needle, kind, why, page_from=None, page_override=None):
         # The page the matcher would fetch carries the PROBE's identifier, not
         # the recalled one. That is exactly the trap.
         "page_text": page,
+        "expected_brand": seed.get("brand"),
         "expect": "DISCARDED",
     }
 
@@ -170,7 +175,10 @@ def run(probes):
     """Every probe must fail to re-assert. Any that passes is a precision bug."""
     results, leaked = [], []
     for p in probes:
+        from normalize import brand_conflict
         matched = reassert(p["page_text"], p["real_identifier"])
+        if matched and brand_conflict(p["page_text"], p.get("expected_brand")):
+            matched = False
         verdict = "RED" if matched else "DISCARDED"
         ok = verdict == p["expect"]
         results.append({**p, "verdict": verdict, "passed": ok})
