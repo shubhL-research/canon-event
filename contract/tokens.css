@@ -58,6 +58,13 @@
   --hazard-wash:   #FDEEEC;
 
   /* Withheld. Black is not a shade here, it is a verdict. */
+  /* The hero ground is graphite, NOT black, and the distance between them is
+     the whole point. #000000 is reserved as a signal: it is what the page turns
+     when a collector is withheld. If the hero were already black, the withheld
+     state would be indistinguishable from a healthy one, which is precisely the
+     failure this project exists to refuse. Spend black on nothing else. */
+  --hero-ground:   #14171A;
+
   --void:          #000000;
   --void-ink:      #FFFFFF;
 

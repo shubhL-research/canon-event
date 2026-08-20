@@ -96,6 +96,29 @@ function check(cond, msg) {
 
 console.log("wall renderer smoke test\n");
 
+/* The withheld hero must not look like a healthy one.
+
+   This is the project's entire thesis and it silently stopped being true. The
+   hero was styled #000000 unconditionally, and the withheld rules still pointed
+   at `.verdict`, a class wall.html had stopped emitting. Every suite passed
+   while the signature state rendered identically to a good day, because nothing
+   here was looking at colour. */
+{
+  const css = fs.readFileSync(path.join(ROOT, "wall.css"), "utf8");
+  const heroRule = /\.act-finding\s*\{[^}]*background:\s*var\(--([a-z-]+)\)/.exec(css);
+  check(!!heroRule, "the hero declares a background token");
+  check(heroRule && heroRule[1] !== "void",
+        "the hero ground is NOT black: black has to stay available as a signal");
+  check(/\.act-finding\.is-withheld\s*\{[^}]*background:\s*var\(--void\)/.test(css),
+        "the withheld hero IS black, on the class the renderer actually applies");
+  check(/\.act-finding\.is-withheld[^{]*\{[^}]*border-top:[^;]*var\(--hazard\)/.test(css),
+        "the withheld hero carries a hazard rule, so it survives greyscale");
+  const html = fs.readFileSync(path.join(ROOT, "wall.html"), "utf8");
+  check(!/\.verdict\.is-withheld/.test(css) || /class="[^"]*verdict/.test(html),
+        "no withheld styling points at a class the markup no longer emits");
+}
+
+
 /* The live payload, if one has been published.
    It is assembled by collector/publish.py, the fixtures by data/make_fixture.py,
    and the two drifted: the live payload omitted stats.credits, which threw inside
