@@ -994,7 +994,7 @@ body.rail-on .rail { opacity: 1; pointer-events: auto; }
      fixed on desktop and then reintroduced here. */
   .wall-head, .row {
     grid-template-columns: 22px minmax(0, 1fr) auto;
-    gap: 10px; padding-left: 12px; padding-right: 12px;
+    gap: 10px; padding-left: 18px; padding-right: 18px;
   }
   .wall-head span:nth-child(3),
   .wall-head span:nth-child(4),
@@ -1024,14 +1024,17 @@ body.rail-on .rail { opacity: 1; pointer-events: auto; }
      on the page. The open row still carries the reason in full. */
   .row .c-tier .cap { display: none; }
   .row .c-bar    { grid-column: 3; grid-row: 2; justify-content: flex-end; }
+  /* The day suffix is the last glyph on the line and was the one sitting on the
+     edge. It gets its own space rather than relying on the row inset alone. */
+  .days::after { margin-right: 2px; }
   /* The duration bar is a silhouette read down a column of forty rows. At one
      row per screen it encodes nothing, so the number stays and the bar goes. */
   .row .c-bar .track { display: none; }
   .c-id .name { font-size: 15px; }
   .days { font-size: 24px; min-width: 0; }
 
-  .sort-note, .historical-note { padding-left: 12px; padding-right: 12px; font-size: 9px; }
-  .receipt { padding-left: 12px; padding-right: 12px; }
+  .sort-note, .historical-note { padding-left: 18px; padding-right: 18px; font-size: 9px; }
+  .receipt { padding-left: 18px; padding-right: 18px; }
   .receipt-grid { grid-template-columns: 1fr; }
   .receipt-pane { padding: 20px 18px; }
 
