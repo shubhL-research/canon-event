@@ -1,6 +1,6 @@
 {
-  "total": 4,
-  "refused": 3,
+  "total": 5,
+  "refused": 4,
   "approved": 1,
   "entries": [
     {
@@ -54,6 +54,19 @@
       "resolved": "2026-08-20 16:04 UTC",
       "outcome_detail": "REJECTED at the approval gate",
       "production": "unchanged, verified after the refusal"
+    },
+    {
+      "file": "heals/2026-08-20-us-003-and-the-pattern.md",
+      "arm": "US",
+      "seq": "003",
+      "outcome": "REFUSED",
+      "outcome_raw": "REFUSED",
+      "collector": "c_mt1fh690ebsllah9n",
+      "raised": "2026-08-20 18:22 UTC",
+      "resolved": "2026-08-20 18:47 UTC",
+      "outcome_detail": "REJECTED at the approval gate",
+      "production": "unchanged, verified after the refusal",
+      "decision": "stop. Three attempts is enough to call it."
     }
   ],
   "by_arm": {
@@ -111,6 +124,19 @@
         "resolved": "2026-08-20 16:04 UTC",
         "outcome_detail": "REJECTED at the approval gate",
         "production": "unchanged, verified after the refusal"
+      },
+      {
+        "file": "heals/2026-08-20-us-003-and-the-pattern.md",
+        "arm": "US",
+        "seq": "003",
+        "outcome": "REFUSED",
+        "outcome_raw": "REFUSED",
+        "collector": "c_mt1fh690ebsllah9n",
+        "raised": "2026-08-20 18:22 UTC",
+        "resolved": "2026-08-20 18:47 UTC",
+        "outcome_detail": "REJECTED at the approval gate",
+        "production": "unchanged, verified after the refusal",
+        "decision": "stop. Three attempts is enough to call it."
       }
     ]
   },
