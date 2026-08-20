@@ -473,6 +473,51 @@ wall reads "exit not attested on this sweep" rather than showing a chip.
 That is the largest open gap in this repository and it is named here rather than
 left for a reader to find.
 
+## Who this is for, and what it asks for
+
+A measurement with no addressee is a curiosity. This one has both.
+
+**The finding, in one sentence.** CPSC publishes a `Products[].Model` field and it
+is empty on 183 of 183 product records across four date windows. The model number
+exists: it is written in English prose in the `Description` instead. Every one of
+104 EU Safety Gate alerts carries a typed barcode in its own field.
+
+**The ask, addressed to CPSC.** Populate `Products[].Model`, or add a `ProductGTIN`
+field alongside the existing `ProductUPCs`. The data is already being written, in
+the same JSON response, one key away. Nothing new has to be collected.
+
+**Who that helps.** Anyone trying to check a recall programmatically: a
+marketplace running its own listings against the recall feed, a journalist asking
+whether a specific product is still on sale, a customs authority, a comparison
+site, and the regulator itself. Right now every one of them has to parse English
+prose to find out which unit was recalled. We wrote that parser, it is in
+`data/pull_seeds.py`, and it recovered an identifier for 82 of 103 US notices that
+the structured field did not carry. Nobody should have to write it.
+
+**What we are handing over.** Everything a reader needs to check this or build on
+it, in `data/sweeps/` and `examples/`:
+
+| | |
+|---|---|
+| `sweep-2026-08-20.csv` | Every notice-arm verdict, one row each |
+| `s_*.jsonl` | Raw sweep rows |
+| `s_*-health.json` | What every detector concluded, per sweep |
+| `examples/` | The structured output shape, with its schema |
+
+All of it is plain CSV, JSONL and JSON, served over HTTPS from the live link. No
+key, no signup, no rate limit.
+
+**What we are not claiming.** Nothing here says any product is on sale. Nothing
+here names a seller. The one number this project would stake itself on is a count
+of an empty field in a public feed, and it is reproducible with one curl command:
+
+```
+curl -s "https://www.saferproducts.gov/RestWebServices/Recall?format=json&RecallDateStart=2026-07-20&RecallDateEnd=2026-08-13"   | python3 -c "import json,sys; d=json.load(sys.stdin);     print(sum(1 for r in d for p in r['Products'] if not (p.get('Model') or '').strip()),           'of', sum(len(r['Products']) for r in d))"
+```
+
+See also `SCRAPER-STUDIO.md`, the written explanation of how the platform was
+used, kept as its own file because it is one of the five mandatory items.
+
 ## The primary evidence
 
 `data/sweeps/` is committed, not ignored. It holds the two things a reader needs

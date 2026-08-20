@@ -21,6 +21,9 @@ echo
 echo "== collector normalizer =="
 python3 collector/test_normalize.py
 echo
+echo "== positive control set =="
+python3 collector/control.py
+echo
 echo "== adversarial precision set =="
 python3 collector/adversarial.py
 echo
