@@ -82,7 +82,8 @@ STOP_AT = re.compile(r"\s+(?:and|or|sold|with|in|for)\b", re.I)
 
 # The identifier is in the feed. We were not opening the key it lives in.
 #
-# Products[].Model is empty on 0 of 57 records checked live. The top-level
+# Products[].Model is empty on 183 of 183 product records across all four date
+# windows, checked live. The top-level
 # Description is non-empty on 57 of 57 and names the model in prose:
 #   "This recall involves CuberShop's Magnetic Stickerless Speed Cubes,
 #    model YJ MGC 5x5."

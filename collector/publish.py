@@ -43,6 +43,7 @@ import sys
 HERE = pathlib.Path(__file__).parent
 ROOT = HERE.parent
 sys.path.insert(0, str(HERE))
+sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "stats"))
 sys.path.insert(0, str(ROOT / "data"))
 
@@ -50,6 +51,8 @@ from wilson import proportion, wilson                        # noqa: E402
 from recapture import from_rows as recapture_from_rows       # noqa: E402
 from survival import survival_curve, observations_from_rows  # noqa: E402
 from make_fixture import hazard_class                        # noqa: E402
+from normalize import gtin_check_digit_ok                    # noqa: E402
+from extract.identifier import UNSEARCHABLE, classify        # noqa: E402
 
 # How long a sweep may speak in the present tense. Mirrors health.FRESHNESS_BOUND_S.
 FRESHNESS_BOUND_S = 14400
@@ -67,20 +70,48 @@ ARM_HOST = {"US": "amazon.com", "DE": "kaufland.de", "IN": "flipkart.com"}
 # that cannot qualify the numbers underneath it is decoration.
 PRECISION_MINIMUM = 50
 
+# The code normalize.py files BOTH of its AMBER outcomes under.
+#
+# "identifier re-asserted but no active buy control" and "identifier not
+# re-asserted on the fetched page" are opposite facts about the same page: the
+# first says we found the product and could not buy it, the second says we never
+# found the product. Counting them in one bucket says neither. The row-level
+# reason separates them, so the reason is what gets counted.
+AMBER_CODE = "AMBER"
+
+
+def _identifier(seed_or_row):
+    """The owned searchability verdict for one notice.
+
+    ONE RULE, AND IT LIVES IN extract/identifier.py
+    -----------------------------------------------
+    This file used to carry a second copy of the rule, and the two disagreed. The
+    copy here accepted any non-empty model string, so "Year 2026 Teryx4 H2" and
+    "Year 2019-2025 UMAX Bistro" counted as searchable identifiers. Over the full
+    207-notice corpus that copy called 19 unsearchable where the owned rule calls
+    21. Two rules is two numbers, and the wall was printing the wrong one.
+
+    The check digit is not a third rule. classify() tests the SHAPE of a barcode;
+    whether those digits are a real GTIN is modulo-10 arithmetic owned by
+    collector/normalize.py. Six Safety Gate notices hold a value in the gtin field
+    that fails its own check digit, at lengths 9, 10, 12 and 14, because the
+    notifying country types into a free-text box. The field does not contain a
+    GTIN, so it is not handed to classify() as one. See README, "Six of the Safety
+    Gate GTINs are not GTINs".
+    """
+    gtin = seed_or_row.get("gtin")
+    if not (gtin and gtin_check_digit_ok(gtin)):
+        gtin = None
+    return classify(seed_or_row.get("model"), gtin, seed_or_row.get("name") or "")
+
 
 def searchable(seed_or_row):
     """Did this notice carry anything a matcher could search for?
 
     The denominator of the unsearchable rate, and the reason it can be computed
-    without a scraper. `gtin` alone is not enough: six Safety Gate notices carry
-    a value in that field that fails its own check digit, and those are not
-    searchable in any useful sense.
+    without a scraper.
     """
-    from normalize import gtin_check_digit_ok
-    gtin = seed_or_row.get("gtin")
-    if gtin and gtin_check_digit_ok(gtin):
-        return True
-    return bool((seed_or_row.get("model") or "").strip())
+    return _identifier(seed_or_row)["verdict"] != UNSEARCHABLE
 
 
 def unsearchable(seeds):
@@ -93,7 +124,44 @@ def unsearchable(seeds):
     n = sum(1 for s in seeds if not searchable(s))
     stat = proportion(n, d, "unsearchable")
     stat["contaminated"] = False
+    stat["note"] = ("Pooled across regulators. CPSC and Safety Gate do not fail the "
+                    "same way and a single rate averaging them describes neither, so "
+                    "the split in stats.unsearchable_by_authority is published beside "
+                    "this figure and never instead of it.")
     return stat
+
+
+def unsearchable_by_authority(seeds):
+    """The unsearchable rate split by regulator, with an interval on each.
+
+    This is the most defensible fact the project holds and the pooled rate hides
+    it. CPSC publishes a Products[].Model field that is empty on 183 of 183
+    product records across four date windows; every one of the 104 Safety Gate
+    alerts carries a typed barcode. Those are two different failures, and anyone
+    can confirm both with curl.
+
+    `by_kind` names the mechanism behind each unsearchable notice, straight from
+    the owned rule, so a reader can see whether a regulator named nothing at all
+    or named something too generic to search.
+    """
+    groups = {}
+    for seed in seeds:
+        authority = seed.get("authority") or "UNKNOWN"
+        group = groups.setdefault(authority, {"n": 0, "d": 0, "by_kind": {}})
+        group["d"] += 1
+        verdict = _identifier(seed)
+        if verdict["verdict"] == UNSEARCHABLE:
+            group["n"] += 1
+            kind = verdict["kind"]
+            group["by_kind"][kind] = group["by_kind"].get(kind, 0) + 1
+
+    out = {}
+    for authority, group in sorted(groups.items()):
+        stat = proportion(group["n"], group["d"], "unsearchable, %s" % authority)
+        stat["by_kind"] = group["by_kind"]
+        stat["contaminated"] = False
+        out[authority] = stat
+    return out
 
 
 def still_buyable(rows, arms=None):
@@ -105,8 +173,8 @@ def still_buyable(rows, arms=None):
 
     Contamination is decided by whether a collector was WITHHELD, not by whether
     a collector was involved. Marking it contaminated unconditionally redacted a
-    figure we had genuinely measured — 0 of 58, from 5,812 adjudicated listings —
-    and a redaction over a real measurement is the same lie as a number over a
+    figure we had genuinely measured, 0 of 58 from 5,812 adjudicated listings, and
+    a redaction over a real measurement is the same lie as a number over a
     broken one, pointed the other way. A DEGRADED arm makes the figure partial
     rather than unpublishable, which is what the contract's partial stamp is for.
     """
@@ -205,36 +273,74 @@ def precision(rows, graded=None):
     }
 
 
-def border_escape(rows, seeds):
+def border_escape(rows, seeds, arms=None):
     """EU-recalled products found on a non-EU marketplace.
 
-    The denominator is free: EU notices carrying a searchable identifier. The
-    numerator needs the IN arm to have measured, so when it has not this renders
-    as PENDING with the reason rather than as a zero. A zero here would read as
-    "nothing escaped", which is a finding we have not made.
+    The numerator needs the IN arm to have measured. This used to emit v=0.0
+    unconditionally, without ever reading arm state, against the promise in this
+    file's own docstring. A zero read as "nothing escaped" while the arm that
+    would have found an escape had not looked.
+
+    THE DENOMINATOR IS WHAT WAS SWEPT, NOT WHAT EXISTS
+    --------------------------------------------------
+    It also scored against the full 104-notice EU corpus while a trial slice had
+    queried 60 of them. That counts 44 notices nobody opened as non-escapes, and
+    an unlooked-at notice is not evidence of anything. The effect is not cosmetic:
+    it narrows the interval from [0, 6.2] to [0, 3.6], so the sweep is credited
+    with a precision it did not buy.
+
+    So `seeds` here is the slice actually swept. `unsearchable` is the one figure
+    that belongs to the whole corpus, because it needs no sweep at all.
     """
     eu = [s for s in seeds if s["authority"] == "SAFETY_GATE"]
     eu_searchable = [s for s in eu if searchable(s)]
-    refs = {s["ref"] for s in eu_searchable}
-    escaped = [r for r in rows
-               if r["source"]["ref"] in refs and r.get("arms", {}).get("IN") == "RED"]
-
     out = {"eu_seeds": len(eu), "eu_searchable": len(eu_searchable),
            "contaminated": True}
+
+    state = (arms or {}).get("IN", {}).get("state")
+    if state != "MEASURED":
+        out.update(v=None, n=0, d=len(eu_searchable), ci95=None,
+                   pending=("The India arm is %s, so no EU-recalled product was "
+                            "looked for outside the EU. A zero here would report "
+                            "that nothing escaped, which is a finding we have not "
+                            "made." % (state or "not in this sweep")))
+        return out
     if not eu_searchable:
         out.update(v=None, n=0, d=0, ci95=None,
                    pending="No EU notice carries a searchable identifier.")
         return out
-    if not escaped:
-        out.update(v=0.0, n=0, d=len(eu_searchable),
-                   ci95=list(wilson(0, len(eu_searchable))))
-        return out
-    stat = proportion(len(escaped), len(eu_searchable), "border escape")
-    out.update(stat)
+
+    refs = {s["ref"] for s in eu_searchable}
+    escaped = [r for r in rows
+               if r["source"]["ref"] in refs and r.get("arms", {}).get("IN") == "RED"]
+    out.update(proportion(len(escaped), len(eu_searchable), "border escape"))
     return out
 
 
-def discarded(health_doc, reports):
+def discard_code(entry):
+    """One discard reason, mapped to the code it is counted under.
+
+    normalize.py files both AMBER outcomes under the code "AMBER", so the code on
+    its own puts every adjudication in one bucket. A single bucket at 100% is the
+    opaque count this panel exists to refuse: it looks exactly like a matcher that
+    stopped working. The reason text is already specific, so it decides the code.
+
+    A reason that matches nothing recognised gets its own bucket rather than
+    joining one of these. If normalize.py grows a third AMBER outcome it surfaces
+    on the wall as an unrecognised code instead of silently inflating a neighbour.
+    """
+    code = entry.get("code") or "unspecified"
+    if code != AMBER_CODE:
+        return code
+    reason = (entry.get("reason") or "").lower()
+    if "not re-asserted" in reason:
+        return "identifier_not_reasserted"
+    if "no active buy control" in reason:
+        return "reasserted_no_buy_control"
+    return "amber_reason_unrecognised"
+
+
+def discarded(rows, reports):
     """Discard rate and the reason codes behind it.
 
     Reported by cause rather than as a single number, because an opaque discard
@@ -243,19 +349,42 @@ def discarded(health_doc, reports):
     The denominator is the number of ADJUDICATION DECISIONS, not the number of
     search loads. One load returns thirty to four hundred listings and every one
     of them is decided, so dividing discards by loads produced a ratio above 1 and
-    a Wilson call that raised — caught on the first live payload. A rate has to be
+    a Wilson call that raised, caught on the first live payload. A rate has to be
     discards over things decided or it is not a rate.
+
+    THE RATE AND THE BREAKDOWN COUNT DIFFERENT THINGS, AND BOTH ARE NAMED
+    ---------------------------------------------------------------------
+    The rate is per listing adjudicated. The breakdown cannot be, because the
+    per-arm normaliser report counts codes and throws the reason away, and the
+    reason is the only thing that separates the two AMBER outcomes. So the
+    breakdown counts the discard entries carried on the published rows, one per
+    notice per arm. Adding `by_code` up will not reach `n`, and `by_code_scope`
+    says why rather than leaving a reader to discover it.
+
+    Apportioning the listing-scale total across the row-scale reasons would close
+    that gap and would be invented. A row keeps only its strongest verdict, so its
+    reason is not a sample of the reasons the listings under it were given.
     """
-    by_code, total, decided = {}, 0, 0
+    total, decided = 0, 0
     for report in reports:
-        for code, count in (report.get("by_code") or {}).items():
-            by_code[code] = by_code.get(code, 0) + count
+        for count in (report.get("by_code") or {}).values():
             total += count
         decided += report.get("out", 0)
 
-    out = {"n": total, "d": decided, "by_code": by_code, "contaminated": True}
-    # A row may carry more than one discard reason, so the count can exceed the
-    # number of rows. Report the counts and withhold the ratio rather than
+    by_code = {}
+    for row in rows:
+        for entry in row.get("discarded") or []:
+            code = discard_code(entry)
+            by_code[code] = by_code.get(code, 0) + 1
+
+    out = {"n": total, "d": decided, "by_code": by_code,
+           "by_code_n": sum(by_code.values()),
+           "by_code_scope": ("Counted per published row per arm, because that is "
+                             "where the reason survives. The rate above is counted "
+                             "per listing adjudicated, so these do not sum to it."),
+           "contaminated": True}
+    # A listing may carry more than one discard reason, so the count can exceed
+    # the number decided. Report the counts and withhold the ratio rather than
     # inventing a denominator that makes the arithmetic work.
     if decided and total <= decided:
         out["v"] = round(total / decided, 4)
@@ -288,9 +417,14 @@ def arithmetic(seeds, reports):
                     "search loads, submitted as %d batch jobs."
                     % (searchable_seeds, len(seeds), arms, planned,
                        sum(r.get("batches", 0) for r in reports))),
-        "note": ("Only searchable notices are queried, so the 96 with no usable "
-                 "identifier cost nothing. Batching is what makes a full sweep "
-                 "possible: one job per 40 urls rather than one job per url."),
+        # Counted, not typed. This sentence carried a hardcoded 96 from a corpus
+        # pull that missed the CPSC Description key, and the seed correction left
+        # it stating a number the same block contradicts two lines above.
+        "note": ("Only searchable notices are queried. %d of %d notices in this plan "
+                 "carry no usable identifier and were never submitted, so they cost "
+                 "nothing. Batching is what makes a full sweep possible: one job per "
+                 "40 urls rather than one job per url."
+                 % (len(seeds) - searchable_seeds, len(seeds))),
     }
 
 
@@ -325,9 +459,11 @@ def build(rows, health_doc, seeds, reports=None, graded=None, variant="live",
     Caught on the first live payload: a trial slice selects notices by identifier
     strength, so every notice it visits has a searchable identifier by
     construction. Computing the unsearchable rate over that subset returned 0 of
-    60 — a headline saying every recall is checkable, produced by the sampling
-    rule rather than by the world. The true figure over the full corpus is 96 of
-    207.
+    60, a headline saying every recall is checkable, produced by the sampling
+    rule rather than by the world. The figure over the full corpus is not that,
+    and it is computed here rather than quoted, because it has already moved
+    twice: once when the seed puller learned to open the CPSC Description key,
+    and once when this file stopped carrying its own copy of the rule.
 
     The unsearchable rate does not depend on sweeping at all. That is the whole
     reason it survives every collector failing, and it has to be computed over
@@ -344,12 +480,15 @@ def build(rows, health_doc, seeds, reports=None, graded=None, variant="live",
     stats = {
         # Over the whole corpus, always. Never over the swept subset.
         "unsearchable": unsearchable(corpus),
+        # Published with the pooled rate every time, never after it.
+        "unsearchable_by_authority": unsearchable_by_authority(corpus),
         "survival": still_buyable(rows, health_doc.get("arms")),
         "survival_curve": curve,
         "hero": hero(rows, corpus),
         "precision": precision(rows, graded),
-        "border_escape": border_escape(rows, corpus),
-        "discarded": discarded(health_doc, reports),
+        # Swept seeds, not the corpus: a notice nobody opened is not a non-escape.
+        "border_escape": border_escape(rows, seeds, health_doc.get("arms")),
+        "discarded": discarded(rows, reports),
         "arithmetic": arithmetic(seeds, reports),
         "findings": {
             "red": sum(1 for r in rows if r["tier"] == "RED"),
@@ -480,6 +619,11 @@ def main(argv):
     print("unsearchable   %s of %s  %s" % (s["unsearchable"]["n"],
                                            s["unsearchable"]["d"],
                                            s["unsearchable"]["ci95"]))
+    # The pooled rate is never printed on its own. The two regulators fail in
+    # different ways and the average describes neither of them.
+    for authority, stat in sorted(s["unsearchable_by_authority"].items()):
+        print("  %-12s %s of %s  %s" % (authority, stat["n"], stat["d"],
+                                        stat["ci95"]))
     print("still buyable  %s of %s  %s" % (s["survival"]["n"], s["survival"]["d"],
                                            s["survival"].get("ci95")))
     print("hero           %d burning-or-choking-children rows" % s["hero"]["n"])

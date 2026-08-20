@@ -135,6 +135,18 @@ body {
 .arm.state-WITHHELD .arm-state { border-color: var(--hazard); color: var(--hazard); }
 
 .arm.state-DEGRADED .arm-state { border-color: var(--hazard); color: var(--hazard-deep); }
+
+/* A country with no collector behind it. Every other card is a surface carrying a
+   result, so this one is not a surface: it stays paper, inside a dashed edge, and
+   its telemetry line reports that there is no exit to attest. */
+.arm.state-NOT_SWEPT {
+  background: var(--paper); border: 1px dashed var(--rule-strong);
+  color: var(--ink-3);
+}
+.arm.state-NOT_SWEPT .arm-code,
+.arm.state-NOT_SWEPT .arm-copy { color: var(--ink-3); }
+.arm.state-NOT_SWEPT .arm-state { border-style: dashed; color: var(--ink-3); }
+.arm.state-NOT_SWEPT .arm-attest { border-top-color: var(--rule-strong); }
 .arm.state-STALE { background: repeating-linear-gradient(45deg,
   var(--surface), var(--surface) 2px, var(--hatch) 2px, var(--hatch) 4px); }
 .arm.state-STALE .arm-copy, .arm.state-STALE .arm-attest { color: var(--ink-3); }
@@ -203,6 +215,14 @@ body {
 .chip.v-WITHHELD { background: var(--void); border-color: var(--void); color: #fff; }
 .chip.v-STALE { background: repeating-linear-gradient(45deg,
   var(--surface), var(--surface) 2px, var(--hatch) 2px, var(--hatch) 4px); }
+/* An arm that never ran is not the hollow chip. Hollow already means we looked in
+   that country and found nothing, which is a measurement. This one is a cell
+   nobody filled in: a dashed edge and unweighted type, with the country code left
+   legible so a reader sees which country is missing rather than which verdict. */
+.chip.v-NOT_SWEPT {
+  background: transparent; border: 1px dashed var(--hatch);
+  color: var(--unknown); font-weight: 400;
+}
 
 /* The wall's shape. Bars share a left edge and are sorted descending, so the
    silhouette is a staircase. Red is length, never fill. */

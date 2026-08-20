@@ -26,7 +26,16 @@
 
   function el(id) { return document.getElementById(id); }
 
-  function pct(v) { return (v * 100).toFixed(1) + "%"; }
+  /* A null is not a zero. This returned "0.0%" for a null, which is how the wall
+     came to print "Precision 0.0%" for a figure no human has adjudicated yet: the
+     scraper announcing zero precision on the number that qualifies every other
+     number on the page. Every caller handed a null now has to say what the
+     absence means instead of being given a figure. */
+  function pct(v) {
+    return typeof v === "number" && isFinite(v)
+      ? (v * 100).toFixed(1) + "%"
+      : "not computed";
+  }
 
   function ci(pair) {
     return pair ? "CI " + pct(pair[0]) + " to " + pct(pair[1]) : "";
@@ -235,15 +244,36 @@
     }
 
     /* Precision carries its interval next to the number it qualifies, never in a
-       footnote. Recall is not directly measured: capture-recapture across the two
-       query strategies puts a floor under what we missed. */
+       footnote. It cannot be derived from a sweep: it takes a human opening
+       listings one at a time, so until that has happened the cell says PENDING
+       and prints the count still needed. */
+    if (s.precision.v === null) {
+      out.push(instrument("Precision", "PENDING", esc(s.precision.pending),
+        "is-apparatus is-pending"));
+    } else {
+      out.push(instrument("Precision", pct(s.precision.v),
+        s.precision.n + " of " + s.precision.d + " hand-verified · " + ci(s.precision.ci95),
+        "is-apparatus"));
+    }
+
+    /* Recall is not directly measured: capture-recapture across the two query
+       strategies puts a floor under what we missed. The estimator needs overlap
+       between those strategies to say anything, and the payload decides whether
+       it had enough. Printing the floor anyway rendered "≥ 0 missed", which is an
+       assertion of perfect recall: the largest claim this page could make, on the
+       sweep least able to support it. */
     var rc = s.precision.recall;
-    out.push(instrument("Precision", pct(s.precision.v),
-      s.precision.n + " of " + s.precision.d + " hand-verified · " + ci(s.precision.ci95),
-      "is-apparatus"));
-    out.push(instrument("Recall, floor", "≥ " + Math.round(rc.missed_floor) + " missed",
-      "capture-recapture, " + esc(rc.estimator.split(" ")[0]) + " · lower bound",
-      "is-apparatus"));
+    if (rc.reportable === false) {
+      var overlap = typeof rc.m_both === "number" && typeof rc.observed === "number"
+        ? "overlap " + rc.m_both + " of " + rc.observed + " observed · " : "";
+      out.push(instrument("Recall", "NOT ESTIMABLE",
+        "capture-recapture · " + overlap + esc(rc.reportable_note),
+        "is-apparatus is-pending"));
+    } else {
+      out.push(instrument("Recall, floor", "≥ " + Math.round(rc.missed_floor) + " missed",
+        "capture-recapture, " + esc(rc.estimator.split(" ")[0]) + " · lower bound",
+        "is-apparatus"));
+    }
 
     out.push(instrument("Arms measured", s.arms_measured.n + " of " + s.arms_measured.d,
       doc.arms.map(function (a) { return a.code + " " + a.state.toLowerCase(); }).join(" · "),
@@ -269,12 +299,26 @@
 
   // -------------------------------------------------------------- arm rail
 
+  /* job.data_lines counts the RED rows an arm produced, not the listings it
+     brought back and adjudicated. Reading it as rows-per-input printed "0 of 60
+     inputs returned rows" beside a sweep that decided 5,812 listings, which reads
+     as a dead collector rather than as a clean result. The listing count is the
+     honest figure, and a payload that does not carry one gets a sentence saying
+     that instead of the nearest available number. */
   function armCopy(a, doc) {
     var j = a.job, h = a.heal;
+    var listings = typeof j.listings === "number" ? j.listings : null;
     switch (a.state) {
       case "MEASURED":
-        return "Measured " + doc.swept_at.slice(11, 19) + "Z. " + j.data_lines +
-          " of " + j.inputs + " inputs returned rows. " + j.fails + " fails.";
+        return "Measured " + doc.swept_at.slice(11, 19) + "Z. " +
+          (listings === null
+            ? j.inputs + " inputs queried" +
+              (typeof j.success_rate === "number"
+                ? ", collector success rate " + pct(j.success_rate) : "") +
+              ". The count of listings adjudicated is not carried in this " +
+              "payload, so it is not stated. "
+            : commas(listings) + " listings adjudicated from " + j.inputs + " inputs. ") +
+          j.fails + " fails.";
       case "DEGRADED":
         return "Partial. " + j.fails + " of " + j.inputs + " inputs returned no row and no " +
           "archived empty-result page. Rows from this arm are shown. Counts carry a partial stamp.";
@@ -297,12 +341,55 @@
     }
   }
 
+  /* The coverage bar is what the arm brought back against what it was asked for.
+     data_lines is a RED count, so dividing it by inputs drew a bar at zero for an
+     arm that had in fact returned thousands of listings. Listings first, the
+     collector's own success rate second, and no bar at all when the payload
+     carries neither: an undrawn bar is honest, a bar at zero is not. */
+  function coverage(j) {
+    if (typeof j.listings === "number" && j.inputs) return j.listings / j.inputs;
+    if (typeof j.success_rate === "number") return j.success_rate;
+    return null;
+  }
+
+  /* ARM_ORDER is every country this project claims to cover, doc.arms is the set
+     that actually ran. A code in the first and not the second was never swept,
+     and that is the absence of a state rather than a state the payload can carry.
+     It is drawn rather than omitted, because a country silently missing from the
+     rail reads as a country with nothing to report. */
+  function notSweptCard(code) {
+    return '<div class="arm state-NOT_SWEPT">' +
+      '<div class="arm-head">' +
+        '<span class="arm-code">' + esc(code) + "</span>" +
+        '<span class="arm-host">no collector</span>' +
+        '<span class="arm-state">not swept</span>' +
+      "</div>" +
+      '<div class="arm-copy">No collector ran for this country in this sweep. ' +
+      "Nothing on this page is a measurement of " + esc(code) + ", and the " +
+      esc(code) + " column on every row below is empty for that reason, not " +
+      "because we looked and found nothing.</div>" +
+      '<div class="arm-attest">no exit, no capture, no verdict</div>' +
+    "</div>";
+  }
+
   function renderArms(doc) {
-    el("armRail").innerHTML = doc.arms.map(function (a) {
+    var byCode = {};
+    doc.arms.forEach(function (a) { byCode[a.code] = a; });
+    var order = ARM_ORDER.slice();
+    doc.arms.forEach(function (a) {
+      if (order.indexOf(a.code) === -1) order.push(a.code);
+    });
+
+    el("armRail").innerHTML = order.map(function (code) {
+      var a = byCode[code];
+      if (!a) return notSweptCard(code);
+
       var extra = "";
       if (a.state === "DEGRADED") {
-        var cov = a.job.data_lines / a.job.inputs;
-        extra = '<div class="coverage"><i style="width:' + (cov * 100).toFixed(1) + '%"></i></div>';
+        var cov = coverage(a.job);
+        if (cov !== null) {
+          extra = '<div class="coverage"><i style="width:' + (cov * 100).toFixed(1) + '%"></i></div>';
+        }
       }
       if (a.state === "HEALING") {
         var cells = "";
@@ -376,6 +463,15 @@
     var maxDays = Math.max.apply(null, rows.map(function (r) { return r.days; }));
     var shown = rows.slice(0, PAGE_CAP);
 
+    /* Which arms actually ran. Every row carries a verdict for all three codes,
+       and a row written by a sweep that never opened the US arm still says
+       "US": "NOT_FOUND". NOT_FOUND is a claim that we looked, so the arms the
+       payload lists decide which chips are verdicts and which are blanks. The
+       row value is not overwritten anywhere: it is simply not believed for an
+       arm that was never swept. */
+    var swept = {};
+    doc.arms.forEach(function (a) { swept[a.code] = true; });
+
     // Name the sort where the columns are named. A reader who can see the order
     // can check it; a reader who cannot has to trust it.
     // Findings-first ordering means a full page of RED can push every AMBER row
@@ -398,6 +494,11 @@
       var ident = [r.model, r.gtin ? "GTIN " + r.gtin : null].filter(Boolean).join(" · ")
         || "no machine-matchable identifier";
       var chips = ARM_ORDER.map(function (code) {
+        if (!swept[code]) {
+          return '<span class="chip v-NOT_SWEPT" title="' + code +
+            ' not swept: no collector ran for this country, so there is no verdict">' +
+            code + "</span>";
+        }
         var v = r.arms[code];
         var glyph = v === "RED" ? code : v === "WITHHELD" ? "–" : code;
         return '<span class="chip v-' + v + '" title="' + code + " " + v + '">' + glyph + "</span>";
@@ -560,6 +661,37 @@
 
   // -------------------------------------------------------- survival curve
 
+  /* What a fit over an all-zero response is worth, said in sentences.
+     Every block came back n=1 and every grid point thin, so the plot rendered as
+     five dashes over five hatched stubs. A monotone fit on a response with no
+     ones returns zero at every day: PAVA hands back its own input, so the shape
+     on screen would be the assumption rather than a finding. An empty chart also
+     reads as a broken chart, and a broken chart is the one thing this section
+     cannot be, because it is where the project is being careful. */
+  function curveNotPublished(c, doc) {
+    var s = doc.stats.survival;
+    var blocks = (c.grid || []).map(function (g) { return g.block_n || 0; });
+    var largest = blocks.length ? Math.max.apply(null, blocks) : 0;
+    var support = c.min_support
+      ? "No grid point reaches the support floor of " + c.min_support +
+        " observations. The largest block behind any point holds " + largest + "."
+      : "No grid point rests on enough observations to publish.";
+
+    return '<p class="lede">No curve is published. Of the ' + c.n +
+      " searchable notices, " + c.n_still_buyable + " were confirmed still " +
+      "buyable, so the response the fit runs on is flat. " + support + "</p>" +
+      '<p class="lede">What ' + c.n_still_buyable + " of " + c.n + " licenses: " +
+      "across the arms this sweep reached, that is how many recalled identifiers " +
+      "were re-asserted on a live page carrying a buy control, and the 95% " +
+      "interval on that rate still reaches " +
+      (s && s.ci95 ? pct(s.ci95[1]) : "an unpublished upper bound") +
+      ". What it does not license: any claim that recalled products have left the " +
+      "shelves, and any claim about how survival changes with age. Both need " +
+      "confirmed listings spread across the day grid, and this sweep has " +
+      c.n_still_buyable + ".</p>" +
+      '<div class="curve-note"><b>' + esc(c.method) + ".</b> " + esc(c.confound) + "</div>";
+  }
+
   /* The curve is FITTED UPSTREAM, in stats/survival.py, and rendered here from
      decided values. The wall never performs inference: what is on screen is
      exactly what examples/stats.json publishes, so a reader can recompute it. */
@@ -571,6 +703,17 @@
         '<p class="lede">Not enough observations to fit a curve yet' +
         (c ? " (" + c.n + ")" : "") + ". A shape fitted to a handful of products " +
         "is a picture, not a finding.</p>";
+      return;
+    }
+
+    /* A point is publishable when the block under it carries enough observations
+       to hold an interval. The payload decides that; `thin` is read as the same
+       judgement for payloads written before the key existed. */
+    var publishable = (c.grid || []).filter(function (g) {
+      return g.publishable === undefined ? !g.thin : g.publishable;
+    });
+    if (!publishable.length) {
+      node.innerHTML = "<h2>Survival by age</h2>" + curveNotPublished(c, doc);
       return;
     }
 
@@ -610,6 +753,15 @@
       return "<dt>" + esc(k.replace(/_/g, " ")) + "</dt><dd>" + d.by_code[k] + "</dd>";
     }).join("");
 
+    /* Same rule as the apparatus cell above: "≥ 0" in the panel that exists to
+       report our blindness would be this page claiming it saw everything. When
+       the estimator cannot report, the row says so and the note under it carries
+       the reason rather than the usual lower-bound caveat. */
+    var rc = s.precision.recall;
+    var unreported = rc.reportable === false;
+    var unseen = unreported ? "not estimable" : "≥ " + Math.round(rc.missed_floor);
+    var recallNote = unreported ? rc.reportable_note : rc.note;
+
     el("notSeen").innerHTML =
       "<h2>What we did not see</h2>" +
       '<p class="lede">A dashboard that only shows what it found is a dashboard that lies. ' +
@@ -617,10 +769,9 @@
       "<dl>" + rows +
         "<dt>AMBER, shown and excluded from every statistic</dt><dd>" + s.findings.amber + "</dd>" +
         "<dt>Seeds published with no searchable identifier</dt><dd>" + s.unsearchable.n + "</dd>" +
-        "<dt>Listings we estimate we never saw at all</dt><dd>≥ " +
-          Math.round(s.precision.recall.missed_floor) + "</dd>" +
+        "<dt>Listings we estimate we never saw at all</dt><dd>" + unseen + "</dd>" +
       "</dl>" +
-      '<p class="lede" style="margin-top:16px">' + esc(s.precision.recall.note) + "</p>" +
+      '<p class="lede" style="margin-top:16px">' + esc(recallNote) + "</p>" +
       '<p class="lede">Adversarial precision set: ' + s.adversarial_precision_set.n +
       " deliberate near-misses fed to the matcher, " +
       (s.adversarial_precision_set.all_discarded ? "all discarded" : "ONE REACHED RED") + ". " +
