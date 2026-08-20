@@ -4,7 +4,7 @@
 
 Governments recall products for burning, choking and killing people. Nobody measures whether those
 products actually leave the shelves. CANON EVENT checks whether recalled products are still buyable
-right now, from residential exit IPs in three markets, and refuses to show a clean screen when its
+right now, from geo-accurate exit IPs in three markets, and refuses to show a clean screen when its
 own scraper is broken. One trial sweep has run, over 60 of 207 notices and two of the three arms.
 Nothing here has been swept at full scale, and the numbers say so on their face.
 
@@ -76,15 +76,33 @@ One trial sweep, 19 August 2026. **60 of 207 notices, two of the three arms.**
 
 | | |
 |---|---|
-| Notices swept | 60 of 207, all of them Safety Gate. No CPSC notice has been swept yet |
-| Arms swept | DE `kaufland.de` MEASURED, IN `flipkart.com` DEGRADED. US `amazon.com` not in this slice |
-| Listings adjudicated | 5,812 |
-| Listings discarded | 5,812, every one |
-| Rows reaching RED | 0 |
+| Notices swept | 60 of 207, all of them Safety Gate. **No CPSC notice has been swept yet** |
+| Arms swept | US `amazon.com` DEGRADED, DE `kaufland.de` MEASURED, IN `flipkart.com` MEASURED |
+| Listings adjudicated | 16,025. US 6,886, DE 1,066, IN 8,073 |
+| Notices that got any candidate at all | US 33, DE 58, IN 56, of 60 queried per arm |
+| Listings discarded | 16,025, every one |
+| Rows reaching RED | 0, across all 180 notice-arm pairs |
 | Still buyable | 0 of 58 searchable notices, Wilson 95% CI [0, 6.2] |
 | Precision | not computed, and cannot be. There are no RED rows to hand-verify |
-| Border escape | pending. The India arm is DEGRADED, so nothing was looked for outside the EU |
-| Credits spent | 232 of a 5,000 cap |
+| Border escape | pending. Scored against swept seeds only, and the swept set is entirely EU |
+| Credits spent | not carried in this payload. The figure is on the collector account, not in the sweep output, so it is not stated rather than estimated |
+
+**The corpus could barely have produced a hit on two of the three arms, and that
+has to be said before anyone else says it.** Every notice in this sweep is an EU
+Safety Gate alert: Danish fireworks, a French whisk, a Polish slime doll, an
+Italian nail varnish. Those were searched on `amazon.com` and `flipkart.com`,
+where European regional retail stock is not listed in the first place. A null
+result there is closer to a statement about distribution than about recall
+enforcement.
+
+The DE arm is the only one where the question was posed fairly, and it returned
+1,066 listings, joined 58 of 60 notices to candidates, and confirmed none of
+them. That is the honest scope of the finding: **on one European storefront, no
+searchable EU-recalled product was confirmed still buyable.**
+
+The next sweep points CPSC notices at `amazon.com`, which is the pairing where a
+hit is physically possible. Until that runs, the null result should be read
+narrowly.
 
 The payload the wall reads is `data/live.js`. It stamps itself:
 
@@ -99,7 +117,7 @@ Four payloads are committed at `data/live-s_*.json`, and three of the four measu
 kept because a sweep that came back empty is the state this interface exists to render honestly.
 
 **The published adjudication is a replay.** The fetches happened live on 19 August against real
-marketplaces from real exit IPs, and the raw rows were archived on receipt. The matcher then
+marketplaces from geo-accurate exit IPs, and the raw rows were archived on receipt. The matcher then
 changed, so those archived rows were re-scored offline through the current rules. No new fetch and
 no new credits, and the sweep id ends in `-replay` so it cannot be passed off as a fresh capture.
 
@@ -317,7 +335,7 @@ hand. That dependency is disclosed here rather than hidden.
 
 Bright Data is used for the one thing no endpoint on earth answers:
 
-> **Is this exact model number buyable right now, from a German residential exit IP?**
+> **Is this exact model number buyable right now, from inside the German market?**
 
 Amazon's Product Advertising API requires affiliate approval and will not answer it. eBay retired the
 open Finding API. Bright Data's prebuilt library scrapers are disqualified by the hackathon rules, so
@@ -337,7 +355,7 @@ only when both hold at capture time:
 
 Identity re-assertion exists because Amazon substitutes ASINs on stale URLs. Without it, a live buy
 button on the *wrong* product scores as a hazard still on sale, which is the worst mistake this
-system could make. It is the entire reason 5,812 listings were discarded in the current sweep: the
+system could make. It is the entire reason 16,025 listings were discarded in the current sweep: the
 recalled identifier was never re-asserted on the page that came back.
 
 A model string alone does not settle identity either. Model numbers are not globally unique, so a
@@ -362,7 +380,7 @@ the reason above, so **every credit spent is spent on the one question no free e
 
 ```
 c_mt00jidz6zhqjbpew   DE   kaufland.de    built clean, swept, MEASURED
-c_mt03cj5z2fo651wy8q  IN   flipkart.com   built clean, swept, DEGRADED
+c_mt03cj5z2fo651wy8q  IN   flipkart.com   built clean, swept, MEASURED
 c_mt01usw31e8y5ubqjs  US   amazon.com     built, one refused heal, not in the trial slice
 c_mt000dde2qdd6uln7z  DE   amazon.de      healed twice and approved, held out of the arms
 ```
@@ -423,6 +441,61 @@ would not:
   the evidence the repair is right rather than merely convenient.
 
 ---
+
+## Six of the exits are not what we said they were
+
+`data/attest/exit-attestation-2026-08-20.json` holds three requests to
+`brdtest.com/myip.json`, one per market. All three resolve to the country asked
+for, with a matching timezone. Geo targeting works, and it is the capability the
+three-arm design rests on.
+
+It also refuted our own wording. Every ASN belongs to a hosting company:
+
+```
+US   AS20473    The Constant Company, LLC      Piscataway, New Jersey
+DE   AS203020   HostRoyale Technologies        Berlin
+IN   AS133499   HostRoyale Technologies        Asia/Kolkata
+```
+
+A residential exit names a carrier: Vodafone, Comcast, Reliance Jio. This
+project's own standard, written on the wall, is that an ASN naming a consumer
+ISP rather than a datacentre is the proof. By that standard these are not
+residential, so the README no longer says residential. It says geo-accurate,
+which is what was measured.
+
+Two limits on what the file shows, both stated in it. It was measured through
+the CLI's default unlocker zone rather than from inside a collector session, so
+it neither confirms nor refutes the collectors' own exit type. And nothing can,
+until a collector issues an attestation request in the same stage as its product
+fetch. **The collectors do not currently do that**, which is why every arm on the
+wall reads "exit not attested on this sweep" rather than showing a chip.
+
+That is the largest open gap in this repository and it is named here rather than
+left for a reader to find.
+
+## The primary evidence
+
+`data/sweeps/` is committed, not ignored. It holds the two things a reader needs
+to check the claim rather than take it:
+
+| File | What it is |
+|---|---|
+| `raw-row-kaufland-de.json` | One row exactly as Scraper Studio returned it, field names and all |
+| `sweep-2026-08-20.csv` | The full three-arm sweep after adjudication, 180 notice-arm verdicts |
+
+The field names in the raw row were chosen by the Scraper Studio AI Agent when it
+built the collector from a natural-language brief. `add_to_cart_button_text` and
+`manufacturer_part_number` are not names we would have picked, and a library
+scraper would have returned a fixed schema we did not choose. That is the
+difference the rules turn on.
+
+Read the two together and the matcher is the distance between them. Three things
+are visible in the raw row and nowhere else: values arrive doubled, so
+`8721003407246 8721003407246` fails its own check digit until `collapse_repeat()`
+runs; the brand field holds a part number; and the notice was a Besrey stroller
+while the page returned a MamaLoes buggy from a reseller, barcode matching and
+brand not, which is exactly the case `brand_conflict()` is written to allow
+rather than reject.
 
 ## Run it
 

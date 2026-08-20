@@ -68,14 +68,14 @@ body {
 }
 
 /* The one motion moment in the entire interface. Nothing else animates. */
-.verdict.is-withheld {
+.act-finding.is-withheld {
   background: var(--void); color: var(--void-ink);
   margin: 0 -32px; padding: 48px 32px;
 }
-.verdict.is-withheld h1 { color: var(--void-ink); }
-.verdict.is-withheld .sub { color: #C9CDD1; }
-.verdict.is-withheld .clause { color: #868E95; }
-.verdict.is-withheld .withheld-mark {
+.act-finding.is-withheld h1 { color: var(--void-ink); }
+.act-finding.is-withheld .sub { color: #C9CDD1; }
+.act-finding.is-withheld .clause { color: #868E95; }
+.act-finding.is-withheld .withheld-mark {
   display: block; font-family: var(--font-machine); font-size: 12px;
   letter-spacing: 0.14em; margin-bottom: 16px; color: var(--hazard);
 }
@@ -492,7 +492,7 @@ details.machinery th { color: var(--ink-3); font-weight: 400; }
 /* --- ACT I: the finding -------------------------------------------------- */
 
 .act-finding {
-  background: var(--void); color: var(--ink-inv);
+  background: var(--hero-ground); color: var(--ink-inv);
   min-height: 92vh; padding: 0;
   display: grid; align-content: center;
 }
@@ -1073,3 +1073,55 @@ body.rail-on .rail { opacity: 1; pointer-events: auto; }
    are checked by measuring the document rather than by looking at the page. */
 html { overflow-x: clip; }
 body { overflow-x: clip; max-width: 100%; }
+
+
+/* ------------------------------------- the withheld hero, and why it is black
+
+   The hero ground is graphite. This is the only element on the page allowed to
+   be #000000, and it earns it: a collector is broken, so the figures it feeds
+   are not shown at all rather than shown empty. An empty hazard wall reads as
+   safe, which is the failure the whole project is built to refuse.
+
+   The transition is the one motion moment in the interface. Nothing else
+   animates, so when this fires it is the only thing that has moved. */
+.act-finding.is-withheld {
+  background: var(--void);
+  transition: background-color 420ms ease;
+}
+.act-finding.is-withheld h1,
+.act-finding.is-withheld .sub { color: var(--void-ink); }
+.act-finding.is-withheld .clause { color: #868E95; }
+.act-finding.is-withheld .withheld-mark {
+  display: block; font-family: var(--font-machine); font-size: 12px;
+  letter-spacing: 0.16em; text-transform: uppercase;
+  color: var(--hazard); margin-bottom: 20px;
+}
+/* A hairline of hazard along the top edge, so the state is legible in a
+   greyscale screenshot and to a reader who cannot separate the two darks. */
+.act-finding.is-withheld { border-top: 3px solid var(--hazard); }
+
+
+/* ------------------------------------------------------ act 05, the detectors */
+
+.det-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-top: 28px; }
+.det { border: 1px solid var(--rule); padding: 16px 18px; }
+/* A firing detector is louder than a quiet one, but a quiet one still speaks.
+   Rendering only the failures would make a board with nothing watching it look
+   identical to a board where nothing is wrong. */
+.det.is-fired { border-color: var(--hazard); border-left-width: 3px; }
+.det-head { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+.det-name {
+  font-family: var(--font-machine); font-size: 13px; font-weight: 700;
+  letter-spacing: 0.02em;
+}
+.det-state {
+  font-family: var(--font-machine); font-size: 10px; letter-spacing: 0.12em;
+  color: var(--ink-3);
+}
+.det.is-fired .det-state { color: var(--hazard); }
+.det-scope {
+  font-family: var(--font-machine); font-size: 10px; color: var(--ink-3);
+  text-transform: uppercase; letter-spacing: 0.1em; margin-top: 6px;
+}
+.det-note { font-size: 13px; color: var(--ink-2); line-height: 1.45; margin-top: 10px; }
+@media (max-width: 1279px) { .det-grid { grid-template-columns: 1fr 1fr; } }

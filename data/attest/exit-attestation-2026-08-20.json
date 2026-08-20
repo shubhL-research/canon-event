@@ -1,0 +1,38 @@
+{
+  "_what": "Exit-IP attestation, measured against brdtest.com/myip.json.",
+  "_measured": "2026-08-20T13:36Z",
+  "_how": "bdata scrape https://brdtest.com/myip.json --country {us,de,in}, one request each, through the CLI's default unlocker zone.",
+  "_what_this_proves": "Geo targeting resolves. Three requests, three distinct countries, each with a matching timezone. The country a request is made from is a thing this toolchain actually controls, and that is the capability the three-arm design rests on.",
+  "_what_this_does_NOT_prove": "That the exits are RESIDENTIAL. Every ASN here belongs to a hosting company: The Constant Company and HostRoyale are infrastructure providers, not consumer ISPs. A residential exit would name a carrier such as Vodafone, Comcast or Reliance Jio. This project's own evidence standard is that an ASN naming a consumer ISP rather than a datacentre is the proof, and by that standard these are not residential.",
+  "_scope": "Measured through the CLI's default unlocker zone, NOT from inside a collector session. The collectors may run through a different zone entirely, so this neither confirms nor refutes their exit type. It cannot: only an attestation request issued inside the same collector stage as the product fetch can, and the collectors do not currently make one. That is the gap this file exists to make visible rather than to paper over.",
+  "_consequence": "The README claimed 'residential exit IPs'. It no longer does. Until a collector attests its own exit, the defensible claim is geo-accurate exit IPs, which is what was measured.",
+  "observations": [
+    {
+      "requested_country": "us",
+      "observed_country": "US",
+      "asn": 20473,
+      "asn_org": "The Constant Company, LLC",
+      "city": "Piscataway",
+      "region_name": "New Jersey",
+      "tz": "America/New_York"
+    },
+    {
+      "requested_country": "de",
+      "observed_country": "DE",
+      "asn": 203020,
+      "asn_org": "HostRoyale Technologies Pvt Ltd",
+      "city": "Berlin",
+      "region_name": "State of Berlin",
+      "tz": "Europe/Berlin"
+    },
+    {
+      "requested_country": "in",
+      "observed_country": "IN",
+      "asn": 133499,
+      "asn_org": "HostRoyale Technologies Pvt Ltd",
+      "city": "",
+      "region_name": "",
+      "tz": "Asia/Kolkata"
+    }
+  ]
+}
