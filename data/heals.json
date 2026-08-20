@@ -1,6 +1,6 @@
 {
-  "total": 3,
-  "refused": 2,
+  "total": 4,
+  "refused": 3,
   "approved": 1,
   "entries": [
     {
@@ -42,6 +42,18 @@
       "production": "unchanged",
       "note": "the diagnosed break was our own query bug. See the",
       "refused_because": "canary found The proposed template no longer times out."
+    },
+    {
+      "file": "heals/2026-08-20-us-002.md",
+      "arm": "US",
+      "seq": "002",
+      "outcome": "REFUSED",
+      "outcome_raw": "REFUSED",
+      "collector": "c_mt1fh690ebsllah9n",
+      "raised": "2026-08-20 15:41 UTC",
+      "resolved": "2026-08-20 16:04 UTC",
+      "outcome_detail": "REJECTED at the approval gate",
+      "production": "unchanged, verified after the refusal"
     }
   ],
   "by_arm": {
@@ -87,6 +99,18 @@
         "production": "unchanged",
         "note": "the diagnosed break was our own query bug. See the",
         "refused_because": "canary found The proposed template no longer times out."
+      },
+      {
+        "file": "heals/2026-08-20-us-002.md",
+        "arm": "US",
+        "seq": "002",
+        "outcome": "REFUSED",
+        "outcome_raw": "REFUSED",
+        "collector": "c_mt1fh690ebsllah9n",
+        "raised": "2026-08-20 15:41 UTC",
+        "resolved": "2026-08-20 16:04 UTC",
+        "outcome_detail": "REJECTED at the approval gate",
+        "production": "unchanged, verified after the refusal"
       }
     ]
   },
