@@ -562,7 +562,13 @@ def build_stats(rows):
                           "contaminated": True,
                           "pending": (f"Denominator ready: {eu_searchable} EU-recalled products carry a "
                                       f"searchable identifier. The numerator requires a live sweep from an "
-                                      f"Indian residential exit IP, which has not run yet."),
+                                      f"Indian exit, which has not run yet."),
+                          # Not "residential". Measured attestation shows every exit
+                          # resolving to a hosting ASN rather than a consumer ISP, so
+                          # the defensible word is geo-accurate. See
+                          # data/attest/exit-attestation-2026-08-20.json. The fixtures
+                          # are what the failure states are filmed from, so a retracted
+                          # claim surviving here would go straight into the demo.
                           "eu_seeds": eu_total, "eu_searchable": eu_searchable},
         "unsearchable": {"v": round(corpus_unsearchable / CORPUS_SEEDS, 4),
                          "n": corpus_unsearchable, "d": CORPUS_SEEDS,

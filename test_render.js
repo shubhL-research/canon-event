@@ -96,6 +96,22 @@ function check(cond, msg) {
 
 console.log("wall renderer smoke test\n");
 
+/* A retracted claim must not survive anywhere a reader can see it.
+
+   The exits were measured and every one resolves to a hosting ASN rather than a
+   consumer ISP, so "residential" was withdrawn. It came out of the README first,
+   then wall.html and wall.js, and it was still sitting in all four fixtures,
+   which are exactly the states the demo films. A word retracted in one file and
+   left in another is not retracted. */
+{
+  for (const f of ["wall.html", "wall.js", "wall.css", "data/fixtures.js"]) {
+    const txt = fs.readFileSync(path.join(ROOT, f), "utf8");
+    const hit = /residential/i.test(txt) && !/not residential|no longer|retracted/i.test(txt);
+    check(!hit, `"residential" is retracted and must not appear in ${f}`);
+  }
+}
+
+
 /* The withheld hero must not look like a healthy one.
 
    This is the project's entire thesis and it silently stopped being true. The

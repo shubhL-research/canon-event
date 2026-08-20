@@ -129,6 +129,15 @@ def main():
             "carried forward from the archived payload of the same sweep rather than "
             "recomputed. It counts PAGE LOADS planned and issued, which is what the "
             "collector controls. It is not a billing figure and is not called one.")
+        # The carried string was written by an older publish and still ends
+        # "submitted as 0 batch jobs". The batch count comes from normaliser
+        # reports that do not exist on a replay, so a zero there is a fact we do
+        # not have rather than a fact that is zero, and beside a real load count
+        # it reads as a collector that ran nothing.
+        w = built["stats"]["arithmetic"].get("working") or ""
+        if "0 batch jobs" in w:
+            built["stats"]["arithmetic"]["working"] = w.split(", submitted as")[0].rstrip(". ") + "."
+
         if old.get("credits"):
             built["stats"]["credits"] = dict(old["credits"])
             built["stats"]["credits"]["carried_forward"] = True

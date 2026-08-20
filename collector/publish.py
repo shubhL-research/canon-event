@@ -447,10 +447,15 @@ def arithmetic(seeds, reports):
         "search_page_loads": planned,
         "batches": sum(r.get("batches", 0) for r in reports),
         "total_page_loads": planned,
-        "working": ("%d searchable of %d notices x 2 queries x %d arms = %d "
-                    "search loads, submitted as %d batch jobs."
-                    % (searchable_seeds, len(seeds), arms, planned,
-                       sum(r.get("batches", 0) for r in reports))),
+        # The batch count comes from the normaliser reports, which are absent on a
+        # replay. Printing "submitted as 0 batch jobs" beside a real load count
+        # reads as a collector that ran nothing, so the clause is omitted rather
+        # than printed as a zero we do not actually know.
+        "working": (("%d searchable of %d notices x 2 queries x %d arms = %d "
+                     "search loads" % (searchable_seeds, len(seeds), arms, planned))
+                    + ((", submitted as %d batch jobs."
+                        % sum(r.get("batches", 0) for r in reports))
+                       if sum(r.get("batches", 0) for r in reports) else ".")),
         # Counted, not typed. This sentence carried a hardcoded 96 from a corpus
         # pull that missed the CPSC Description key, and the seed correction left
         # it stating a number the same block contradicts two lines above.
