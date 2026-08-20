@@ -151,7 +151,7 @@
       "d": 104,
       "ci95": null,
       "contaminated": true,
-      "pending": "Denominator ready: 104 EU-recalled products carry a searchable identifier. The numerator requires a live sweep from an Indian residential exit IP, which has not run yet.",
+      "pending": "Denominator ready: 104 EU-recalled products carry a searchable identifier. The numerator requires a live sweep from an Indian exit, which has not run yet.",
       "eu_seeds": 104,
       "eu_searchable": 104
     },
