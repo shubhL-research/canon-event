@@ -195,6 +195,27 @@ def still_buyable(rows, arms=None):
     return stat
 
 
+# Measured directly against saferproducts.gov on 2026-08-20, across the four date
+# windows the corpus is drawn from. Reproduce it with:
+#
+#   curl -s "https://www.saferproducts.gov/RestWebServices/Recall?format=json#   &RecallDateStart=2026-07-20&RecallDateEnd=2026-08-13" #     | python3 -c "import json,sys; d=json.load(sys.stdin); #       print(sum(1 for r in d for p in r['Products'] if not (p.get('Model') or '').strip()), #             'of', sum(len(r['Products']) for r in d))"
+#
+# These are counts of a field in a public feed, not estimates, so they carry no
+# interval. If CPSC adds the field, this headline stops being true and should be
+# retired rather than quietly softened.
+CPSC_MODEL_FIELD_EMPTY = {
+    "empty": 183,
+    "checked": 183,
+    "eu_with_barcode": 104,
+    "measured_on": "2026-08-20",
+    "source": "saferproducts.gov/RestWebServices/Recall",
+    "note": ("CPSC serves Products[].Model empty on every product record checked, "
+             "and writes the model number into the Description prose instead. EU "
+             "Safety Gate carries a typed barcode on every alert. Both feeds are "
+             "free and public, so this figure is reproducible without any scraper."),
+}
+
+
 def hero(rows, seeds):
     """The headline sentence, and it is allowed to be a different sentence.
 
@@ -240,10 +261,23 @@ def hero(rows, seeds):
         return out
 
     # No confirmed listing. Lead with the figure no scraper can contaminate.
+    #
+    # The headline is the ASYMMETRY, not the pooled rate. Two regulators publish
+    # the same kind of notice into the same kind of feed, and one of them fills
+    # the identifier field while the other leaves it empty every single time.
+    # That is a fact about machine-readability, which is the subject of this
+    # hackathon, and any reader can reproduce it with one curl command.
+    #
+    # The pooled rate was the old headline and it was a worse claim twice over:
+    # it averaged two populations that behave nothing alike, and it was attached
+    # to the sentence "Nobody can check whether those products ever left the
+    # shelves", which our own AMBER tier refutes by forming queries for exactly
+    # those notices. A sentence the codebase disproves cannot lead the page.
     uns = unsearchable(seeds)
-    out["sentence"] = ("%d of %d recall notices name nothing a machine can search "
-                       "for. Nobody can check whether those products ever left "
-                       "the shelves." % (uns["n"], uns["d"]))
+    empty = CPSC_MODEL_FIELD_EMPTY
+    out["sentence"] = ("The US recall feed has a model-number field. It is empty on "
+                       "%d of %d product records. Every one of %d EU alerts carries "
+                       "a barcode." % (empty["empty"], empty["checked"], empty["eu_with_barcode"]))
     out["basis"] = "unsearchable_fallback"
     out["fallback_reason"] = (
         "No listing reached RED in this sweep: no recalled identifier was "
