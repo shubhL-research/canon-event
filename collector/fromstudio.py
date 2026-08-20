@@ -41,12 +41,23 @@ ALIASES = {
     "brand": ("brand", "brand_name", "manufacturer"),
     "model": ("manufacturer_part_number", "model_number", "part_number", "mpn",
               "item_model_number", "model", "model_no"),
-    "gtin": ("ean", "gtin", "upc", "barcode", "gtin13", "ean13"),
+    "gtin": ("ean", "gtin", "barcode", "upc", "gtin13", "ean13"),
     "url": ("product_page_url", "product_url", "url", "link", "page_url"),
-    "buy_label": ("add_to_cart_button_text", "add_to_cart_text", "add_to_cart",
-                  "buy_button_text", "buy_button", "cart_button", "buy_now"),
+    # add_to_cart_button, without the _text, is what the rebuilt amazon.com
+    # collector emits. The AI names its own fields and a rebuild of the same
+    # prompt does not have to name them the same way, which is the whole reason
+    # this file exists and the reason the drift detector reports strangers rather
+    # than dropping them: it caught this on the sweep that introduced it.
+    #
+    # It mattered. buy_label was never populated on that arm, and a row with no
+    # buy control cannot reach RED by construction, so the arm could not have
+    # produced a finding whatever was on the page.
+    "buy_label": ("add_to_cart_button_text", "add_to_cart_button",
+                  "add_to_cart_text", "add_to_cart", "buy_button_text",
+                  "buy_button", "cart_button", "buy_now"),
     "availability": ("availability_text", "availability", "in_stock_text",
                      "stock_status", "stock"),
+    # Same rebuild, same lesson: the field lost its _text suffix.
     "seller": ("seller_name", "seller", "sold_by", "merchant"),
     "ships_from": ("ships_from", "shipped_by", "fulfilled_by", "dispatched_from"),
     "currency": ("currency_symbol", "currency", "currency_code"),
