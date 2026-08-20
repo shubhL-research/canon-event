@@ -4,7 +4,7 @@
 
 Governments recall products for burning, choking and killing people. Nobody measures whether those
 products actually leave the shelves. CANON EVENT checks whether recalled products are still buyable
-right now, from residential exit IPs in three markets, and refuses to show a clean screen when its
+right now, from geo-accurate exit IPs in three markets, and refuses to show a clean screen when its
 own scraper is broken. One trial sweep has run, over 60 of 207 notices and two of the three arms.
 Nothing here has been swept at full scale, and the numbers say so on their face.
 
@@ -117,7 +117,7 @@ Four payloads are committed at `data/live-s_*.json`, and three of the four measu
 kept because a sweep that came back empty is the state this interface exists to render honestly.
 
 **The published adjudication is a replay.** The fetches happened live on 19 August against real
-marketplaces from real exit IPs, and the raw rows were archived on receipt. The matcher then
+marketplaces from geo-accurate exit IPs, and the raw rows were archived on receipt. The matcher then
 changed, so those archived rows were re-scored offline through the current rules. No new fetch and
 no new credits, and the sweep id ends in `-replay` so it cannot be passed off as a fresh capture.
 
@@ -335,7 +335,7 @@ hand. That dependency is disclosed here rather than hidden.
 
 Bright Data is used for the one thing no endpoint on earth answers:
 
-> **Is this exact model number buyable right now, from a German residential exit IP?**
+> **Is this exact model number buyable right now, from inside the German market?**
 
 Amazon's Product Advertising API requires affiliate approval and will not answer it. eBay retired the
 open Finding API. Bright Data's prebuilt library scrapers are disqualified by the hackathon rules, so
@@ -441,6 +441,37 @@ would not:
   the evidence the repair is right rather than merely convenient.
 
 ---
+
+## Six of the exits are not what we said they were
+
+`data/attest/exit-attestation-2026-08-20.json` holds three requests to
+`brdtest.com/myip.json`, one per market. All three resolve to the country asked
+for, with a matching timezone. Geo targeting works, and it is the capability the
+three-arm design rests on.
+
+It also refuted our own wording. Every ASN belongs to a hosting company:
+
+```
+US   AS20473    The Constant Company, LLC      Piscataway, New Jersey
+DE   AS203020   HostRoyale Technologies        Berlin
+IN   AS133499   HostRoyale Technologies        Asia/Kolkata
+```
+
+A residential exit names a carrier: Vodafone, Comcast, Reliance Jio. This
+project's own standard, written on the wall, is that an ASN naming a consumer
+ISP rather than a datacentre is the proof. By that standard these are not
+residential, so the README no longer says residential. It says geo-accurate,
+which is what was measured.
+
+Two limits on what the file shows, both stated in it. It was measured through
+the CLI's default unlocker zone rather than from inside a collector session, so
+it neither confirms nor refutes the collectors' own exit type. And nothing can,
+until a collector issues an attestation request in the same stage as its product
+fetch. **The collectors do not currently do that**, which is why every arm on the
+wall reads "exit not attested on this sweep" rather than showing a chip.
+
+That is the largest open gap in this repository and it is named here rather than
+left for a reader to find.
 
 ## The primary evidence
 
