@@ -37,11 +37,19 @@ quotes the figures as they stand today:
 
 | Where | Figure as scripted |
 |---|---|
-| Hero sentence | `21 of 207 recall notices name nothing a machine can search for` |
+| Hero sentence | `27 of 207 recall notices name nothing a machine can search for` |
 | Figure 1 | `0.0%` still on sale, `0 of 58 searchable notices`, CI `0.0% to 6.2%` |
-| Figure 2 | `10.1%` unsearchable, `21 of 207 notices` |
-| Discard panel | `AMBER 5812` |
+| Figure 2 | `13.0%` unsearchable, `27 of 207 notices` |
+| Discard panel | `AMBER 16025` |
 | Ledger row 2 | `Foam mat`, `719` days, `SAFETY_GATE A12/02404/24` |
+| Arm rail | `DE` MEASURED, `IN` MEASURED, `US` DEGRADED at 55% coverage |
+
+The pooled figure is 27 of 207 rather than 21 because the wall refuses six EU
+barcodes that fail their own check digit, and a value that is not a barcode is not
+a searchable identifier. Both numbers are in the README with the reason. If asked
+on camera, the figure to quote is the US one: **20.4%**, 21 of 103 CPSC notices,
+because pooling a US parsing failure with an EU typing failure averages two
+different problems.
 
 If a re-sweep has moved any of these, **say the number that is on the screen**,
 not the number printed here. A voiceover that disagrees with its own frame is the
@@ -181,7 +189,7 @@ number. Read that one. CPSC keeps publishing, so it climbs.
 
 - 0:40 to 0:48 Act 01, both figures settled. Left figure reads `0.0%` with
   `0 of 58 searchable notices · 95% confidence 0.0% to 6.2%` under it. Right
-  figure reads `10.1%` with `no scraper touches this figure` under it.
+  figure reads `13.0%` with `no scraper touches this figure` under it.
 - 0:48 to 0:53 Scroll to Act 03. Hold on the instrument strip. The `Precision`
   cell reads `PENDING` with its reason printed beside it.
 - 0:53 to 0:57 Continue to the arm rail. Two arms: `DE kaufland.de` measured,

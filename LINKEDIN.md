@@ -19,8 +19,8 @@ The model number is not missing. It is in the Description, as prose: "The model
 number GJD49 is located on the back of the kettlebell toy in the gift set."
 
 I read the structured field and published an unsearchable rate of 46.4%. That
-figure measured my parser, not the regulator. Corrected, it is 10.1%. The
-correction argued against my own headline, which is how I knew it was worth
+figure measured my parser, not the regulator. Corrected, the US figure is 20.4%.
+The correction argued against my own headline, which is how I knew it was worth
 making.
 
 For contrast, all 104 EU Safety Gate alerts carry a barcode in a typed field.
