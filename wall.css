@@ -986,9 +986,15 @@ body.rail-on .rail { opacity: 1; pointer-events: auto; }
   /* The ledger keeps identity, verdict and duration. The hazard sentence is the
      one column that cannot survive 390px without becoming two words a line, and
      it is one tap away in the open row, quoted in full. */
+  /* Not zero. Zeroing the inset put the verdict badge and the day count exactly
+     on the row's right edge, which reads as cropped whether or not anything is
+     cut — and nothing is: measured at 430, 390, 360, 320, 300 and 280, the
+     furthest content in any row stops short of the viewport at every width.
+     It looked cut because it was flush, which is the same complaint that was
+     fixed on desktop and then reintroduced here. */
   .wall-head, .row {
     grid-template-columns: 22px minmax(0, 1fr) auto;
-    gap: 12px; padding-left: 0; padding-right: 0;
+    gap: 10px; padding-left: 12px; padding-right: 12px;
   }
   .wall-head span:nth-child(3),
   .wall-head span:nth-child(4),
@@ -1024,8 +1030,8 @@ body.rail-on .rail { opacity: 1; pointer-events: auto; }
   .c-id .name { font-size: 15px; }
   .days { font-size: 24px; min-width: 0; }
 
-  .sort-note, .historical-note { padding-left: 0; padding-right: 0; font-size: 9px; }
-  .receipt { padding-left: 0; padding-right: 0; }
+  .sort-note, .historical-note { padding-left: 12px; padding-right: 12px; font-size: 9px; }
+  .receipt { padding-left: 12px; padding-right: 12px; }
   .receipt-grid { grid-template-columns: 1fr; }
   .receipt-pane { padding: 20px 18px; }
 
