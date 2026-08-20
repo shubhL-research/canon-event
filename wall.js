@@ -118,7 +118,7 @@
           "sale, which is a result, not a blank." : "") + "</p>";
     }
     return '<p class="sub">Every one of these is a product a government recalled, ' +
-      "found on sale again from a residential connection in that country.</p>";
+      "found on sale again from an exit measured in that country.</p>";
   }
 
   function renderVerdict(doc) {
