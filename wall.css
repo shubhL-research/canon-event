@@ -673,8 +673,13 @@ details.machinery th { color: var(--ink-3); font-weight: 400; }
   place-items: center; font-family: var(--font-machine); font-size: 10px;
   letter-spacing: 0.14em; color: var(--void-ink);
 }
+/* A redaction whose caption still prints "0 of 104" underneath it has redacted
+   nothing. The qualifier is replaced rather than appended to. */
+.instrument.is-struck .qualifier { font-size: 0; }
 .instrument.is-struck .qualifier::after {
-  content: " · withheld, contaminated by an unhealed collector"; color: var(--ink-3);
+  content: "Withheld: a collector this figure depends on was too broken to trust. "
+           "The count exists and is not published.";
+  font-size: 10px; color: var(--ink-3); line-height: 1.6;
 }
 .instrument.is-pending .value { color: var(--unknown); font-size: 18px; }
 

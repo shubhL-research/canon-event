@@ -420,8 +420,19 @@ def _arms_for_wall(health_doc):
             "state": block["state"],
             "reason": block.get("reason"),
             "collector_id": block.get("collector_id"),
+            # data_lines is what the arm RETURNED, not what reddened. Passing the
+            # RED count made an arm that brought back 1,066 listings report "0 of
+            # 60 inputs returned rows", which is the same inversion the
+            # zero_is_a_fault detector suffered.
+            # Three different counts, and they are three different units. inputs
+            # are notices we asked about; data_lines are listings that came back;
+            # joined is how many notices got any candidate at all. Conflating the
+            # first two produced "1066 of 60 inputs returned rows" on screen and a
+            # coverage bar 11,477% wide.
             "job": {"inputs": block.get("inputs", 0),
-                    "data_lines": block.get("rows", 0),
+                    "data_lines": block.get("listings", block.get("rows", 0)),
+                    "joined": block.get("joined", 0),
+                    "red": block.get("rows", 0),
                     "fails": block.get("fails", 0)},
             "heal": {"status": "none", "step": None, "completed_steps": [],
                      "started_at": None, "canary_pass": None, "canary_total": 3,

@@ -237,13 +237,37 @@
     /* Precision carries its interval next to the number it qualifies, never in a
        footnote. Recall is not directly measured: capture-recapture across the two
        query strategies puts a floor under what we missed. */
-    var rc = s.precision.recall;
-    out.push(instrument("Precision", pct(s.precision.v),
-      s.precision.n + " of " + s.precision.d + " hand-verified · " + ci(s.precision.ci95),
-      "is-apparatus"));
-    out.push(instrument("Recall, floor", "≥ " + Math.round(rc.missed_floor) + " missed",
-      "capture-recapture, " + esc(rc.estimator.split(" ")[0]) + " · lower bound",
-      "is-apparatus"));
+    /* PENDING, not 0.0%.
+       pct(null) is "0.0%", and a precision of zero is not a missing figure — it
+       is a claim that every row on this page is wrong. The only honest render of
+       an unmeasured precision is to say it is unmeasured, and to say what would
+       measure it. */
+    var rc = s.precision.recall || {};
+    if (s.precision.v === null || s.precision.v === undefined) {
+      out.push(instrument("Precision", "PENDING",
+        s.precision.n + " of " + s.precision.d + " listings hand-verified. " +
+        "Nothing on this page is qualified until this exists.",
+        "is-apparatus is-pending"));
+    } else {
+      out.push(instrument("Precision", pct(s.precision.v),
+        s.precision.n + " of " + s.precision.d + " hand-verified · " +
+        ci(s.precision.ci95), "is-apparatus"));
+    }
+
+    /* The recall floor is estimated from rows that reddened under each query
+       strategy. With no RED rows there is no overlap to estimate from, and
+       "≥ 0 missed" would read as "we missed nothing" when the truth is that we
+       have no basis to say. */
+    if (rc.observed) {
+      out.push(instrument("Recall, floor", "≥ " + Math.round(rc.missed_floor) + " missed",
+        "capture-recapture, " + esc((rc.estimator || "Chapman").split(" ")[0]) +
+        " · lower bound", "is-apparatus"));
+    } else {
+      out.push(instrument("Recall, floor", "NO BASIS",
+        "Capture-recapture needs confirmed rows to estimate from. This sweep " +
+        "confirmed none, so how much it missed is unknown rather than zero.",
+        "is-apparatus is-pending"));
+    }
 
     out.push(instrument("Arms measured", s.arms_measured.n + " of " + s.arms_measured.d,
       doc.arms.map(function (a) { return a.code + " " + a.state.toLowerCase(); }).join(" · "),
@@ -273,11 +297,17 @@
     var j = a.job, h = a.heal;
     switch (a.state) {
       case "MEASURED":
-        return "Measured " + doc.swept_at.slice(11, 19) + "Z. " + j.data_lines +
-          " of " + j.inputs + " inputs returned rows. " + j.fails + " fails.";
+        // Notices asked, listings returned, notices reached. Three counts, three
+        // units, and the sentence has to keep them apart.
+        return "Measured " + doc.swept_at.slice(11, 19) + "Z. " + j.inputs +
+          " notices searched, " + commas(j.data_lines) + " listings returned and " +
+          "adjudicated" + (j.joined !== undefined
+            ? ", " + j.joined + " notices reached" : "") + ". " + j.fails + " fails.";
       case "DEGRADED":
-        return "Partial. " + j.fails + " of " + j.inputs + " inputs returned no row and no " +
-          "archived empty-result page. Rows from this arm are shown. Counts carry a partial stamp.";
+        return "Partial. This arm reached only " + (j.joined || 0) + " of " + j.inputs +
+          " notices, so its result covers less than it appears to. Rows are shown " +
+          "and counts carry a partial stamp: a listing it never surfaced could " +
+          "still exist.";
       case "WITHHELD":
         return h.status === "rejected"
           ? "Heal rejected. " + esc(h.failed_canary) + ". Production template unchanged at " +
@@ -301,7 +331,10 @@
     el("armRail").innerHTML = doc.arms.map(function (a) {
       var extra = "";
       if (a.state === "DEGRADED") {
-        var cov = a.job.data_lines / a.job.inputs;
+        // Coverage is notices REACHED over notices asked. Using the listing count
+        // here made the bar 11,477% wide, because listings and notices are not
+        // the same unit and a ratio between them means nothing.
+        var cov = Math.min(1, (a.job.joined || 0) / (a.job.inputs || 1));
         extra = '<div class="coverage"><i style="width:' + (cov * 100).toFixed(1) + '%"></i></div>';
       }
       if (a.state === "HEALING") {
