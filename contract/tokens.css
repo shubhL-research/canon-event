@@ -17,8 +17,18 @@
 :root {
   /* Ground and surface. Cool paper, never cream: cream reads as editorial
      nostalgia and this is a document filed this morning. */
-  --paper:         #EDEFF1;
-  --ground:        #EDEFF1;   /* alias, kept for existing selectors */
+  /* Deepened from #EDEFF1. A full viewport of near-white under 82px of near-black
+     is uncomfortable to sit in front of, and the hero is a full viewport of
+     exactly that. Dropping the ground four steps takes the glare out without
+     going anywhere near the void, which is still reserved for a withheld
+     verdict. The white surfaces gain contrast against it rather than losing it,
+     so the cards read as floating rather than as flush. */
+  --paper:         #E7EAEC;
+  --ground:        #E7EAEC;   /* alias, kept for existing selectors */
+  /* The opening spread sits a shade deeper still. An editorial front page is
+     quieter than the pages behind it, and it is the one screen a reader looks at
+     without anything to do. */
+  --paper-hero:    #E1E5E8;
   --surface:       #FFFFFF;
   --surface-raised:#F8F9FA;
   --surface-sunk:  #E3E6E9;
@@ -30,7 +40,13 @@
 
   /* Ink, three levels only. Deeper and cooler than a neutral grey so that the
      hazard red beside it reads warm. */
-  --ink:           #080A0C;
+  --ink:           #0B0E11;
+  /* Display sizes only. #0B0E11 set at 82px is a wall of near-black that glares
+     on a light ground; books and newspapers have never set body black either. At
+     13:1 against the hero ground this is far above AA and materially easier to
+     read. Body copy keeps the darker ink, where the mass is small and the
+     contrast earns its keep. */
+  --ink-display:   #16191D;
   --ink-2:         #464E55;
   --ink-3:         #6B747C;
   --ink-inv:       #FFFFFF;

@@ -913,8 +913,9 @@ body.rail-on .rail { opacity: 1; pointer-events: auto; }
    who has seen the page once knows which they are looking at before reading a
    word, which is what a colour is for. */
 .act-finding {
-  background: var(--paper); color: var(--ink);
+  background: var(--paper-hero); color: var(--ink);
 }
+.act-finding h1 { color: var(--ink-display); }
 .act-finding .withheld-mark { color: var(--hazard); }
 .act-finding .sub { color: var(--ink-2); }
 .act-finding .clause { color: var(--ink-3); }
