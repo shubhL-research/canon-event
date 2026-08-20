@@ -115,7 +115,7 @@
       return '<p class="sub">We searched every notice that named an identifier, ' +
         "in each country, twice. " +
         (s && s.d ? "None of the " + s.d + " we could search for was found on " +
-          "sale — which is a result, not a blank." : "") + "</p>";
+          "sale, which is a result, not a blank." : "") + "</p>";
     }
     return '<p class="sub">Every one of these is a product a government recalled, ' +
       "found on sale again from a residential connection in that country.</p>";
