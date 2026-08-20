@@ -809,6 +809,41 @@
                   commas(cr.cap) + "." : "") + "</p>";
   }
 
+
+  /* The detectors, all eight, firing or quiet.
+
+     collector/health.py builds these and publish.build() never read them, so the
+     answer to criterion 5 ("does the project account for website changes, missing
+     data, or extraction failures?") was an eight-item inventory rendered nowhere.
+
+     The quiet ones are printed as prominently as the firing one on purpose. A
+     detector that only speaks when it fires is one nobody can prove was running,
+     and a board with nothing watching it looks identical to a board where nothing
+     is wrong. That distinction is the entire project. */
+  function renderDetectors(doc) {
+    var node = el("detectors");
+    if (!node) return;
+    var d = doc.detectors;
+    if (!d) { node.innerHTML = ""; return; }
+    var sum = doc.detector_summary || {};
+
+    var cards = Object.keys(d).map(function (k) {
+      var v = d[k];
+      return '<div class="det' + (v.fired ? " is-fired" : "") + '">' +
+        '<div class="det-head"><span class="det-name">' + esc(k.replace(/_/g, " ")) +
+          '</span><span class="det-state">' + (v.fired ? "FIRED" : "quiet") + "</span></div>" +
+        '<div class="det-scope">' + esc(v.scope) + "</div>" +
+        '<div class="det-note">' + esc(v.note) + "</div>" +
+      "</div>";
+    }).join("");
+
+    node.innerHTML =
+      '<h2 class="act-head"><span class="act-num">05</span> What was watching</h2>' +
+      '<p class="act-lede">' + (sum.fired || 0) + " of " + (sum.total || 0) +
+        " detectors fired on this sweep. " + esc(sum.note || "") + "</p>" +
+      '<div class="det-grid">' + cards + "</div>";
+  }
+
   // ---------------------------------------------------------------- panels
 
   function renderNotSeen(doc) {
@@ -1020,6 +1055,7 @@
     section("wall", function () { renderRows(doc); });
     section("curve", function () { renderCurve(doc); });
     section("platform", function () { renderPlatform(doc); });
+    section("detectors", function () { renderDetectors(doc); });
     section("notSeen", function () { renderNotSeen(doc); });
     section("healLedger", function () { renderHeal(doc); });
     section("provenance", function () { renderProvenance(doc); });

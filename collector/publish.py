@@ -602,7 +602,13 @@ def _arms_for_wall(health_doc):
             # joined is how many notices got any candidate at all. Conflating the
             # first two produced "1066 of 60 inputs returned rows" on screen and a
             # coverage bar 11,477% wide.
+            # Emitted under BOTH names on purpose. wall.js reads `listings`;
+            # the archived payloads carry `data_lines`. Emitting one and reading
+            # the other is how 16,025 adjudicated listings disappeared from the
+            # page while the README stated them, so the emitter now satisfies
+            # both readers rather than the reader guessing.
             "job": {"inputs": block.get("inputs", 0),
+                    "listings": block.get("listings", block.get("rows", 0)),
                     "data_lines": block.get("listings", block.get("rows", 0)),
                     "joined": block.get("joined", 0),
                     "red": block.get("rows", 0),

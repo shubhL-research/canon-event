@@ -51,7 +51,7 @@ function run(variant, livePath) {
   // renderer put in them was ever checked.
   const ids = ["verdict", "figures", "instruments", "armRail", "wall", "pager",
                "curve", "notSeen", "healLedger", "provenance", "machinery",
-               "sortNote", "historicalNote", "rail", "platform"];
+               "sortNote", "historicalNote", "rail", "platform", "detectors"];
   ids.forEach((i) => (nodes[i] = makeNode(i)));
 
   const sandbox = {
