@@ -1,0 +1,28 @@
+metric,value,basis,note
+sweep_id,s_2026-08-20T02:26Z-replay,,"re-scored from the raw archive, no network"
+swept_at,2026-08-20T02:26:48Z,,UTC
+notices swept,60,of 207 in corpus,29% of the corpus
+search loads,348,60 searchable x 2 queries x 3 arms,
+listings adjudicated,16025,,"every one decided, none sampled"
+
+ARM,state,listings,coverage / inputs joined
+DE,MEASURED,1066,58 of 60 (97%)
+IN,MEASURED,8073,56 of 60 (93%)
+US,DEGRADED,6886,33 of 60 (55%)
+
+FINDING,value,basis,note
+still on sale,0.0%,0 of 58 searchable,CI 0.0-6.2%. A FLOOR: US reached only 55% coverage.
+never checkable,46.4%,96 of 207 notices,"CI 39.7-53.2%. Free govt corpus, no scraper can touch it."
+precision,PENDING,0 of 50 hand-verified,needs a human: golden/HOW-TO.md
+RED rows,0,,no recalled product confirmed still on sale
+AMBER rows,58,,"candidate seen, identity not re-asserted"
+
+DETECTOR,fired,detail,
+identity_reassertion,no,Every RED row re-asserted its identifier on the fetched page.,
+zero_is_a_fault,no,DE returned 1066 listings and adjudicated every one.,
+join_key_coverage,YES,"Tracked separately from row count. An arm can return thousands of clean rows that match nothing, and a row-count check p",
+sibling_differential,no,No arm has collapsed against its siblings across two sweeps.,
+implausible_cleanliness,no,No prior sweep to compare against.,
+currency_fingerprint,no,"Every DE row must carry EUR, every IN row INR, every US row USD. Kills a country-drift failure class that cross-arm comp",
+schema_drift,no,Every field the collectors returned is mapped by the contract.,
+freshness,no,Rows older than the freshness bound are historical. DAY counters freeze at last capture rather than continuing to count.,

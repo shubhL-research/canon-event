@@ -12,6 +12,7 @@
    "collector_id": "c_mt01usw31e8y5ubqjs",
    "job": {
     "inputs": 207,
+    "listings": 14632,
     "data_lines": 14632,
     "joined": 95,
     "red": 0,
@@ -35,6 +36,7 @@
    "collector_id": "c_mt00jidz6zhqjbpew",
    "job": {
     "inputs": 207,
+    "listings": 1037,
     "data_lines": 1037,
     "joined": 59,
     "red": 0,
@@ -58,6 +60,7 @@
    "collector_id": "c_mt03cj5z2fo651wy8q",
    "job": {
     "inputs": 207,
+    "listings": 7986,
     "data_lines": 7986,
     "joined": 55,
     "red": 0,

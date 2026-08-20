@@ -1,0 +1,310 @@
+{
+  "sweep_id": "s_2026-08-20T11:37Z",
+  "swept_at": "2026-08-20T11:37:48Z",
+  "arms": {
+    "US": {
+      "state": "DEGRADED",
+      "reason": "fail_rate_above_bound",
+      "rows": 0,
+      "listings": 7957,
+      "fails": 40,
+      "inputs": 148,
+      "joined": 64,
+      "collector_id": "c_mt1fh690ebsllah9n"
+    }
+  },
+  "detectors": {
+    "identity_reassertion": {
+      "fired": false,
+      "scope": "per row",
+      "note": "Every RED row re-asserted its identifier on the fetched page.",
+      "checked": 0,
+      "offending": null
+    },
+    "zero_is_a_fault": {
+      "fired": false,
+      "scope": "per claim",
+      "note": "US returned 7957 listings and adjudicated every one.",
+      "arm": "US"
+    },
+    "join_key_coverage": {
+      "fired": true,
+      "scope": "per arm",
+      "note": "Tracked separately from row count. An arm can return thousands of clean rows that match nothing, and a row-count check passes it happily.",
+      "arm": "US",
+      "coverage": 0.4324,
+      "bound": 0.8
+    },
+    "sibling_differential": {
+      "fired": false,
+      "scope": "across arms",
+      "note": "No arm has collapsed against its siblings across two sweeps.",
+      "collapsed": [
+        "US"
+      ],
+      "holding": null,
+      "requires": "persistence across two sweeps"
+    },
+    "implausible_cleanliness": {
+      "fired": false,
+      "scope": "whole board",
+      "note": "No prior sweep to compare against.",
+      "threshold": 0.4
+    },
+    "currency_fingerprint": {
+      "fired": false,
+      "scope": "per row",
+      "note": "Every DE row must carry EUR, every IN row INR, every US row USD. Kills a country-drift failure class that cross-arm comparison is blind to.",
+      "offending": null
+    },
+    "schema_drift": {
+      "fired": true,
+      "scope": "per arm",
+      "note": "Collector returned fields the contract does not map: US: add_to_cart_button. The rows still validate, which is exactly why this needs saying.",
+      "drifted": {
+        "US": [
+          "add_to_cart_button"
+        ]
+      }
+    },
+    "freshness": {
+      "fired": false,
+      "scope": "whole board",
+      "note": "Rows older than the freshness bound are historical. DAY counters freeze at last capture rather than continuing to count.",
+      "age_s": 0,
+      "bound_s": 14400
+    }
+  },
+  "reports": [
+    {
+      "in": 7997,
+      "out": 7997,
+      "orphaned": 0,
+      "by_code": {
+        "AMBER": 6980,
+        "brand_conflict": 895,
+        "crawl_error": 40,
+        "no_join_key": 82
+      },
+      "currency_mismatch": 0,
+      "by_query": {
+        "model_only": 5220,
+        "brand_model": 2777
+      },
+      "arm": "US",
+      "collector_id": "c_mt1fh690ebsllah9n",
+      "listings": 7957,
+      "planned_loads": 258,
+      "batches": 26,
+      "fetch_errors": [
+        {
+          "ref": "24337",
+          "strategy": "brand_model",
+          "error": "Running batch for 10 URLs via /dca/trigger...\nSubmitting batch job...\nBatch job: j_mt1hsrhu1ni5runnr3 (ETA: 2026-08-20T12:24:20.530Z)\nCollecting (batch)...\nPolling batch (attempt 1/3600)\nPolling batch (attempt 2/3600)\nPolling batch (attempt 3/3600)\nPolling batch (attempt 4/3600)\nPolling batch (attempt 5/3600)\nPolling batch (attempt 6/3600)\nPolling batch (attempt 7/3600)\nPolling batch (attempt 8/36"
+        },
+        {
+          "ref": "24337",
+          "strategy": "model_only",
+          "error": "Running batch for 10 URLs via /dca/trigger...\nSubmitting batch job...\nBatch job: j_mt1hsrhu1ni5runnr3 (ETA: 2026-08-20T12:24:20.530Z)\nCollecting (batch)...\nPolling batch (attempt 1/3600)\nPolling batch (attempt 2/3600)\nPolling batch (attempt 3/3600)\nPolling batch (attempt 4/3600)\nPolling batch (attempt 5/3600)\nPolling batch (attempt 6/3600)\nPolling batch (attempt 7/3600)\nPolling batch (attempt 8/36"
+        },
+        {
+          "ref": "24344",
+          "strategy": "brand_model",
+          "error": "Running batch for 10 URLs via /dca/trigger...\nSubmitting batch job...\nBatch job: j_mt1hsrhu1ni5runnr3 (ETA: 2026-08-20T12:24:20.530Z)\nCollecting (batch)...\nPolling batch (attempt 1/3600)\nPolling batch (attempt 2/3600)\nPolling batch (attempt 3/3600)\nPolling batch (attempt 4/3600)\nPolling batch (attempt 5/3600)\nPolling batch (attempt 6/3600)\nPolling batch (attempt 7/3600)\nPolling batch (attempt 8/36"
+        },
+        {
+          "ref": "24344",
+          "strategy": "model_only",
+          "error": "Running batch for 10 URLs via /dca/trigger...\nSubmitting batch job...\nBatch job: j_mt1hsrhu1ni5runnr3 (ETA: 2026-08-20T12:24:20.530Z)\nCollecting (batch)...\nPolling batch (attempt 1/3600)\nPolling batch (attempt 2/3600)\nPolling batch (attempt 3/3600)\nPolling batch (attempt 4/3600)\nPolling batch (attempt 5/3600)\nPolling batch (attempt 6/3600)\nPolling batch (attempt 7/3600)\nPolling batch (attempt 8/36"
+        },
+        {
+          "ref": "24345",
+          "strategy": "brand_model",
+          "error": "Running batch for 10 URLs via /dca/trigger...\nSubmitting batch job...\nBatch job: j_mt1hsrhu1ni5runnr3 (ETA: 2026-08-20T12:24:20.530Z)\nCollecting (batch)...\nPolling batch (attempt 1/3600)\nPolling batch (attempt 2/3600)\nPolling batch (attempt 3/3600)\nPolling batch (attempt 4/3600)\nPolling batch (attempt 5/3600)\nPolling batch (attempt 6/3600)\nPolling batch (attempt 7/3600)\nPolling batch (attempt 8/36"
+        },
+        {
+          "ref": "24345",
+          "strategy": "model_only",
+          "error": "Running batch for 10 URLs via /dca/trigger...\nSubmitting batch job...\nBatch job: j_mt1hsrhu1ni5runnr3 (ETA: 2026-08-20T12:24:20.530Z)\nCollecting (batch)...\nPolling batch (attempt 1/3600)\nPolling batch (attempt 2/3600)\nPolling batch (attempt 3/3600)\nPolling batch (attempt 4/3600)\nPolling batch (attempt 5/3600)\nPolling batch (attempt 6/3600)\nPolling batch (attempt 7/3600)\nPolling batch (attempt 8/36"
+        },
+        {
+          "ref": "24346",
+          "strategy": "brand_model",
+          "error": "Running batch for 10 URLs via /dca/trigger...\nSubmitting batch job...\nBatch job: j_mt1hsrhu1ni5runnr3 (ETA: 2026-08-20T12:24:20.530Z)\nCollecting (batch)...\nPolling batch (attempt 1/3600)\nPolling batch (attempt 2/3600)\nPolling batch (attempt 3/3600)\nPolling batch (attempt 4/3600)\nPolling batch (attempt 5/3600)\nPolling batch (attempt 6/3600)\nPolling batch (attempt 7/3600)\nPolling batch (attempt 8/36"
+        },
+        {
+          "ref": "24346",
+          "strategy": "model_only",
+          "error": "Running batch for 10 URLs via /dca/trigger...\nSubmitting batch job...\nBatch job: j_mt1hsrhu1ni5runnr3 (ETA: 2026-08-20T12:24:20.530Z)\nCollecting (batch)...\nPolling batch (attempt 1/3600)\nPolling batch (attempt 2/3600)\nPolling batch (attempt 3/3600)\nPolling batch (attempt 4/3600)\nPolling batch (attempt 5/3600)\nPolling batch (attempt 6/3600)\nPolling batch (attempt 7/3600)\nPolling batch (attempt 8/36"
+        },
+        {
+          "ref": "24347",
+          "strategy": "brand_model",
+          "error": "Running batch for 10 URLs via /dca/trigger...\nSubmitting batch job...\nBatch job: j_mt1hsrhu1ni5runnr3 (ETA: 2026-08-20T12:24:20.530Z)\nCollecting (batch)...\nPolling batch (attempt 1/3600)\nPolling batch (attempt 2/3600)\nPolling batch (attempt 3/3600)\nPolling batch (attempt 4/3600)\nPolling batch (attempt 5/3600)\nPolling batch (attempt 6/3600)\nPolling batch (attempt 7/3600)\nPolling batch (attempt 8/36"
+        },
+        {
+          "ref": "24347",
+          "strategy": "model_only",
+          "error": "Running batch for 10 URLs via /dca/trigger...\nSubmitting batch job...\nBatch job: j_mt1hsrhu1ni5runnr3 (ETA: 2026-08-20T12:24:20.530Z)\nCollecting (batch)...\nPolling batch (attempt 1/3600)\nPolling batch (attempt 2/3600)\nPolling batch (attempt 3/3600)\nPolling batch (attempt 4/3600)\nPolling batch (attempt 5/3600)\nPolling batch (attempt 6/3600)\nPolling batch (attempt 7/3600)\nPolling batch (attempt 8/36"
+        },
+        {
+          "ref": "25431",
+          "strategy": "brand_model",
+          "error": "Running batch for 10 URLs via /dca/trigger...\nSubmitting batch job...\nBatch job: j_mt1kk45tajelp428d (ETA: 2026-08-20T13:41:35.710Z)\nCollecting (batch)...\nPolling batch (attempt 1/3600)\nPolling batch (attempt 2/3600)\nPolling batch (attempt 3/3600)\nPolling batch (attempt 4/3600)\nPolling batch (attempt 5/3600)\nPolling batch (attempt 6/3600)\nPolling batch (attempt 7/3600)\nPolling batch (attempt 8/360"
+        },
+        {
+          "ref": "25431",
+          "strategy": "model_only",
+          "error": "Running batch for 10 URLs via /dca/trigger...\nSubmitting batch job...\nBatch job: j_mt1kk45tajelp428d (ETA: 2026-08-20T13:41:35.710Z)\nCollecting (batch)...\nPolling batch (attempt 1/3600)\nPolling batch (attempt 2/3600)\nPolling batch (attempt 3/3600)\nPolling batch (attempt 4/3600)\nPolling batch (attempt 5/3600)\nPolling batch (attempt 6/3600)\nPolling batch (attempt 7/3600)\nPolling batch (attempt 8/360"
+        },
+        {
+          "ref": "25436",
+          "strategy": "brand_model",
+          "error": "Running batch for 10 URLs via /dca/trigger...\nSubmitting batch job...\nBatch job: j_mt1kk45tajelp428d (ETA: 2026-08-20T13:41:35.710Z)\nCollecting (batch)...\nPolling batch (attempt 1/3600)\nPolling batch (attempt 2/3600)\nPolling batch (attempt 3/3600)\nPolling batch (attempt 4/3600)\nPolling batch (attempt 5/3600)\nPolling batch (attempt 6/3600)\nPolling batch (attempt 7/3600)\nPolling batch (attempt 8/360"
+        },
+        {
+          "ref": "25436",
+          "strategy": "model_only",
+          "error": "Running batch for 10 URLs via /dca/trigger...\nSubmitting batch job...\nBatch job: j_mt1kk45tajelp428d (ETA: 2026-08-20T13:41:35.710Z)\nCollecting (batch)...\nPolling batch (attempt 1/3600)\nPolling batch (attempt 2/3600)\nPolling batch (attempt 3/3600)\nPolling batch (attempt 4/3600)\nPolling batch (attempt 5/3600)\nPolling batch (attempt 6/3600)\nPolling batch (attempt 7/3600)\nPolling batch (attempt 8/360"
+        },
+        {
+          "ref": "25437",
+          "strategy": "brand_model",
+          "error": "Running batch for 10 URLs via /dca/trigger...\nSubmitting batch job...\nBatch job: j_mt1kk45tajelp428d (ETA: 2026-08-20T13:41:35.710Z)\nCollecting (batch)...\nPolling batch (attempt 1/3600)\nPolling batch (attempt 2/3600)\nPolling batch (attempt 3/3600)\nPolling batch (attempt 4/3600)\nPolling batch (attempt 5/3600)\nPolling batch (attempt 6/3600)\nPolling batch (attempt 7/3600)\nPolling batch (attempt 8/360"
+        },
+        {
+          "ref": "25437",
+          "strategy": "model_only",
+          "error": "Running batch for 10 URLs via /dca/trigger...\nSubmitting batch job...\nBatch job: j_mt1kk45tajelp428d (ETA: 2026-08-20T13:41:35.710Z)\nCollecting (batch)...\nPolling batch (attempt 1/3600)\nPolling batch (attempt 2/3600)\nPolling batch (attempt 3/3600)\nPolling batch (attempt 4/3600)\nPolling batch (attempt 5/3600)\nPolling batch (attempt 6/3600)\nPolling batch (attempt 7/3600)\nPolling batch (attempt 8/360"
+        },
+        {
+          "ref": "25441",
+          "strategy": "brand_model",
+          "error": "Running batch for 10 URLs via /dca/trigger...\nSubmitting batch job...\nBatch job: j_mt1kk45tajelp428d (ETA: 2026-08-20T13:41:35.710Z)\nCollecting (batch)...\nPolling batch (attempt 1/3600)\nPolling batch (attempt 2/3600)\nPolling batch (attempt 3/3600)\nPolling batch (attempt 4/3600)\nPolling batch (attempt 5/3600)\nPolling batch (attempt 6/3600)\nPolling batch (attempt 7/3600)\nPolling batch (attempt 8/360"
+        },
+        {
+          "ref": "25441",
+          "strategy": "model_only",
+          "error": "Running batch for 10 URLs via /dca/trigger...\nSubmitting batch job...\nBatch job: j_mt1kk45tajelp428d (ETA: 2026-08-20T13:41:35.710Z)\nCollecting (batch)...\nPolling batch (attempt 1/3600)\nPolling batch (attempt 2/3600)\nPolling batch (attempt 3/3600)\nPolling batch (attempt 4/3600)\nPolling batch (attempt 5/3600)\nPolling batch (attempt 6/3600)\nPolling batch (attempt 7/3600)\nPolling batch (attempt 8/360"
+        },
+        {
+          "ref": "25445",
+          "strategy": "brand_model",
+          "error": "Running batch for 10 URLs via /dca/trigger...\nSubmitting batch job...\nBatch job: j_mt1kk45tajelp428d (ETA: 2026-08-20T13:41:35.710Z)\nCollecting (batch)...\nPolling batch (attempt 1/3600)\nPolling batch (attempt 2/3600)\nPolling batch (attempt 3/3600)\nPolling batch (attempt 4/3600)\nPolling batch (attempt 5/3600)\nPolling batch (attempt 6/3600)\nPolling batch (attempt 7/3600)\nPolling batch (attempt 8/360"
+        },
+        {
+          "ref": "25445",
+          "strategy": "model_only",
+          "error": "Running batch for 10 URLs via /dca/trigger...\nSubmitting batch job...\nBatch job: j_mt1kk45tajelp428d (ETA: 2026-08-20T13:41:35.710Z)\nCollecting (batch)...\nPolling batch (attempt 1/3600)\nPolling batch (attempt 2/3600)\nPolling batch (attempt 3/3600)\nPolling batch (attempt 4/3600)\nPolling batch (attempt 5/3600)\nPolling batch (attempt 6/3600)\nPolling batch (attempt 7/3600)\nPolling batch (attempt 8/360"
+        },
+        {
+          "ref": "25449",
+          "strategy": "brand_model",
+          "error": "Running batch for 10 URLs via /dca/trigger...\nSubmitting batch job...\nBatch job: j_mt1kvk9qsn28x7scw (ETA: 2026-08-20T13:50:29.081Z)\nCollecting (batch)...\nPolling batch (attempt 1/3600)\nPolling batch (attempt 2/3600)\nfetch failed (collection_id j_mt1kvk9qsn28x7scw)"
+        },
+        {
+          "ref": "25449",
+          "strategy": "model_only",
+          "error": "Running batch for 10 URLs via /dca/trigger...\nSubmitting batch job...\nBatch job: j_mt1kvk9qsn28x7scw (ETA: 2026-08-20T13:50:29.081Z)\nCollecting (batch)...\nPolling batch (attempt 1/3600)\nPolling batch (attempt 2/3600)\nfetch failed (collection_id j_mt1kvk9qsn28x7scw)"
+        },
+        {
+          "ref": "25450",
+          "strategy": "brand_model",
+          "error": "Running batch for 10 URLs via /dca/trigger...\nSubmitting batch job...\nBatch job: j_mt1kvk9qsn28x7scw (ETA: 2026-08-20T13:50:29.081Z)\nCollecting (batch)...\nPolling batch (attempt 1/3600)\nPolling batch (attempt 2/3600)\nfetch failed (collection_id j_mt1kvk9qsn28x7scw)"
+        },
+        {
+          "ref": "25450",
+          "strategy": "model_only",
+          "error": "Running batch for 10 URLs via /dca/trigger...\nSubmitting batch job...\nBatch job: j_mt1kvk9qsn28x7scw (ETA: 2026-08-20T13:50:29.081Z)\nCollecting (batch)...\nPolling batch (attempt 1/3600)\nPolling batch (attempt 2/3600)\nfetch failed (collection_id j_mt1kvk9qsn28x7scw)"
+        },
+        {
+          "ref": "25451",
+          "strategy": "brand_model",
+          "error": "Running batch for 10 URLs via /dca/trigger...\nSubmitting batch job...\nBatch job: j_mt1kvk9qsn28x7scw (ETA: 2026-08-20T13:50:29.081Z)\nCollecting (batch)...\nPolling batch (attempt 1/3600)\nPolling batch (attempt 2/3600)\nfetch failed (collection_id j_mt1kvk9qsn28x7scw)"
+        },
+        {
+          "ref": "25451",
+          "strategy": "model_only",
+          "error": "Running batch for 10 URLs via /dca/trigger...\nSubmitting batch job...\nBatch job: j_mt1kvk9qsn28x7scw (ETA: 2026-08-20T13:50:29.081Z)\nCollecting (batch)...\nPolling batch (attempt 1/3600)\nPolling batch (attempt 2/3600)\nfetch failed (collection_id j_mt1kvk9qsn28x7scw)"
+        },
+        {
+          "ref": "25452",
+          "strategy": "brand_model",
+          "error": "Running batch for 10 URLs via /dca/trigger...\nSubmitting batch job...\nBatch job: j_mt1kvk9qsn28x7scw (ETA: 2026-08-20T13:50:29.081Z)\nCollecting (batch)...\nPolling batch (attempt 1/3600)\nPolling batch (attempt 2/3600)\nfetch failed (collection_id j_mt1kvk9qsn28x7scw)"
+        },
+        {
+          "ref": "25452",
+          "strategy": "model_only",
+          "error": "Running batch for 10 URLs via /dca/trigger...\nSubmitting batch job...\nBatch job: j_mt1kvk9qsn28x7scw (ETA: 2026-08-20T13:50:29.081Z)\nCollecting (batch)...\nPolling batch (attempt 1/3600)\nPolling batch (attempt 2/3600)\nfetch failed (collection_id j_mt1kvk9qsn28x7scw)"
+        },
+        {
+          "ref": "25455",
+          "strategy": "brand_model",
+          "error": "Running batch for 10 URLs via /dca/trigger...\nSubmitting batch job...\nBatch job: j_mt1kvk9qsn28x7scw (ETA: 2026-08-20T13:50:29.081Z)\nCollecting (batch)...\nPolling batch (attempt 1/3600)\nPolling batch (attempt 2/3600)\nfetch failed (collection_id j_mt1kvk9qsn28x7scw)"
+        },
+        {
+          "ref": "25455",
+          "strategy": "model_only",
+          "error": "Running batch for 10 URLs via /dca/trigger...\nSubmitting batch job...\nBatch job: j_mt1kvk9qsn28x7scw (ETA: 2026-08-20T13:50:29.081Z)\nCollecting (batch)...\nPolling batch (attempt 1/3600)\nPolling batch (attempt 2/3600)\nfetch failed (collection_id j_mt1kvk9qsn28x7scw)"
+        },
+        {
+          "ref": "25456",
+          "strategy": "brand_model",
+          "error": "Running batch for 10 URLs via /dca/trigger...\nSubmitting batch job...\nBatch job: j_mt1kwpc41ictzbs00c (ETA: 2026-08-20T13:51:22.303Z)\nCollecting (batch)...\nPolling batch (attempt 1/3600)\nPolling batch (attempt 2/3600)\nPolling batch (attempt 3/3600)\nfetch failed (collection_id j_mt1kwpc41ictzbs00c)"
+        },
+        {
+          "ref": "25456",
+          "strategy": "model_only",
+          "error": "Running batch for 10 URLs via /dca/trigger...\nSubmitting batch job...\nBatch job: j_mt1kwpc41ictzbs00c (ETA: 2026-08-20T13:51:22.303Z)\nCollecting (batch)...\nPolling batch (attempt 1/3600)\nPolling batch (attempt 2/3600)\nPolling batch (attempt 3/3600)\nfetch failed (collection_id j_mt1kwpc41ictzbs00c)"
+        },
+        {
+          "ref": "26444",
+          "strategy": "brand_model",
+          "error": "Running batch for 10 URLs via /dca/trigger...\nSubmitting batch job...\nBatch job: j_mt1kwpc41ictzbs00c (ETA: 2026-08-20T13:51:22.303Z)\nCollecting (batch)...\nPolling batch (attempt 1/3600)\nPolling batch (attempt 2/3600)\nPolling batch (attempt 3/3600)\nfetch failed (collection_id j_mt1kwpc41ictzbs00c)"
+        },
+        {
+          "ref": "26444",
+          "strategy": "model_only",
+          "error": "Running batch for 10 URLs via /dca/trigger...\nSubmitting batch job...\nBatch job: j_mt1kwpc41ictzbs00c (ETA: 2026-08-20T13:51:22.303Z)\nCollecting (batch)...\nPolling batch (attempt 1/3600)\nPolling batch (attempt 2/3600)\nPolling batch (attempt 3/3600)\nfetch failed (collection_id j_mt1kwpc41ictzbs00c)"
+        },
+        {
+          "ref": "26452",
+          "strategy": "brand_model",
+          "error": "Running batch for 10 URLs via /dca/trigger...\nSubmitting batch job...\nBatch job: j_mt1kwpc41ictzbs00c (ETA: 2026-08-20T13:51:22.303Z)\nCollecting (batch)...\nPolling batch (attempt 1/3600)\nPolling batch (attempt 2/3600)\nPolling batch (attempt 3/3600)\nfetch failed (collection_id j_mt1kwpc41ictzbs00c)"
+        },
+        {
+          "ref": "26452",
+          "strategy": "model_only",
+          "error": "Running batch for 10 URLs via /dca/trigger...\nSubmitting batch job...\nBatch job: j_mt1kwpc41ictzbs00c (ETA: 2026-08-20T13:51:22.303Z)\nCollecting (batch)...\nPolling batch (attempt 1/3600)\nPolling batch (attempt 2/3600)\nPolling batch (attempt 3/3600)\nfetch failed (collection_id j_mt1kwpc41ictzbs00c)"
+        },
+        {
+          "ref": "26453",
+          "strategy": "brand_model",
+          "error": "Running batch for 10 URLs via /dca/trigger...\nSubmitting batch job...\nBatch job: j_mt1kwpc41ictzbs00c (ETA: 2026-08-20T13:51:22.303Z)\nCollecting (batch)...\nPolling batch (attempt 1/3600)\nPolling batch (attempt 2/3600)\nPolling batch (attempt 3/3600)\nfetch failed (collection_id j_mt1kwpc41ictzbs00c)"
+        },
+        {
+          "ref": "26453",
+          "strategy": "model_only",
+          "error": "Running batch for 10 URLs via /dca/trigger...\nSubmitting batch job...\nBatch job: j_mt1kwpc41ictzbs00c (ETA: 2026-08-20T13:51:22.303Z)\nCollecting (batch)...\nPolling batch (attempt 1/3600)\nPolling batch (attempt 2/3600)\nPolling batch (attempt 3/3600)\nfetch failed (collection_id j_mt1kwpc41ictzbs00c)"
+        },
+        {
+          "ref": "26454",
+          "strategy": "brand_model",
+          "error": "Running batch for 10 URLs via /dca/trigger...\nSubmitting batch job...\nBatch job: j_mt1kwpc41ictzbs00c (ETA: 2026-08-20T13:51:22.303Z)\nCollecting (batch)...\nPolling batch (attempt 1/3600)\nPolling batch (attempt 2/3600)\nPolling batch (attempt 3/3600)\nfetch failed (collection_id j_mt1kwpc41ictzbs00c)"
+        },
+        {
+          "ref": "26454",
+          "strategy": "model_only",
+          "error": "Running batch for 10 URLs via /dca/trigger...\nSubmitting batch job...\nBatch job: j_mt1kwpc41ictzbs00c (ETA: 2026-08-20T13:51:22.303Z)\nCollecting (batch)...\nPolling batch (attempt 1/3600)\nPolling batch (attempt 2/3600)\nPolling batch (attempt 3/3600)\nfetch failed (collection_id j_mt1kwpc41ictzbs00c)"
+        }
+      ],
+      "unmapped_fields": [
+        "add_to_cart_button"
+      ],
+      "with_language": 5499,
+      "with_currency": 7244
+    }
+  ],
+  "verdict": "Partial for US. Figures computed from the seed corpus are unaffected and remain live.",
+  "blackout": false
+}

@@ -1,0 +1,162 @@
+{
+  "sweep_id": "s_2026-08-19T16:47Z",
+  "swept_at": "2026-08-19T16:47:54Z",
+  "arms": {
+    "DE": {
+      "state": "WITHHELD",
+      "reason": "zero_rows_uncorroborated",
+      "rows": 0,
+      "fails": 0,
+      "inputs": 12,
+      "joined": 12,
+      "collector_id": "c_mt00jidz6zhqjbpew"
+    },
+    "IN": {
+      "state": "WITHHELD",
+      "reason": "zero_rows_uncorroborated",
+      "rows": 0,
+      "fails": 0,
+      "inputs": 12,
+      "joined": 11,
+      "collector_id": "c_mt03cj5z2fo651wy8q"
+    },
+    "US": {
+      "state": "WITHHELD",
+      "reason": "zero_rows_uncorroborated",
+      "rows": 0,
+      "fails": 0,
+      "inputs": 12,
+      "joined": 10,
+      "collector_id": "c_mt01usw31e8y5ubqjs"
+    }
+  },
+  "detectors": {
+    "identity_reassertion": {
+      "fired": false,
+      "scope": "per row",
+      "note": "Every RED row re-asserted its identifier on the fetched page.",
+      "checked": 0,
+      "offending": null
+    },
+    "zero_is_a_fault": {
+      "fired": true,
+      "scope": "per claim",
+      "note": "DE returned zero rows with no archived empty-result page to corroborate it. Zero is not published as a finding without an affirmative negative.",
+      "arm": "DE"
+    },
+    "join_key_coverage": {
+      "fired": false,
+      "scope": "per arm",
+      "note": "Tracked separately from row count. An arm can return thousands of clean rows that match nothing, and a row-count check passes it happily.",
+      "arm": "DE",
+      "coverage": 1.0,
+      "bound": 0.8
+    },
+    "sibling_differential": {
+      "fired": false,
+      "scope": "across arms",
+      "note": "No arm has collapsed against its siblings across two sweeps.",
+      "collapsed": [
+        "DE",
+        "IN",
+        "US"
+      ],
+      "holding": null,
+      "requires": "persistence across two sweeps"
+    },
+    "implausible_cleanliness": {
+      "fired": false,
+      "scope": "whole board",
+      "note": "No prior sweep to compare against.",
+      "threshold": 0.4
+    },
+    "currency_fingerprint": {
+      "fired": false,
+      "scope": "per row",
+      "note": "Every DE row must carry EUR, every IN row INR, every US row USD. Kills a country-drift failure class that cross-arm comparison is blind to.",
+      "offending": null
+    },
+    "schema_drift": {
+      "fired": false,
+      "scope": "per arm",
+      "note": "Every field the collectors returned is mapped by the contract.",
+      "drifted": null
+    },
+    "freshness": {
+      "fired": false,
+      "scope": "whole board",
+      "note": "Rows older than the freshness bound are historical. DAY counters freeze at last capture rather than continuing to count.",
+      "age_s": 0,
+      "bound_s": 14400
+    }
+  },
+  "reports": [
+    {
+      "in": 157,
+      "out": 157,
+      "orphaned": 0,
+      "by_code": {
+        "AMBER": 157
+      },
+      "currency_mismatch": 0,
+      "by_query": {
+        "brand_model": 102,
+        "model_only": 55
+      },
+      "arm": "DE",
+      "collector_id": "c_mt00jidz6zhqjbpew",
+      "planned_loads": 24,
+      "batches": 1,
+      "fetch_errors": [],
+      "unmapped_fields": [],
+      "with_language": 0,
+      "with_currency": 156
+    },
+    {
+      "in": 1182,
+      "out": 1182,
+      "orphaned": 0,
+      "by_code": {
+        "AMBER": 1182
+      },
+      "currency_mismatch": 0,
+      "by_query": {
+        "brand_model": 440,
+        "model_only": 742
+      },
+      "arm": "IN",
+      "collector_id": "c_mt03cj5z2fo651wy8q",
+      "planned_loads": 24,
+      "batches": 1,
+      "fetch_errors": [],
+      "unmapped_fields": [],
+      "with_language": 1182,
+      "with_currency": 579
+    },
+    {
+      "in": 1636,
+      "out": 1636,
+      "orphaned": 0,
+      "by_code": {
+        "AMBER": 1636
+      },
+      "currency_mismatch": 0,
+      "by_query": {
+        "brand_model": 274,
+        "model_only": 1362
+      },
+      "arm": "US",
+      "collector_id": "c_mt01usw31e8y5ubqjs",
+      "planned_loads": 24,
+      "batches": 1,
+      "fetch_errors": [],
+      "unmapped_fields": [],
+      "with_language": 1636,
+      "with_currency": 1606
+    }
+  ],
+  "verdict": "WITHHELD for DE, IN, US. Figures depending on DE and IN and US are struck. Figures computed from the seed corpus are unaffected and remain live.",
+  "blackout": false,
+  "trial_slice": 12,
+  "_STATUS": "TRIAL SLICE, 12 of 207 notices. Denominators are not the full corpus."
+}

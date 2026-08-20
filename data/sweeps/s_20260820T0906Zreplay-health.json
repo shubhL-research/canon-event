@@ -1,0 +1,178 @@
+{
+  "sweep_id": "s_2026-08-20T09:06Z-replay",
+  "swept_at": "2026-08-20T09:06:53Z",
+  "arms": {
+    "DE": {
+      "state": "MEASURED",
+      "reason": null,
+      "rows": 0,
+      "listings": 1066,
+      "fails": 0,
+      "inputs": 60,
+      "joined": 58,
+      "collector_id": "c_mt00jidz6zhqjbpew"
+    },
+    "IN": {
+      "state": "MEASURED",
+      "reason": null,
+      "rows": 0,
+      "listings": 8073,
+      "fails": 0,
+      "inputs": 60,
+      "joined": 56,
+      "collector_id": "c_mt03cj5z2fo651wy8q"
+    },
+    "US": {
+      "state": "DEGRADED",
+      "reason": "join_key_coverage_below_bound",
+      "rows": 0,
+      "listings": 6886,
+      "fails": 0,
+      "inputs": 60,
+      "joined": 33,
+      "collector_id": "c_mt01usw31e8y5ubqjs"
+    }
+  },
+  "detectors": {
+    "identity_reassertion": {
+      "fired": false,
+      "scope": "per row",
+      "note": "Every RED row re-asserted its identifier on the fetched page.",
+      "checked": 0,
+      "offending": null
+    },
+    "zero_is_a_fault": {
+      "fired": false,
+      "scope": "per claim",
+      "note": "DE returned 1066 listings and adjudicated every one.",
+      "arm": "DE"
+    },
+    "join_key_coverage": {
+      "fired": true,
+      "scope": "per arm",
+      "note": "Tracked separately from row count. An arm can return thousands of clean rows that match nothing, and a row-count check passes it happily.",
+      "arm": "US",
+      "coverage": 0.55,
+      "bound": 0.8
+    },
+    "sibling_differential": {
+      "fired": false,
+      "scope": "across arms",
+      "note": "No arm has collapsed against its siblings across two sweeps.",
+      "collapsed": [
+        "DE",
+        "IN",
+        "US"
+      ],
+      "holding": null,
+      "requires": "persistence across two sweeps"
+    },
+    "implausible_cleanliness": {
+      "fired": false,
+      "scope": "whole board",
+      "note": "No prior sweep to compare against.",
+      "threshold": 0.4
+    },
+    "currency_fingerprint": {
+      "fired": false,
+      "scope": "per row",
+      "note": "Every DE row must carry EUR, every IN row INR, every US row USD. Kills a country-drift failure class that cross-arm comparison is blind to.",
+      "offending": null
+    },
+    "schema_drift": {
+      "fired": false,
+      "scope": "per arm",
+      "note": "Every field the collectors returned is mapped by the contract.",
+      "drifted": null
+    },
+    "freshness": {
+      "fired": false,
+      "scope": "whole board",
+      "note": "Rows older than the freshness bound are historical. DAY counters freeze at last capture rather than continuing to count.",
+      "age_s": 0,
+      "bound_s": 14400
+    }
+  },
+  "reports": [
+    {
+      "in": 1066,
+      "out": 1066,
+      "orphaned": 0,
+      "by_code": {
+        "AMBER": 1066
+      },
+      "currency_mismatch": 0,
+      "by_query": {
+        "model_only": 455,
+        "brand_model": 611
+      },
+      "listings": 1066,
+      "arm": "DE",
+      "collector_id": "c_mt00jidz6zhqjbpew",
+      "planned_loads": 116,
+      "batches": 0,
+      "fetch_errors": [],
+      "replayed": true,
+      "raw_rows": 1066,
+      "unclaimed_rows": 0,
+      "unmapped_fields": [],
+      "with_language": 0,
+      "with_currency": 1061
+    },
+    {
+      "in": 8073,
+      "out": 8073,
+      "orphaned": 0,
+      "by_code": {
+        "AMBER": 8073
+      },
+      "currency_mismatch": 0,
+      "by_query": {
+        "model_only": 3802,
+        "brand_model": 4271
+      },
+      "listings": 8073,
+      "arm": "IN",
+      "collector_id": "c_mt03cj5z2fo651wy8q",
+      "planned_loads": 116,
+      "batches": 0,
+      "fetch_errors": [],
+      "replayed": true,
+      "raw_rows": 8073,
+      "unclaimed_rows": 0,
+      "unmapped_fields": [],
+      "with_language": 8073,
+      "with_currency": 3607
+    },
+    {
+      "in": 6886,
+      "out": 6886,
+      "orphaned": 0,
+      "by_code": {
+        "AMBER": 6886
+      },
+      "currency_mismatch": 0,
+      "by_query": {
+        "brand_model": 627,
+        "model_only": 6259
+      },
+      "listings": 6886,
+      "arm": "US",
+      "collector_id": "c_mt01usw31e8y5ubqjs",
+      "planned_loads": 116,
+      "batches": 0,
+      "fetch_errors": [],
+      "replayed": true,
+      "raw_rows": 6886,
+      "unclaimed_rows": 0,
+      "unmapped_fields": [],
+      "with_language": 6886,
+      "with_currency": 6451
+    }
+  ],
+  "verdict": "Partial for US. Figures computed from the seed corpus are unaffected and remain live.",
+  "blackout": false,
+  "replayed_from_archive": true,
+  "trial_slice": 60,
+  "_STATUS": "TRIAL SLICE, 60 of 207 notices. Denominators are not the full corpus."
+}
