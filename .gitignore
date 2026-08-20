@@ -13,3 +13,7 @@ data/sweeps/
 
 # Internal planning, not a submission artifact
 PLAN.md
+
+# A second account's collector ids. Untracked: the committed map is the one
+# that produced the published payload.
+data/collectors.local.json

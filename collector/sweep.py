@@ -89,6 +89,27 @@ COLLECTORS = {
     "US": "c_mt01usw31e8y5ubqjs",  # amazon.com, one refused heal, measures
 }
 
+def collectors():
+    """The collector map, with an explicit local override.
+
+    The ids above are the ones that produced the published payload, and the
+    comment on them says publishing them is what lets a judge re-run any figure
+    against the same scraper. Silently swapping them for a different account's
+    would break exactly that.
+
+    So a second account is an override rather than an edit:
+    data/collectors.local.json, untracked, read only if present. Whatever is
+    actually used ends up in the payload's provenance block, so the wall always
+    names the collectors that produced the rows on it rather than the ones the
+    source file happens to list.
+    """
+    override = pathlib.Path(__file__).parent.parent / "data" / "collectors.local.json"
+    if override.exists():
+        loaded = json.loads(override.read_text(encoding="utf-8"))
+        return {**COLLECTORS, **loaded}
+    return dict(COLLECTORS)
+
+
 # amazon.de, healed twice and approved. Held separately because it is a SECOND
 # German storefront rather than a fourth arm: it exists to demonstrate the heal
 # loop on a property that fought back, and the DE arm's published rows come from
@@ -629,7 +650,7 @@ def main(argv):
     dry = "--dry-run" in argv
     replay = "--from-raw" in argv
     batch_override = None
-    arms = dict(COLLECTORS)
+    arms = collectors()
     for i, a in enumerate(argv):
         if a == "--limit" and i + 1 < len(argv):
             limit = int(argv[i + 1])
@@ -637,7 +658,7 @@ def main(argv):
             batch_override = int(argv[i + 1])
         if a == "--arms" and i + 1 < len(argv):
             wanted = argv[i + 1].split(",")
-            arms = {k: v for k, v in COLLECTORS.items() if k in wanted}
+            arms = {k: v for k, v in collectors().items() if k in wanted}
 
     seeds = load_seeds(limit=limit)
 
