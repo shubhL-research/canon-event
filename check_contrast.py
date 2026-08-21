@@ -44,6 +44,31 @@ def contrast(a, b):
     return (hi + 0.05) / (lo + 0.05)
 
 
+def _lab(hex_colour):
+    """CIE L*a*b*, so two colours can be compared the way an eye compares them.
+
+    Contrast ratio answers "can this be read". It does not answer "can these two
+    be told apart", and those are different questions with different failure
+    modes. A verdict wall where RED and AMBER are both legible and look alike has
+    passed every contrast check and lost the only distinction it exists to draw.
+    """
+    h = hex_colour.lstrip("#")
+    rgb = [int(h[i:i + 2], 16) for i in (0, 2, 4)]
+    r, g, b = (_lin(c) for c in rgb)
+    X = r * 0.4124 + g * 0.3576 + b * 0.1805
+    Y = r * 0.2126 + g * 0.7152 + b * 0.0722
+    Z = r * 0.0193 + g * 0.1192 + b * 0.9505
+    def f(t):
+        return t ** (1 / 3) if t > 0.008856 else 7.787 * t + 16 / 116
+    fx, fy, fz = f(X / 0.95047), f(Y / 1.0), f(Z / 1.08883)
+    return (116 * fy - 16, 500 * (fx - fy), 200 * (fy - fz))
+
+
+def delta_e(a, b):
+    import math
+    return math.sqrt(sum((x - y) ** 2 for x, y in zip(_lab(a), _lab(b))))
+
+
 def tokens():
     css = (ROOT / "contract" / "tokens.css").read_text(encoding="utf-8")
     return {m.group(1): m.group(2)
@@ -108,6 +133,26 @@ def main():
           % (hue(h1), hue(h2), drift))
     if drift > 3:
         bad.append(("hazard-on-dark hue drift", h2, drift, 3))
+
+    # THE DISTINCTION THE WALL EXISTS TO DRAW.
+    #
+    # Every verdict label passed contrast individually and nothing compared them
+    # to each other. Darkening amber to clear AA moved it toward the red, and a
+    # 10px AMBER that reads as a shade of RED would be a worse defect than the
+    # one the darkening fixed. dE below about 10 is where two colours stop being
+    # two colours at small sizes.
+    SEPARATIONS = [
+        ("AMBER label vs RED label", t["--amber"], t["--hazard-deep"], 20.0),
+        ("AMBER label vs body ink",  t["--amber"], t["--ink"],         20.0),
+        ("RED label vs body ink",    t["--hazard-deep"], t["--ink"],   20.0),
+    ]
+    print()
+    for label, a, b, floor in SEPARATIONS:
+        d = delta_e(a, b)
+        ok = d >= floor
+        if not ok:
+            bad.append((label, a + " vs " + b, d, floor))
+        print("    %-26s dE %5.1f  needs %.0f  %s" % (label, d, floor, "ok" if ok else "FAIL"))
 
     if bad:
         print("\n  BELOW THRESHOLD:\n")
