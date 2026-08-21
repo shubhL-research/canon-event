@@ -32,11 +32,25 @@ function makeNode(id) {
     innerHTML: "",
     textContent: "",
     dataset: {},
-    classList: { _s: new Set(), add(c) { this._s.add(c); }, contains(c) { return this._s.has(c); } },
+    classList: { _s: new Set(), add(c) { this._s.add(c); }, contains(c) { return this._s.has(c); },
+                 remove(c) { this._s.delete(c); },
+                 toggle(c, on) { if (on) { this._s.add(c); } else { this._s.delete(c); } } },
     set className(v) { this._cn = v; },
     get className() { return this._cn || ""; },
     addEventListener() {},
-    insertAdjacentHTML() {},
+    // toggle() sets aria-expanded on the row it opens. Without these the
+    // auto-open threw a TypeError, section() caught it, and the caught error
+    // REPLACED the rendered rows with a failure card, so the symptom looked
+    // like the wall never rendering rather than like a missing stub method.
+    _attrs: {},
+    setAttribute(k, v) { this._attrs[k] = v; },
+    getAttribute(k) { return k in this._attrs ? this._attrs[k] : null; },
+    removeAttribute(k) { delete this._attrs[k]; },
+    // Captured, not discarded. The evidence receipt is written with
+    // insertAdjacentHTML and nothing else, so a stub that swallowed it left
+    // the most important element on the page untested: the regulator link,
+    // the identity re-assertion, and the whole MISSING path.
+    insertAdjacentHTML(_where, html) { this.inserted = (this.inserted || "") + html; },
     remove() {},
     querySelectorAll() { return []; },
     closest() { return null; },
@@ -46,6 +60,7 @@ function makeNode(id) {
 
 function run(variant, livePath, nowMs) {
   const nodes = {};
+  const firstRow = makeNode("first-row");
   // Every element the renderer writes into. "figures" and the two notes were
   // added with the five-act restructure and were missing here, so nothing the
   // renderer put in them was ever checked.
@@ -63,7 +78,10 @@ function run(variant, livePath, nowMs) {
       // The stub holds no real elements, so a lookup finds nothing. The
       // first-row-open behaviour is exercised in a real browser instead; this
       // only has to not throw.
-      querySelector: () => null,
+      /* boot() opens the first row on load so proof arrives at row one without
+         being hunted for. Returning null meant that never happened here, and
+         the receipt was only checked as fixture DATA, never as rendered HTML. */
+      querySelector: (sel) => (sel === "#wall .row" ? firstRow : null),
       querySelectorAll: () => [],
       addEventListener: () => {},
     },
@@ -85,13 +103,24 @@ function run(variant, livePath, nowMs) {
   if (livePath) {
     vm.runInContext(fs.readFileSync(livePath, "utf8"), sandbox);
   }
+  // The rank is only knowable once a payload is in the sandbox, and boot() reads
+  // it off the node to find which row to open.
+  const loaded = sandbox.window.CANON_LIVE || (sandbox.window.CANON_FIXTURES || {})[variant];
+  if (loaded && loaded.rows && loaded.rows.length) {
+    firstRow.dataset.rank = String(loaded.rows[0].rank);
+  }
   vm.runInContext(fs.readFileSync(path.join(ROOT, "wall.js"), "utf8"), sandbox);
 
-  const html = ids.map((i) => nodes[i].innerHTML).join("\n") + "\n" + nodes.pager.textContent;
+  const html = ids.map((i) => nodes[i].innerHTML).join("\n") + "\n" +
+               nodes.pager.textContent + "\n" + (firstRow.inserted || "");
   // A guarded section reports its own failure in place, so counting those is how
   // the test sees a half-rendered page that would otherwise look fine.
   const failures = (html.match(/render-fail/g) || []).length;
-  return { nodes, html, failures };
+  return {
+    nodes, html, failures,
+    collapsed: ids.map((i) => nodes[i].innerHTML).join(String.fromCharCode(10)),
+    receipt: firstRow.inserted || "",
+  };
 }
 
 let failures = 0;
@@ -269,6 +298,8 @@ for (const variant of VARIANTS) {
     continue;
   }
   const html = out.html;
+  const collapsed = out.collapsed;
+  const receipt = out.receipt;
 
   console.log(`?state=${variant}`);
 
@@ -315,7 +346,18 @@ for (const variant of VARIANTS) {
     check(/HEAL REJECTED/.test(html), "v1 renders the rejected heal, the hardest thing to fake");
     check(/prompt budget \d+ \/ 1000/.test(html), "prompt budget meter rendered");
     check(/Vodafone|Reliance|Comcast/.test(html), "exit attestation names a residential ASN");
-    check(/MISSING/.test(html) === false, "MISSING only appears once a receipt is opened");
+    /* The invariant is that MISSING belongs to the evidence receipt and never to
+       the collapsed row list. This used to be asserted as "MISSING appears
+       nowhere", which held only because the suite never opened a receipt: the
+       harness returned null for the first row and boot()'s auto-open silently
+       did nothing. Now that a receipt really opens, the check is the real one,
+       scoped to where each half is allowed to appear. */
+    check(/MISSING/.test(collapsed) === false,
+          "MISSING never appears in the collapsed row list");
+    check(!/is-missing/.test(receipt) || /MISSING/.test(receipt),
+          "MISSING renders inside the receipt whenever a field is absent");
+    check(/cpsc\.gov|europa\.eu/i.test(receipt),
+          "the opened receipt links the regulator's own notice");
     check(/capture-recapture/i.test(html), "recall floor is stated");
     check(/of \d+ shown/.test(html), "pager reconciles displayed rows to the finding set");
     check(/Survival by age/.test(html), "survival curve section rendered");
@@ -353,6 +395,49 @@ console.log("\nreceipt card");
         "every RED row carries an identity re-assertion needle");
   check(red.every((r) => r.evidence.assertion.context.includes(r.evidence.assertion.needle)),
         "every needle actually appears in its own captured context");
+}
+
+/* Every claim on this page must be one click from its evidence, and every one
+   of those clicks must land.
+
+   The wall had no outbound links at all. All 207 rows carried the regulator's
+   own URL and none was clickable, so the first check anyone performs on a recall
+   audit, whether the recall is real, meant retyping a notice number into a
+   search engine. The heal ledgers, which are the entire self-healing argument,
+   were printed as dead filenames.
+
+   The second half of this matters as much as the first: a link into the
+   repository has to be ABSOLUTE. The deployed host serves the wall and its
+   assets, not the archive, so a relative href to a ledger or a fetched page is a
+   404 for exactly the reader who cared enough to click. */
+if (fs.existsSync(LIVE)) {
+  const out = run("v1", LIVE);
+  const markup = fs.readFileSync(path.join(ROOT, "wall.html"), "utf8");
+  const all = out.html + markup;
+
+  console.log("outbound links");
+  check(/cpsc\.gov|ec\.europa\.eu|safetygate/i.test(out.html),
+        "rows link to the regulator's own notice");
+  check(/github\.com\/[\w-]+\/canon-event\/blob\/main\/heals\//.test(out.html),
+        "heal ledgers link into the repository");
+  check(/github\.com\/[\w-]+\/canon-event\/blob\/main\/data\/hunt\//.test(out.html),
+        "hunt findings link to the page that was fetched");
+  check(/class="repo-links"/.test(markup),
+        "the footer carries a verification path back to the repository");
+
+  // Anything the deployed host does not serve must be linked absolutely.
+  const SERVED = ["wall.html", "wall.css", "wall.js", "index.html",
+                  "data/fixtures.js", "data/live.js", "contract/tokens.css"];
+  const bad = [];
+  for (const m of all.matchAll(/href="([^"#][^"]*)"/g)) {
+    const href = m[1];
+    if (/^(https?:|mailto:|\/\/)/.test(href)) continue;
+    if (!SERVED.includes(href.split("?")[0])) bad.push(href);
+  }
+  check(bad.length === 0,
+        "no link points relatively at a path the host does not serve (" +
+        [...new Set(bad)].slice(0, 4).join(", ") + ")");
+  console.log("");
 }
 
 /* FRESHNESS, tested by moving the clock forward.

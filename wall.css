@@ -1299,3 +1299,32 @@ body { overflow-x: clip; max-width: 100%; }
 .qc-note { margin: 16px 0 0; font-size: 13px; line-height: 1.55; color: var(--ink-2); max-width: 76ch; }
 @media (max-width: 1279px) { .qc-figs { grid-template-columns: 1fr 1fr; } }
 @media (max-width: 719px)  { .qc-figs { grid-template-columns: 1fr; } }
+
+/* Outbound links inside an evidence receipt. Underlined and in the flux accent
+   because a reader has to be able to SEE that a claim is checkable; a link
+   styled to look like text is a link nobody clicks. */
+.field.is-link .v a { color: var(--flux); text-decoration: underline; text-underline-offset: 2px; }
+.field.is-link .v a:hover { text-decoration-thickness: 2px; }
+.link-why { margin-top: 5px; font-size: 11px; line-height: 1.45; color: var(--ink-3); max-width: 46ch; }
+.heal-meta a { color: var(--flux); text-decoration: underline; text-underline-offset: 2px; }
+.hunt-links { display: flex; flex-wrap: wrap; gap: 18px; margin-top: 12px; }
+.hunt-links .hunt-evidence { margin-top: 0; }
+
+/* ------------------------------------------------------------- repo links
+   The deployed wall is one file. Everything that substantiates it is in the
+   repository, and a judge arriving from a submission form has minutes, so the
+   path from claim to proof has to be one click rather than a search. */
+.repo-links { margin-top: 40px; padding-top: 24px; border-top: 1px solid var(--rule); }
+.repo-links h3 {
+  margin: 0 0 16px; font-family: var(--font-machine); font-size: 10px;
+  letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-3);
+}
+.repo-links ul { list-style: none; margin: 0; padding: 0;
+  display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px 28px; }
+.repo-links li { font-size: 13px; line-height: 1.5; }
+.repo-links a {
+  color: var(--flux); text-decoration: underline; text-underline-offset: 2px;
+  font-weight: 700;
+}
+.repo-links span { display: block; margin-top: 3px; color: var(--ink-2); }
+@media (max-width: 719px) { .repo-links ul { grid-template-columns: 1fr; } }

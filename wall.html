@@ -153,6 +153,27 @@
       </ul>
       <p class="final">There is no green in this interface. The absence of a red row is not evidence of safety.</p>
 
+      <!-- Everything that proves this page is in the repository and the page
+           linked to none of it. A judge arrives here from a submission form and
+           spends a few minutes; the verification path has to be one click, not a
+           search. These four are the ones worth naming: the whole thing, the
+           script that re-runs every check offline, the raw platform output the
+           adjudication can be re-derived from without spending a credit, and the
+           refused heals that are the entire self-healing argument. -->
+      <nav class="repo-links" aria-label="Check this yourself">
+        <h3>Check it yourself</h3>
+        <ul>
+          <li><a href="https://github.com/shubhL-research/canon-event" target="_blank" rel="noopener noreferrer">The repository</a>
+            <span>Every collector, every statistic, every fixture.</span></li>
+          <li><a href="https://github.com/shubhL-research/canon-event/blob/main/verify.sh" target="_blank" rel="noopener noreferrer">verify.sh</a>
+            <span>Sixteen suites, no dependencies, no network. Runs on a clean clone.</span></li>
+          <li><a href="https://github.com/shubhL-research/canon-event/tree/main/data/sweeps" target="_blank" rel="noopener noreferrer">The raw platform output</a>
+            <span>Unmodified Bright Data rows. The zero on this page can be re-derived from them without issuing a single request.</span></li>
+          <li><a href="https://github.com/shubhL-research/canon-event/tree/main/heals" target="_blank" rel="noopener noreferrer">The heal ledgers</a>
+            <span>Five repairs against live collectors. Four were refused, with the reason and the canary output for each.</span></li>
+        </ul>
+      </nav>
+
       <div class="provenance" id="provenance"></div>
 
       <details class="machinery">

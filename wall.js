@@ -684,6 +684,28 @@
 
   function currencyCountry(c) { return { EUR: "DE", USD: "US", INR: "IN" }[c] || "?"; }
 
+  /* A claim a reader cannot check is a claim they have to take on trust, and
+     this project's entire argument is that it does not ask for trust.
+
+     Every one of the 207 rows carries the regulator's own URL and the wall never
+     made one of them clickable, so the first thing anyone checks on a recall
+     audit, whether the recall is real, required copying a notice number into a
+     search engine. The links live in the expanded receipt rather than the
+     collapsed row because the receipt is inserted as a SIBLING of the row, so a
+     click inside it does not reach the row's toggle handler. */
+  /* The deployed wall serves one file. Everything that proves it, the heal
+     ledgers, the raw platform archive, the collector code, verify.sh, lives in
+     the repository, and until now the page linked to none of it. */
+  var REPO = "https://github.com/shubhL-research/canon-event";
+
+  function linkField(label, url, text, why) {
+    if (!url) return field(label, null);
+    return '<div class="field is-link"><div class="k">' + esc(label) + "</div>" +
+      '<div class="v"><a href="' + esc(url) + '" target="_blank" ' +
+      'rel="noopener noreferrer">' + esc(text || url) + "</a></div>" +
+      (why ? '<div class="link-why">' + esc(why) + "</div>" : "") + "</div>";
+  }
+
   function regulatorPane(r) {
     // The hazard sentence first. It is the reason anyone is reading the row, and
     // it was arriving sixth, under four lines of filing metadata.
@@ -701,7 +723,9 @@
       field(r.tier === "RED" ? "Recalled, and still on sale, days"
                              : "Days since the recall was published",
             commas(r.days), { mono: true }) +
-      field("Notice", r.source.ref, { mono: true }) +
+      linkField("Notice", r.source.url, r.source.ref,
+                "Opens the regulator's own published notice. Check the hazard "
+                + "sentence above against it: it is quoted, not paraphrased.") +
       field("Model", r.model, { mono: true }) +
       field("Barcode", r.gtin, { mono: true });
   }
@@ -865,7 +889,9 @@
           " · " + esc(h.arm) + "-" + esc(h.seq) + "</div>" +
           (h.collector ? '<div class="heal-meta">' + esc(h.collector) + "</div>" : "") +
           (h.refused_because ? '<div class="heal-why">' + esc(h.refused_because) + "</div>" : "") +
-          '<div class="heal-meta">' + esc(h.file) + "</div>" +
+          '<div class="heal-meta"><a href="' + esc(REPO) + "/blob/main/" +
+            esc(h.file) + '" target="_blank" rel="noopener noreferrer">' +
+            esc(h.file) + "</a></div>" +
         "</div>";
       }).join("");
     }
@@ -1045,10 +1071,22 @@
           esc(f.why_it_holds) + "</p>";
       }
 
-      var ev = f.evidence_file
-        ? '<a class="hunt-evidence" href="' + esc(f.evidence_file) +
-          '">the page we fetched, committed</a>'
-        : "";
+      var links = [];
+      if (f.url) {
+        links.push('<a class="hunt-evidence" href="' + esc(f.url) +
+          '" target="_blank" rel="noopener noreferrer nofollow">the listing, live</a>');
+      }
+      if (f.evidence_file) {
+        // Absolute, into the repository. A relative href would 404: the deployed
+        // host serves the wall, not the archive.
+        links.push('<a class="hunt-evidence" href="' + esc(REPO) + "/blob/main/" +
+          esc(f.evidence_file) + '" target="_blank" rel="noopener noreferrer">' +
+          "the page we fetched, committed</a>");
+      }
+      links.push('<a class="hunt-evidence" href="' + esc(REPO) +
+        '/blob/main/data/hunt/rederive.py" target="_blank" rel="noopener noreferrer">' +
+        "re-derive this verdict</a>");
+      var ev = '<div class="hunt-links">' + links.join("") + "</div>";
 
       return '<article class="hunt-item' + (red ? " is-red" : "") + '">' +
         '<div class="hunt-top">' +
