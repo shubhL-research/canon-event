@@ -57,24 +57,44 @@ def main():
         print("  --hero-ground not found in tokens.css")
         return 1
 
-    # Every foreground the finding act actually uses, with the size it uses it at.
-    # 4.5 unless the type is large enough for the 3:1 threshold.
+    # THREE GROUNDS, not one.
+    #
+    # This file started by checking the finding act, because that is where the
+    # first bug was. Checking the other two immediately found three more: the
+    # 10px verdict label at 4.03:1 on paper, the AMBER label carried on 173 of
+    # 207 rows at 3.48:1, and the withheld mark at 4.32:1 on the void ground,
+    # which is on screen in a filmed state. A guard that only looks where the
+    # last bug was will only ever find that bug again.
+    #
+    # Only TEXT is listed. A border or a bar carries no contrast threshold, which
+    # is why the signature red survives unchanged as a rule and as a fill while
+    # small text on paper takes --hazard-deep.
+    PAPER, VOID = t["--paper"], t["--void"]
     CASES = [
-        ("hero heading",        t["--ink-inv"],        3.0, "clamp(38px+), large"),
-        ("found-anyway body",   "#C9CDD1",             4.5, "15px normal"),
-        ("found-anyway bold",   t["--hazard-on-dark"], 4.5, "15px bold, under the large threshold"),
-        ("found-anyway link",   t["--ink-inv"],        4.5, "15px normal"),
+        ("hero heading",         t["--ink-inv"],        ground,        3.0, "clamp(38px+), large"),
+        ("found-anyway body",    "#C9CDD1",             ground,        4.5, "15px normal"),
+        ("found-anyway bold",    t["--hazard-on-dark"], ground,        4.5, "15px bold, under the large threshold"),
+        ("found-anyway link",    t["--ink-inv"],        ground,        4.5, "15px normal"),
+        ("withheld mark",        t["--hazard-on-dark"], VOID,          4.5, "12px on void, filmed state"),
+        ("body copy",            t["--ink"],            PAPER,         4.5, "15px normal"),
+        ("secondary copy",       t["--ink-2"],          PAPER,         4.5, "13px normal"),
+        ("display type",         t["--ink-display"],    PAPER,         3.0, "56px+, large"),
+        ("tier-box RED",         t["--hazard-deep"],    PAPER,         4.5, "10px verdict label"),
+        ("tier-box AMBER",       t["--amber"],          PAPER,         4.5, "10px, on 173 of 207 rows"),
+        ("white on hazard fill", t["--ink-inv"],        t["--hazard"], 4.5, "chip label"),
+        ("white on amber fill",  t["--ink-inv"],        t["--amber"],  4.5, "hunt chip label"),
     ]
 
-    print("  finding act ground %s\n" % ground)
+    print("  grounds: hero %s   paper %s   void %s" % (ground, PAPER, VOID))
+    print()
     bad = []
-    for label, colour, need, note in CASES:
-        r = contrast(colour, ground)
+    for label, colour, bg, need, note in CASES:
+        r = contrast(colour, bg)
         ok = r >= need
         if not ok:
             bad.append((label, colour, r, need))
-        print("    %-20s %-9s %6.2f:1  needs %.1f  %s   %s"
-              % (label, colour, r, need, "ok  " if ok else "FAIL", note))
+        print("    %-21s %-9s on %-9s %6.2f:1  needs %.1f  %s  %s"
+              % (label, colour, bg, r, need, "ok  " if ok else "FAIL", note))
 
     # The dark-ground red must stay the same colour, not become a different one.
     h1, h2 = t["--hazard"], t["--hazard-on-dark"]
@@ -94,7 +114,7 @@ def main():
         for label, colour, r, need in bad:
             print("    %s: %s is %.2f, needs %.2f" % (label, colour, r, need))
         return 1
-    print("\n  every finding-act colour clears AA on its own ground")
+    print("\n  every text colour clears AA on the ground it is set on")
     return 0
 
 

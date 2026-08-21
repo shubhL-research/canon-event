@@ -77,7 +77,9 @@ body {
 .act-finding.is-withheld .clause { color: #868E95; }
 .act-finding.is-withheld .withheld-mark {
   display: block; font-family: var(--font-machine); font-size: 12px;
-  letter-spacing: 0.14em; margin-bottom: 16px; color: var(--hazard);
+  /* On --void, not on paper: 12px --hazard measures 4.32:1 there and fails.
+     This label is on screen in ?state=v1, which is a filmed state. */
+  letter-spacing: 0.14em; margin-bottom: 16px; color: var(--hazard-on-dark);
 }
 
 /* --------------------------------------------------------- instrument line */
@@ -254,7 +256,10 @@ body {
 .c-tier { text-align: right; }
 .tier-box {
   display: inline-block; font-family: var(--font-machine); font-size: 10px;
-  padding: 1px 5px; border: 1px solid var(--hazard); color: var(--hazard);
+  /* 10px, so it needs 4.5:1. --hazard is 4.03:1 on paper; --hazard-deep is
+     6.07:1. The border keeps the signature red, where thresholds do not
+     apply, so the box still reads as the same colour. */
+  padding: 1px 5px; border: 1px solid var(--hazard); color: var(--hazard-deep);
   letter-spacing: 0.06em;
 }
 .tier-box.t-AMBER { border-color: var(--amber); color: var(--amber); }

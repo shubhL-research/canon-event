@@ -43,15 +43,24 @@
   --ink:           #0B0E11;
   /* Display sizes only. #0B0E11 set at 82px is a wall of near-black that glares
      on a light ground; books and newspapers have never set body black either. At
-     13:1 against the hero ground this is far above AA and materially easier to
-     read. Body copy keeps the darker ink, where the mass is small and the
-     contrast earns its keep. */
+     14.59:1 on paper this is far above AA and materially easier to read. Body
+     copy keeps the darker ink, where the mass is small and the contrast earns
+     its keep.
+     This comment used to claim 13:1 "against the hero ground". Both halves were
+     wrong: the ratio is 14.59:1, and against the hero ground it would be 1.02:1,
+     which is invisible. Display ink is never set on the hero. */
   --ink-display:   #16191D;
   --ink-2:         #464E55;
   --ink-3:         #6B747C;
   --ink-inv:       #FFFFFF;
 
-  /* Hazard: ISO 3864 safety red, Pantone 485 C. 6.7:1 on white.
+  /* Hazard: ISO 3864 safety red, Pantone 485 C.
+     4.87:1 on pure white, and 4.03:1 on the paper it is actually set on, which
+     FAILS AA for normal text. This comment used to claim 6.7:1 on white; that
+     number was never measured. The colour is kept because it is a standards
+     choice and because it is used as a FILL, where white on it is 4.87:1, and as
+     a rule, where contrast thresholds do not apply. Small text takes
+     --hazard-deep on paper and --hazard-on-dark on the two dark grounds.
      Rationed. It marks an accusation and nothing else. */
   --hazard:        #DA291C;
   --hazard-deep:   #A81E14;
@@ -82,8 +91,14 @@
   --unknown:       #6E767D;
   --hatch:         #C9CDD1;
 
-  /* Excluded. Quarantined to the discard drawer, never on the wall. */
-  --amber:         #B26B00;
+  /* Excluded. Quarantined to the discard drawer, never on the wall.
+     Darkened from #B26B00, which measured 3.48:1 on paper and failed AA for the
+     10px AMBER verdict label that appears on 173 of 207 rows. Same hue at 36.1
+     degrees, same saturation, lifted only to the point that passes: 4.71:1. It
+     also raises white-on-amber in the hunt chip from 4.20:1 to 5.69:1, so both
+     directions improve. Small text at low contrast is also the first thing video
+     compression destroys, and this label is on screen for most of the demo. */
+  --amber:         #945900;
   --amber-mark:    #E8A33D;
 
   /* In flight, and the only interface accent. */
