@@ -982,11 +982,16 @@
        always false. Everything else on this board is a fact about the sweep and
        is read as published. This one is a fact about NOW. */
     var stale = isStale(doc);
+    var inconclusive = Object.keys(d).filter(function (k) {
+      return d[k].inconclusive && !d[k].fired;
+    }).length;
     if (stale && d.freshness) {
       d = JSON.parse(JSON.stringify(d));
       d.freshness = {
         fired: true,
         scope: d.freshness.scope || "whole board",
+        bound_s: doc.freshness_bound_s,
+        age_s: ageS(doc),
         note: "This sweep is " + ageWords(ageS(doc)) + " past its " +
               Math.round(doc.freshness_bound_s / 3600) + "h freshness bound. The " +
               "rows below are what the last sweep found, not a claim about what " +
@@ -994,12 +999,59 @@
       };
     }
 
+    /* Every card shows the MEASUREMENT, not just the verdict.
+
+       The act is headed "What was watching" and its own lede argues that a
+       detector nobody can prove was running is worthless. Eight cards reading
+       FIRED or quiet above a sentence were exactly that. The single firing
+       detector never printed the number that fired it, and the payload has
+       carried coverage 0.4589 against a bound of 0.8 the whole time. */
+    function measured(k, v) {
+      var bits = [];
+      if (typeof v.coverage === "number" && typeof v.bound === "number") {
+        // A bound is a round number chosen by us, not a measurement, so it is
+        // printed as one: "an 80% bound", not "a 80.0% bound".
+        var b = Math.round(v.bound * 100);
+        bits.push(pct(v.coverage) + " against " + (b === 8 || b === 11 || b === 18 ||
+          (b >= 80 && b < 90) ? "an " : "a ") + b + "% bound");
+      }
+      if (typeof v.checked === "number") {
+        bits.push(v.checked === 0 ? "0 rows examined" : commas(v.checked) + " examined");
+      }
+      if (v.arm) bits.push("arm " + v.arm);
+      if (v.collapsed && v.collapsed.length) bits.push("collapsed " + v.collapsed.join(", "));
+      if (v.holding && v.holding.length) bits.push("holding " + v.holding.join(", "));
+      else if (v.collapsed && v.collapsed.length) bits.push("nothing holding");
+      if (typeof v.threshold === "number") {
+        bits.push("threshold " + Math.round(v.threshold * 100) + "%");
+      }
+      if (typeof v.red_before === "number" && typeof v.red_now === "number") {
+        bits.push(v.red_before + " RED before, " + v.red_now + " now");
+      }
+      if (typeof v.bound_s === "number") {
+        bits.push((typeof v.age_s === "number" ? "age " + ageWords(v.age_s) + " · " : "") +
+                  "bound " + Math.round(v.bound_s / 3600) + "h");
+      }
+      if (v.offending && v.offending.length) bits.push(v.offending.length + " offending");
+      if (v.drifted && v.drifted.length) bits.push("drifted: " + v.drifted.join(", "));
+      return bits.join(" · ");
+    }
+
     var cards = Object.keys(d).map(function (k) {
       var v = d[k];
-      return '<div class="det' + (v.fired ? " is-fired" : "") + '">' +
+      /* Three states, because two were carrying three meanings. `fired: false`
+         meant both "this ran and found nothing" and "this had nothing to run
+         on", and the board drew them identically, so identity_reassertion
+         reported every RED row clean having examined none. An all-clear from a
+         check that never executed is the failure this project exists to refuse. */
+      var cls = v.fired ? " is-fired" : v.inconclusive ? " is-inconclusive" : "";
+      var state = v.fired ? "FIRED" : v.inconclusive ? "COULD NOT RUN" : "quiet";
+      var m = measured(k, v);
+      return '<div class="det' + cls + '">' +
         '<div class="det-head"><span class="det-name">' + esc(k.replace(/_/g, " ")) +
-          '</span><span class="det-state">' + (v.fired ? "FIRED" : "quiet") + "</span></div>" +
+          '</span><span class="det-state">' + state + "</span></div>" +
         '<div class="det-scope">' + esc(v.scope) + "</div>" +
+        (m ? '<div class="det-measured">' + esc(m) + "</div>" : "") +
         '<div class="det-note">' + esc(v.note) + "</div>" +
       "</div>";
     }).join("");
@@ -1008,8 +1060,12 @@
       '<h2 class="act-head"><span class="act-num">05</span> What was watching</h2>' +
       '<p class="act-lede">' + ((sum.fired || 0) + (stale ? 1 : 0)) + " of " +
         (sum.total || 0) + " detectors " +
-        (stale ? "are firing as you read this" : "fired on this sweep") + ". " +
-        esc(sum.note || "") +
+        (stale ? "are firing as you read this" : "fired on this sweep") +
+        (inconclusive ? ", and " + inconclusive + " could not run at all: a sweep " +
+          "that reaches no RED row leaves the checks that examine RED rows with " +
+          "nothing to examine. They are reported as inconclusive rather than " +
+          "clean, because a check that ran against zero rows has not passed" : "") +
+        ". " + esc(sum.note || "") +
         (stale ? " One of them is firing now rather than at sweep time: freshness " +
                  "is a fact about the moment you are looking, so it is decided in " +
                  "your browser and not in the payload." : "") + "</p>" +

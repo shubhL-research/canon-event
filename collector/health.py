@@ -84,6 +84,14 @@ def _detector(fired, scope, note, **extra):
     """
     out = {"fired": bool(fired), "scope": scope, "note": note}
     out.update(extra)
+    # A THIRD STATE, because two were not enough and the missing one was the
+    # dangerous one. `fired: false` was carrying two entirely different meanings:
+    # "this ran and found nothing wrong", and "this had nothing to run on". The
+    # board rendered them identically, so identity_reassertion printed "Every RED
+    # row re-asserted its identifier" having examined zero rows. An all-clear from
+    # a check that never executed is precisely the failure this project exists to
+    # refuse, and it was on our own detector board.
+    out["inconclusive"] = bool(out.get("inconclusive", False))
     return out
 
 
@@ -101,12 +109,17 @@ def identity_reassertion(rows):
                if not (r.get("evidence") or {}).get("assertion")]
     return _detector(
         bool(missing), "per row",
-        ("Every RED row re-asserted its identifier on the fetched page."
+        ("This sweep produced no RED row, so this detector had nothing to "
+         "examine. It is reported as inconclusive rather than clean: a check "
+         "that ran against zero rows has not passed, it has not run."
+         if not reds else
+         "Every RED row re-asserted its identifier on the fetched page."
          if not missing else
          "%d RED row(s) reached the wall with no assertion. These are not "
          "publishable." % len(missing)),
         checked=len(reds),
         offending=missing or None,
+        inconclusive=not reds,
     )
 
 
@@ -202,9 +215,15 @@ def sibling_differential(arm_rows, previous=None):
         fired, "across arms",
         ("%s collapsed while %s held, across two consecutive sweeps."
          % (", ".join(dead), ", ".join(sorted(live)))) if fired else
-        "No arm has collapsed against its siblings across two sweeps.",
+        ("Every arm returned zero RED, so there is no sibling still holding to "
+         "measure a collapse against. A differential needs one arm up and "
+         "another down; with all of them level there is nothing to compare, which "
+         "is not the same as nothing being wrong."
+         if dead and not live else
+         "No arm has collapsed against its siblings across two sweeps."),
         collapsed=dead or None, holding=sorted(live) or None,
         requires="persistence across two sweeps",
+        inconclusive=bool(dead) and not live,
     )
 
 
@@ -218,9 +237,15 @@ def implausible_cleanliness(red_now, red_before):
     project exists to refuse, so it blacks the whole board instead.
     """
     if not red_before:
-        return _detector(False, "whole board",
-                         "No prior sweep to compare against.",
-                         threshold=IMPLAUSIBLE_CLEANLINESS_DROP)
+        return _detector(
+            False, "whole board",
+            "The previous sweep also reached zero RED, so the proportional drop "
+            "this detector measures is zero over zero, which has no value. That is "
+            "not the same as nothing having got worse, and it is not the same as "
+            "there being no prior sweep, which is what this used to say.",
+            threshold=IMPLAUSIBLE_CLEANLINESS_DROP,
+            red_before=red_before, red_now=red_now,
+            inconclusive=True)
     drop = (red_before - red_now) / red_before
     return _detector(
         drop > IMPLAUSIBLE_CLEANLINESS_DROP, "whole board",

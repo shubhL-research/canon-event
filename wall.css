@@ -1328,3 +1328,19 @@ body { overflow-x: clip; max-width: 100%; }
 }
 .repo-links span { display: block; margin-top: 3px; color: var(--ink-2); }
 @media (max-width: 719px) { .repo-links ul { grid-template-columns: 1fr; } }
+
+/* A detector that could not run is not a detector that passed.
+   Two states drew three meanings: "ran and found nothing" and "had nothing to
+   run on" both rendered as a quiet card, so identity_reassertion looked like an
+   all-clear while having examined zero rows. The third state is drawn in the
+   unknown grey this palette already reserves for withheld verdicts, with a
+   dashed edge, so it reads as absence rather than as either pass or fail. */
+.det.is-inconclusive { border-style: dashed; border-color: var(--unknown); }
+.det.is-inconclusive .det-state { color: var(--unknown); font-weight: 700; }
+.det.is-inconclusive .det-name { color: var(--ink-2); }
+.det-measured {
+  font-family: var(--font-machine); font-size: 11px; color: var(--ink);
+  margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--rule);
+  line-height: 1.5;
+}
+.det.is-fired .det-measured { color: var(--hazard-deep); font-weight: 700; }

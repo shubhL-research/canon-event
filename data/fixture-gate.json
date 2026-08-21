@@ -9888,15 +9888,17 @@
     "identity_reassertion": {
       "fired": false,
       "scope": "per row",
-      "note": "Every RED row re-asserted its identifier on the fetched page.",
+      "note": "This sweep produced no RED row, so this detector had nothing to examine. It is reported as inconclusive rather than clean: a check that ran against zero rows has not passed, it has not run.",
       "checked": 0,
-      "offending": null
+      "offending": null,
+      "inconclusive": true
     },
     "zero_is_a_fault": {
       "fired": false,
       "scope": "per claim",
       "note": "US returned 14632 listings and adjudicated every one.",
-      "arm": "US"
+      "arm": "US",
+      "inconclusive": false
     },
     "join_key_coverage": {
       "fired": true,
@@ -9904,44 +9906,52 @@
       "note": "Tracked separately from row count. An arm can return thousands of clean rows that match nothing, and a row-count check passes it happily.",
       "arm": "US",
       "coverage": 0.4589,
-      "bound": 0.8
+      "bound": 0.8,
+      "inconclusive": false
     },
     "sibling_differential": {
       "fired": false,
       "scope": "across arms",
-      "note": "No arm has collapsed against its siblings across two sweeps.",
+      "note": "Every arm returned zero RED, so there is no sibling still holding to measure a collapse against. A differential needs one arm up and another down; with all of them level there is nothing to compare, which is not the same as nothing being wrong.",
       "collapsed": [
         "DE",
         "IN",
         "US"
       ],
       "holding": null,
-      "requires": "persistence across two sweeps"
+      "requires": "persistence across two sweeps",
+      "inconclusive": true
     },
     "implausible_cleanliness": {
       "fired": false,
       "scope": "whole board",
-      "note": "No prior sweep to compare against.",
-      "threshold": 0.4
+      "note": "The previous sweep also reached zero RED, so the proportional drop this detector measures is zero over zero, which has no value. That is not the same as nothing having got worse, and it is not the same as there being no prior sweep, which is what this used to say.",
+      "threshold": 0.4,
+      "red_before": null,
+      "red_now": 0,
+      "inconclusive": true
     },
     "currency_fingerprint": {
       "fired": false,
       "scope": "per row",
       "note": "Every DE row must carry EUR, every IN row INR, every US row USD. Kills a country-drift failure class that cross-arm comparison is blind to.",
-      "offending": null
+      "offending": null,
+      "inconclusive": false
     },
     "schema_drift": {
       "fired": false,
       "scope": "per arm",
       "note": "Every field the collectors returned is mapped by the contract.",
-      "drifted": null
+      "drifted": null,
+      "inconclusive": false
     },
     "freshness": {
       "fired": false,
       "scope": "whole board",
       "note": "Rows older than the freshness bound are historical. DAY counters freeze at last capture rather than continuing to count.",
       "age_s": 0,
-      "bound_s": 14400
+      "bound_s": 14400,
+      "inconclusive": false
     }
   },
   "detector_summary": {
