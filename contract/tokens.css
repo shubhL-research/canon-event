@@ -57,6 +57,16 @@
   --hazard-deep:   #A81E14;
   --hazard-wash:   #FDEEEC;
 
+  /* The same accusation, on the one dark ground in this interface.
+     #DA291C is chosen for the paper and measures 3.70:1 against the graphite
+     hero, which fails AA for anything under 18.66px bold. The finding act is the
+     first thing on screen and the first thing on camera, so the accusation has
+     to be legible there or it is decoration.
+     Same hue (4.1 degrees) and same saturation, lifted only as far as it takes
+     to pass: 4.59:1. It is not a second red, it is this red surviving a dark
+     background, and it may be used nowhere else. */
+  --hazard-on-dark: #E6483D;
+
   /* Withheld. Black is not a shade here, it is a verdict. */
   /* The hero ground is graphite, NOT black, and the distance between them is
      the whole point. #000000 is reserved as a signal: it is what the page turns

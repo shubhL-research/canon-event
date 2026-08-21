@@ -1452,7 +1452,10 @@ body { overflow-x: clip; max-width: 100%; }
   color: #C9CDD1; border-left: 3px solid var(--hazard);
   padding: 12px 0 12px 18px;
 }
-.found-anyway b { color: var(--hazard); }
+/* --hazard measures 3.70:1 on the graphite hero and this text is 15px bold,
+   which needs 4.5:1. The dark-ground variant is the same hue at the minimum
+   lift that passes. This is the loudest phrase on the first screen. */
+.found-anyway b { color: var(--hazard-on-dark); }
 .found-anyway a {
   color: var(--ink-inv); text-decoration: underline; text-underline-offset: 3px;
   text-decoration-thickness: 1px;
