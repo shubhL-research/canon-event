@@ -982,6 +982,69 @@
     var unseen = unreported ? "not estimable" : "≥ " + Math.round(rc.missed_floor);
     var recallNote = unreported ? rc.reportable_note : rc.note;
 
+    /* THE MATCHER PROOF, both halves.
+
+       This sweep's headline is a ZERO, and a zero has two possible causes: the
+       products are not there, or the matcher never fires. The wall used to
+       publish only the adversarial half, which proves the matcher does not
+       OVER-fire. That is the wrong half to show on its own. It answers an
+       attack nobody was making and leaves the one question a zero actually
+       raises completely open.
+
+       Both sets have existed and passed since they were written. control.json
+       was produced on every single run and read by nobody, because publish.py
+       had an adversarial() reader and no controls() reader. So the strongest
+       available answer to "is your zero real" sat on disk, unpublished.
+
+       Rendered as a pair, deliberately, because neither half means anything
+       alone: a matcher that discards everything passes the adversarial set
+       perfectly, and a matcher that reddens everything passes the controls
+       perfectly. Only both together say the zero describes the market. */
+    var ctl = s.positive_control_set, adv = s.adversarial_precision_set;
+    var proof = "";
+    if (ctl || adv) {
+      var card = function (title, ok, okText, badText, n, unit, note) {
+        return '<div class="mp-card' + (ok ? "" : " is-broken") + '">' +
+          '<div class="mp-head"><span class="mp-title">' + esc(title) + "</span>" +
+            '<span class="mp-state">' + (ok ? "HOLDS" : "BROKEN") + "</span></div>" +
+          '<div class="mp-count">' + n + " <span>" + esc(unit) + "</span></div>" +
+          '<div class="mp-result">' + esc(ok ? okText : badText) + "</div>" +
+          '<p class="mp-note">' + esc(note) + "</p>" +
+        "</div>";
+      };
+      var cards = "";
+      if (ctl) {
+        cards += card("Does it fire at all?", ctl.all_red,
+          "All " + ctl.n + " reached RED.",
+          "A CONTROL FELL OUT OF RED. This is a recall bug and blocks the freeze.",
+          ctl.n, "planted must-RED controls", ctl.note);
+      }
+      if (adv) {
+        cards += card("Does it fire at nothing?", adv.all_discarded,
+          "All " + adv.n + " were discarded.",
+          "A NEAR-MISS REACHED RED. This is a precision bug and blocks the freeze.",
+          adv.n, "deliberate near-misses", adv.note);
+      }
+      var bothHold = (!ctl || ctl.all_red) && (!adv || adv.all_discarded);
+      proof =
+        '<div class="mp">' +
+          "<h3>Before you believe the zero</h3>" +
+          '<p class="lede">A sweep that finds nothing has two possible ' +
+            "explanations, and they look identical from the outside: the " +
+            "products are not on sale, or the matcher never fires. These two " +
+            "sets separate them, and the wall is worth nothing without both.</p>" +
+          '<div class="mp-grid">' + cards + "</div>" +
+          '<p class="mp-close">' + esc(bothHold
+            ? "Both hold. The matcher accepts what it should and refuses what it "
+              + "should, so the zero is a statement about the three marketplaces "
+              + "we swept rather than about our own code. It is still only a "
+              + "statement about those three: Act 06 is what happened when we "
+              + "looked somewhere else."
+            : "One of these is broken, so no verdict on this page should be "
+              + "read as a measurement until it is fixed.") + "</p>" +
+        "</div>";
+    }
+
     el("notSeen").innerHTML =
       "<h2>What we did not see</h2>" +
       '<p class="lede">A dashboard that only shows what it found is a dashboard that lies. ' +
@@ -992,10 +1055,7 @@
         "<dt>Listings we estimate we never saw at all</dt><dd>" + unseen + "</dd>" +
       "</dl>" +
       '<p class="lede" style="margin-top:16px">' + esc(recallNote) + "</p>" +
-      '<p class="lede">Adversarial precision set: ' + s.adversarial_precision_set.n +
-      " deliberate near-misses fed to the matcher, " +
-      (s.adversarial_precision_set.all_discarded ? "all discarded" : "ONE REACHED RED") + ". " +
-      esc(s.adversarial_precision_set.note) + "</p>";
+      proof;
   }
 
   /* The prompt budgeter is deterministic and hard-capped. Fixed priority order:
