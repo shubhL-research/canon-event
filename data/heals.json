@@ -14,8 +14,9 @@
       "resolved": "2026-08-19 11:58 UTC",
       "outcome_detail": "REJECTED at the approval gate",
       "production": "unchanged",
+      "refused_because": "the repair fixed the reported timeout and broke two fields it was never asked about: ean returned a Danish review rating and brand returned the storefront link",
       "error_code": "wait_element_timeout",
-      "refused_because": "canary found **The reported fault was genuinely fixed."
+      "message": "waiting for selector \".s-main-slot\" failed:"
     },
     {
       "file": "heals/2026-08-19-de-002.md",
@@ -40,8 +41,8 @@
       "resolved": "2026-08-19 13:29 UTC",
       "outcome_detail": "REJECTED at the approval gate",
       "production": "unchanged",
-      "note": "the diagnosed break was our own query bug. See the",
-      "refused_because": "canary found The proposed template no longer times out."
+      "refused_because": "the proposed template stopped timing out and returned rows with every field the RED gate needs missing, so no row from it could ever re-assert an identifier",
+      "note": "the diagnosed break was our own query bug. See the"
     },
     {
       "file": "heals/2026-08-20-us-002.md",
@@ -53,7 +54,8 @@
       "raised": "2026-08-20 15:41 UTC",
       "resolved": "2026-08-20 16:04 UTC",
       "outcome_detail": "REJECTED at the approval gate",
-      "production": "unchanged, verified after the refusal"
+      "production": "unchanged, verified after the refusal",
+      "refused_because": "the draft was run at version=dev rather than trusted from its preview, and it returned 240 rows carrying only input and product_page_url: it did not add the attestation, it removed the extraction"
     },
     {
       "file": "heals/2026-08-20-us-003-and-the-pattern.md",
@@ -66,6 +68,7 @@
       "resolved": "2026-08-20 18:47 UTC",
       "outcome_detail": "REJECTED at the approval gate",
       "production": "unchanged, verified after the refusal",
+      "refused_because": "asked to add one field it dropped eleven, the third time in a row a repair widened past what it was asked for, which is what stopped the attempts",
       "decision": "stop. Three attempts is enough to call it."
     }
   ],
@@ -82,8 +85,9 @@
         "resolved": "2026-08-19 11:58 UTC",
         "outcome_detail": "REJECTED at the approval gate",
         "production": "unchanged",
+        "refused_because": "the repair fixed the reported timeout and broke two fields it was never asked about: ean returned a Danish review rating and brand returned the storefront link",
         "error_code": "wait_element_timeout",
-        "refused_because": "canary found **The reported fault was genuinely fixed."
+        "message": "waiting for selector \".s-main-slot\" failed:"
       },
       {
         "file": "heals/2026-08-19-de-002.md",
@@ -110,8 +114,8 @@
         "resolved": "2026-08-19 13:29 UTC",
         "outcome_detail": "REJECTED at the approval gate",
         "production": "unchanged",
-        "note": "the diagnosed break was our own query bug. See the",
-        "refused_because": "canary found The proposed template no longer times out."
+        "refused_because": "the proposed template stopped timing out and returned rows with every field the RED gate needs missing, so no row from it could ever re-assert an identifier",
+        "note": "the diagnosed break was our own query bug. See the"
       },
       {
         "file": "heals/2026-08-20-us-002.md",
@@ -123,7 +127,8 @@
         "raised": "2026-08-20 15:41 UTC",
         "resolved": "2026-08-20 16:04 UTC",
         "outcome_detail": "REJECTED at the approval gate",
-        "production": "unchanged, verified after the refusal"
+        "production": "unchanged, verified after the refusal",
+        "refused_because": "the draft was run at version=dev rather than trusted from its preview, and it returned 240 rows carrying only input and product_page_url: it did not add the attestation, it removed the extraction"
       },
       {
         "file": "heals/2026-08-20-us-003-and-the-pattern.md",
@@ -136,9 +141,10 @@
         "resolved": "2026-08-20 18:47 UTC",
         "outcome_detail": "REJECTED at the approval gate",
         "production": "unchanged, verified after the refusal",
+        "refused_because": "asked to add one field it dropped eleven, the third time in a row a repair widened past what it was asked for, which is what stopped the attempts",
         "decision": "stop. Three attempts is enough to call it."
       }
     ]
   },
-  "note": "Every heal here was run against a live collector through Scraper Studio's refactor_template flow. Two were refused by the canary gate: the repair worked and the gate rejected it anyway, because a fix that passes the reported fault can still break a field it was never asked about. There is no rollback endpoint, so verification sits before promotion rather than after it."
+  "note": "Every heal here was run against a live collector through Scraper Studio's refactor_template flow. 4 of 5 were refused at the canary gate, for two different reasons that are worth keeping apart: two repairs fixed the fault they were asked about and broke a field they were not, and two widened past the request and stripped the extraction entirely. There is no rollback endpoint, so verification sits before promotion rather than after it, and a draft is run at version=dev rather than trusted from its preview."
 }

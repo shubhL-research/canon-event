@@ -894,6 +894,18 @@
     if (!h || !h.findings || !h.findings.length) { node.innerHTML = ""; return; }
 
     var reds = h.findings.filter(function (f) { return f.published_verdict === "RED"; }).length;
+    /* The listings total is SUMMED from the arms, never typed.
+
+       It was typed once, as "23,655 listings", and DE went from 1,037 to 2,061
+       on the next sweep while the sentence stayed put. The arms carry the parts,
+       so a reader who adds the table gets the same figure the prose claims, and
+       there is no second place for it to go stale. */
+    var adjudicated = (doc.arms || []).reduce(function (t, a) {
+      var n = a.job && a.job.listings;
+      return typeof n === "number" ? t + n : t;
+    }, 0);
+
+
 
     var items = h.findings.map(function (f) {
       var red = f.published_verdict === "RED";
@@ -949,7 +961,11 @@
     node.innerHTML =
       '<h2 class="act-head"><span class="act-num">06</span> ' +
         "What three marketplaces could not see</h2>" +
-      '<p class="act-lede">' + esc(h._why_it_exists || "") + "</p>" +
+      '<p class="act-lede">' + (adjudicated
+        ? "The three arms adjudicated " + commas(adjudicated) + " listings across " +
+          doc.rows.length + " notices and reached zero RED. " +
+          esc(h._why_it_exists || "").replace(/^The three arms[^:]*: /, "")
+        : esc(h._why_it_exists || "")) + "</p>" +
       '<p class="hunt-banner"><b>These are not sweep results.</b> ' +
         "Every row below was fetched by hand, one URL at a time, from a market " +
         "no collector arm covers. They are adjudicated by the same classifier " +

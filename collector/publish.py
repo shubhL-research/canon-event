@@ -191,8 +191,18 @@ def still_buyable(rows, arms=None):
     stat = proportion(n, len(scored), "still buyable")
     stat["contaminated"] = withheld
     if partial and not withheld:
-        stat["partial"] = ("One collector is degraded, so this is a floor: a "
-                           "listing it failed to match could still exist.")
+        # Counted, not asserted. This sentence sits directly under the headline
+        # figure and said "One collector is degraded" while all three were, which
+        # is a caveat SMALLER than the truth. Understating your own impairment
+        # under your own headline is the same class of failure as overstating a
+        # finding, and it is the one a hostile reader checks first, because the
+        # arm rail three screens down contradicts it in one glance.
+        bad = sum(1 for v in states if v in ("DEGRADED", "STALE"))
+        total_arms = len(states)
+        stat["partial"] = (
+            "%s of %s collectors %s degraded, so this is a floor: a listing they "
+            "failed to match could still exist." %
+            (bad, total_arms, "is" if bad == 1 else "are"))
     return stat
 
 

@@ -18,6 +18,9 @@ echo
 echo "== identifier extractor =="
 python3 extract/test_identifier.py
 echo
+echo "== source bytes: no collapsed escapes =="
+python3 check_sources.py
+echo
 echo "== collector normalizer =="
 python3 collector/test_normalize.py
 echo

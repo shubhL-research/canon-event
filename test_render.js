@@ -104,10 +104,30 @@ console.log("wall renderer smoke test\n");
    which are exactly the states the demo films. A word retracted in one file and
    left in another is not retracted. */
 {
-  for (const f of ["wall.html", "wall.js", "wall.css", "data/fixtures.js"]) {
-    const txt = fs.readFileSync(path.join(ROOT, f), "utf8");
-    const hit = /residential/i.test(txt) && !/not residential|no longer|retracted/i.test(txt);
-    check(!hit, `"residential" is retracted and must not appear in ${f}`);
+  /* Line-scoped, not file-scoped. A whole-file exemption meant one sentence
+     explaining the retraction licensed every other use of the word in the same
+     file, which is how it survived in the fixtures. This flags an AFFIRMATIVE
+     use and allows the retraction itself to be written down, which the project
+     needs to do in several places. */
+  /* Match the CLAIM, not the word. The project has to be able to write the
+     retraction down, define what a residential exit would be, and tell the
+     presenter not to say it, all of which contain the word. What it may never
+     do again is assert that its own traffic came from one, and that assertion
+     has a shape: a preposition in front of it. "from residential exit IPs" is
+     the sentence that was published and withdrawn. "A residential exit names a
+     carrier" is the sentence that withdraws it. */
+  const RETRACTED = /\b(from|via|using|through|on|over)\s+residential\b/i;
+  const ALLOWED = /not residential|no longer|retracted|rather than|withdrew|withdrawn|do not narrate|NOT prove/i;
+  for (const f of ["wall.html", "wall.js", "wall.css", "data/fixtures.js",
+                   "index.html", "README.md", "SCRAPER-STUDIO.md", "DEMO.md"]) {
+    const full = path.join(ROOT, f);
+    if (!fs.existsSync(full)) continue;
+    const bad = fs.readFileSync(full, "utf8").split("\n")
+      .map((line, i) => ({ line, n: i + 1 }))
+      .filter((x) => RETRACTED.test(x.line) && !ALLOWED.test(x.line));
+    check(bad.length === 0,
+          '"residential" is retracted and must not be asserted in ' + f +
+          (bad.length ? " (line " + bad[0].n + ")" : ""));
   }
 }
 
@@ -130,7 +150,7 @@ console.log("wall renderer smoke test\n");
   check(/\.act-finding\.is-withheld[^{]*\{[^}]*border-top:[^;]*var\(--hazard\)/.test(css),
         "the withheld hero carries a hazard rule, so it survives greyscale");
   const html = fs.readFileSync(path.join(ROOT, "wall.html"), "utf8");
-  check(!/\.verdict\.is-withheld/.test(css) || /class="[^"]*verdict/.test(html),
+  check(!/\.verdict\.is-withheld/.test(css) || /class="[^"]*\bverdict\b/.test(html),
         "no withheld styling points at a class the markup no longer emits");
 }
 

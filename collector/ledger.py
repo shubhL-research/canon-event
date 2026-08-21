@@ -63,19 +63,29 @@ def parse(path):
     # parsed verdict silently overwrote every outcome with a sentence, and the
     # counts then read zero refused and zero approved against three real heals.
     # The verdict comes from the title and nothing else may write to it.
-    for line in lines[1:14]:
+    for line in lines[1:16]:
         f = FIELD.match(line)
         if f:
             key = f.group(1).strip().lower().replace(" ", "_")
             if key == "outcome":
                 key = "outcome_detail"
-            entry[key] = f.group(2).strip().split("  ")[0].split(" (")[0].strip()
+            val = f.group(2).strip()
+            if key != "refused_because":
+                # Short machine facts carry trailing parentheticals and aligned
+                # columns; a prose reason is one field holding one sentence and
+                # must not be cut at its first double space or bracket.
+                val = val.split("  ")[0].split(" (")[0].strip()
+            entry[key] = val
 
-    # The canary that refused it is the whole point of a refusal, so find the
-    # sentence naming it rather than making the reader open the file.
-    refused = re.search(r"(?:canary|check digit|did not re-?assert)[^.]*\.", text, re.I)
-    if refused and entry["outcome"] == "REFUSED":
-        entry["refused_because"] = " ".join(refused.group(0).split())[:220]
+    if entry["outcome"] == "REFUSED" and not entry.get("refused_because"):
+        raise ValueError(
+            "%s is REFUSED and carries no `refused_because` field. The reason a "
+            "heal was refused is the whole point of recording it, and it is not "
+            "something to infer from the prose: the regex that used to do so "
+            "matched the heading 'What the canary found' running into the line "
+            "below it, so every refusal card on the wall printed the sentence "
+            "saying the fix WORKED as the reason it was rejected. State it in "
+            "the indented block." % entry.get("file", "this ledger"))
 
     return entry
 
@@ -102,18 +112,29 @@ def by_arm(entries):
 
 
 def summary(entries):
+    # The counts are computed and the note is built FROM them. It used to say
+    # "Two were refused" in prose directly under a computed heading that said
+    # four, in the one section built to answer the self-healing criterion. A
+    # hand-typed count beside a derived one is a contradiction with a timer on
+    # it: every heal added moves one number and not the other.
+    refused = sum(1 for e in entries if e["outcome"] == "REFUSED")
+    approved = sum(1 for e in entries if e["outcome"] == "APPROVED")
     return {
         "total": len(entries),
-        "refused": sum(1 for e in entries if e["outcome"] == "REFUSED"),
-        "approved": sum(1 for e in entries if e["outcome"] == "APPROVED"),
+        "refused": refused,
+        "approved": approved,
         "entries": entries,
         "by_arm": by_arm(entries),
-        "note": ("Every heal here was run against a live collector through Scraper "
-                 "Studio's refactor_template flow. Two were refused by the canary "
-                 "gate: the repair worked and the gate rejected it anyway, because "
-                 "a fix that passes the reported fault can still break a field it "
-                 "was never asked about. There is no rollback endpoint, so "
-                 "verification sits before promotion rather than after it."),
+        "note": (
+            "Every heal here was run against a live collector through Scraper "
+            "Studio's refactor_template flow. %d of %d %s refused at the canary "
+            "gate, for two different reasons that are worth keeping apart: two "
+            "repairs fixed the fault they were asked about and broke a field they "
+            "were not, and two widened past the request and stripped the "
+            "extraction entirely. There is no rollback endpoint, so verification "
+            "sits before promotion rather than after it, and a draft is run at "
+            "version=dev rather than trusted from its preview."
+            % (refused, len(entries), "was" if refused == 1 else "were")),
     }
 
 

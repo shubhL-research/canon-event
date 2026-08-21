@@ -5,6 +5,7 @@
     resolved    2026-08-20 18:47 UTC
     outcome     REJECTED at the approval gate
     production  unchanged, verified after the refusal
+    refused_because  asked to add one field it dropped eleven, the third time in a row a repair widened past what it was asked for, which is what stopped the attempts
     decision    stop. Three attempts is enough to call it.
 
 ## The attempt
