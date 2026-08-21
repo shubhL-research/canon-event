@@ -162,6 +162,15 @@
       "found on sale again from an exit measured in that country.</p>";
   }
 
+  /* Summed from the arms, never typed. Used in two places now, and the first
+     time a total was written by hand it went stale within a day. */
+  function adjudicatedTotal(doc) {
+    return (doc.arms || []).reduce(function (t, a) {
+      var n = a.job && a.job.listings;
+      return typeof n === "number" ? t + n : t;
+    }, 0);
+  }
+
   function renderVerdict(doc) {
     var node = el("verdict");
     var withheld = doc.arms.filter(function (a) { return a.state === "WITHHELD"; });
@@ -193,11 +202,42 @@
         "<h1>" + heroSentence(hero.sentence) + "</h1>" +
         heroSub(hero, doc) +
         '<p class="clause">' + doc.stats.arms_measured.n + " of " +
-        doc.stats.arms_measured.d + " countries measured.</p>";
+        doc.stats.arms_measured.d + " countries measured" +
+        (adjudicatedTotal(doc)
+          ? ", and every one of them fell short of our own bound rather than " +
+            "returning nothing: " + commas(adjudicatedTotal(doc)) +
+            " listings were adjudicated across the three."
+          : ".") + "</p>";
     }
 
     node.className = "act act-finding" + (blackout || withheld.length ? " is-withheld" : "");
-    node.innerHTML = '<div class="finding-inner">' + body + "</div>" +
+    /* THE ONE THING THE FIRST SCREEN MUST NOT BURY.
+
+       A judge reading the hero learns that the sweep found nothing, and then
+       scrolls or does not. The confirmed RED is six acts down, and without this
+       the whole takeaway is "they swept three marketplaces and found nothing",
+       which is both the least interesting reading and the one the page was
+       handing out for free.
+
+       It is drawn only when a hunt row is actually published RED, it says out
+       loud that it came from outside the sweep, and it links rather than
+       claiming, so nothing here can be mistaken for a sweep result. If the hunt
+       ever has no RED, this line does not exist. */
+    var hunted = ((doc.hunt || {}).findings || []).filter(function (f) {
+      return f.published_verdict === "RED";
+    });
+    var lead = "";
+    if (hunted.length && !blackout) {
+      lead = '<p class="found-anyway">' +
+        "<b>" + (hunted.length === 1 ? "We found one anyway." : "We found " +
+          hunted.length + " anyway.") + "</b> " +
+        esc(hunted[0].product) + ", recalled because " +
+        esc(String(hunted[0].hazard).replace(/\.$/, "").toLowerCase()) +
+        ", on sale by hand-search in a market no arm of this sweep covers. " +
+        '<a href="#hunt">The evidence is in act 06 &darr;</a></p>';
+    }
+
+    node.innerHTML = '<div class="finding-inner">' + body + lead + "</div>" +
       '<p class="scroll-cue">What the sweep found</p>';
   }
 
@@ -1282,12 +1322,61 @@
        on the next sweep while the sentence stayed put. The arms carry the parts,
        so a reader who adds the table gets the same figure the prose claims, and
        there is no second place for it to go stale. */
-    var adjudicated = (doc.arms || []).reduce(function (t, a) {
-      var n = a.job && a.job.listings;
-      return typeof n === "number" ? t + n : t;
-    }, 0);
+    var adjudicated = adjudicatedTotal(doc);
 
 
+
+    /* THE CROSS-REFERENCE, which is what makes this act evidence rather than
+       an anecdote.
+
+       Every hunt finding is looked up in the sweep's own rows by authority and
+       reference. It is computed here rather than written down, because a
+       hardcoded claim about our own data is the thing that goes stale first, and
+       if a future sweep ever DOES find one of these the sentence has to change
+       by itself.
+
+       What it shows: all four notices were in the corpus, all four were searched
+       in all three arms, and all four came back NOT_FOUND everywhere. The Acer
+       scooter has a row in the ledger higher up this page marked NOT_FOUND in
+       three countries, and it was on sale the entire time. That is not a
+       different story from the sweep. It IS the sweep, seen from outside. */
+    var byRef = {};
+    (doc.rows || []).forEach(function (r) {
+      if (r.source) byRef[r.source.authority + " " + r.source.ref] = r;
+    });
+    function swept(f) { return byRef[f.authority + " " + f.ref] || null; }
+
+    function xref(f) {
+      var r = swept(f);
+      if (!r) {
+        return '<div class="xref is-absent">Not in the swept corpus, so the ' +
+          "sweep never had a chance at this one.</div>";
+      }
+      var arms = r.arms || {};
+      var codes = Object.keys(arms);
+      var notFound = codes.filter(function (c) { return arms[c] === "NOT_FOUND"; });
+      var found = codes.filter(function (c) { return arms[c] === "RED"; });
+      if (found.length) {
+        return '<div class="xref">Our sweep found this too, in ' +
+          esc(found.join(", ")) + ".</div>";
+      }
+      return '<div class="xref">Our own sweep searched for this in ' +
+        codes.length + " marketplace" + (codes.length === 1 ? "" : "s") +
+        " and returned NOT_FOUND in " + (notFound.length === codes.length
+          ? "every one" : esc(notFound.join(", "))) +
+        ". It is row " + r.rank + " in the ledger above, tier " + esc(r.tier) +
+        ", and it was on sale while we recorded that.</div>";
+    }
+
+    var inCorpus = h.findings.filter(swept).length;
+    var allBlind = h.findings.filter(function (f) {
+      var r = swept(f);
+      if (!r) return false;
+      var arms = r.arms || {};
+      return Object.keys(arms).length > 0 && Object.keys(arms).every(function (c) {
+        return arms[c] !== "RED";
+      });
+    }).length;
 
     var items = h.findings.map(function (f) {
       var red = f.published_verdict === "RED";
@@ -1348,7 +1437,7 @@
         "</div>" +
         '<p class="hunt-hazard">' + esc(f.hazard) + "</p>" +
         '<dl class="hunt-facts">' + dl + "</dl>" +
-        caveat + ev +
+        xref(f) + caveat + ev +
       "</article>";
     }).join("");
 
@@ -1368,6 +1457,12 @@
         esc(String(doc.stats.survival.n)) + " of " +
         esc(String(doc.stats.survival.d)) + ", because that figure describes " +
         "the three arms and these rows are not from the three arms.</p>" +
+      (inCorpus ? '<p class="hunt-xref-lede"><b>' + allBlind + " of these " +
+        inCorpus + " were searched by our own sweep, in every arm, and came back " +
+        "NOT_FOUND.</b> They are not a different story from the zero above. They " +
+        "are that zero, seen from outside: the same notices, the same " +
+        "identifiers, the same matcher, looking in three marketplaces that did " +
+        "not have them while a fourth did.</p>" : "") +
       '<div class="hunt-list">' + items + "</div>" +
       '<p class="hunt-close">' +
         (reds ? "" : "") +

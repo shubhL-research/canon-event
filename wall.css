@@ -1409,3 +1409,30 @@ body { overflow-x: clip; max-width: 100%; }
   font-size: 13px; line-height: 1.6; color: var(--ink); font-weight: 700;
   border-top: 1px solid var(--rule-strong); padding-top: 14px;
 }
+
+/* The cross-reference into the sweep's own ledger. Not styled as a caveat and
+   not styled as an accusation: it is the join between the two halves of the
+   page, so it reads as a fact with a rule under it. */
+.hunt-xref-lede { margin: 22px 0 0; max-width: 72ch; font-size: 15px; line-height: 1.6; color: var(--ink-2); }
+.hunt-xref-lede b { color: var(--ink); }
+.xref {
+  margin-top: 14px; padding: 10px 14px; background: var(--paper-hero);
+  border-left: 2px solid var(--ink); font-size: 13px; line-height: 1.5;
+  color: var(--ink); max-width: 74ch;
+}
+.xref.is-absent { border-left-color: var(--unknown); color: var(--ink-2); }
+
+/* The one line on the first screen that is not about the sweep.
+   Set apart by a hazard rule because it IS the accusation, and marked in its own
+   words as coming from outside the sweep, so the separation the whole act rests
+   on survives being quoted out of context on the very first screen. */
+.found-anyway {
+  margin: 32px 0 0; max-width: 62ch; font-size: 15px; line-height: 1.6;
+  color: var(--ink-2); border-left: 3px solid var(--hazard);
+  padding: 12px 0 12px 18px;
+}
+.found-anyway b { color: var(--hazard-deep); }
+.found-anyway a { color: var(--ink); text-decoration: underline; text-underline-offset: 2px; }
+.act-finding.is-withheld .found-anyway { color: var(--void-ink); border-left-color: var(--void-ink); }
+.act-finding.is-withheld .found-anyway b,
+.act-finding.is-withheld .found-anyway a { color: var(--void-ink); }
