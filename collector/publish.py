@@ -451,8 +451,19 @@ def arithmetic(seeds, reports):
         # replay. Printing "submitted as 0 batch jobs" beside a real load count
         # reads as a collector that ran nothing, so the clause is omitted rather
         # than printed as a zero we do not actually know.
-        "working": (("%d searchable of %d notices x 2 queries x %d arms = %d "
-                     "search loads" % (searchable_seeds, len(seeds), arms, planned))
+        # STATE THE DERIVATION THAT HOLDS, not one that reads well.
+        #
+        # This asserted "180 searchable x 2 queries x 3 arms = 1107". That product
+        # is 1080. The right-hand side was never computed from the left: `planned`
+        # is summed from the per-arm plans, which issue 369 unique URLs each. The
+        # 27 gap happens to equal the unsearchable count, so a reader who
+        # multiplied concluded we had queried the notices we say we never
+        # submitted. A cost figure nobody can re-derive is the thing this block
+        # exists to prevent.
+        "working": (("%d unique URLs planned per arm x %d arms = %d search loads, "
+                     "from %d searchable of %d notices"
+                     % (planned // arms if arms else planned, arms, planned,
+                        searchable_seeds, len(seeds)))
                     + ((", submitted as %d batch jobs."
                         % sum(r.get("batches", 0) for r in reports))
                        if sum(r.get("batches", 0) for r in reports) else ".")),

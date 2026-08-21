@@ -548,6 +548,17 @@ def _stub(seed):
         "source": {"authority": seed["authority"], "ref": seed["ref"],
                    "published": seed["published"], "url": seed["url"]},
         "days": seed["days"], "days_frozen": False, "tier": "DISCARDED",
+        # The identifier has to survive onto the stub or the docstring above is a
+        # lie. still_buyable() and observations_from_rows() both decide
+        # searchability by looking for these two keys, so a stub that omits them
+        # is silently removed from the denominator it says it belongs in.
+        #
+        # It removed 60 of 180 searchable notices: exactly the ones where no arm
+        # returned a candidate, which is the strongest not-on-sale evidence the
+        # sweep produced. Dropping them shrank the denominator to 120 and made
+        # the published interval WIDER than the data supports.
+        **({"model": seed["model"]} if seed.get("model") else {}),
+        **({"gtin": seed["gtin"]} if seed.get("gtin") else {}),
     }
 
 

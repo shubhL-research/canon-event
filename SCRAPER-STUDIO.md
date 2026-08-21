@@ -58,14 +58,18 @@ separable.
 
 ## What the platform actually did
 
-Full corpus, three arms, one sweep:
+Full corpus, three arms, one sweep. The load count is the plan the collectors
+issued, not a multiplication: 180 of the 207 notices carry a searchable
+identifier, and planning them produces 369 unique URLs per arm rather than a
+clean 360, because a notice can yield more than two distinct queries.
 
 ```
-207 notices x 2 query strategies x 3 arms   =  1,107 search page loads
-listings adjudicated                        =  23,771
+369 unique URLs planned per arm x 3 arms  =   1,107 search page loads
 US amazon.com    14,632 listings,  95 of 207 notices joined
 DE kaufland.de    1,037 listings,  59 of 207 notices joined
-IN flipkart.com   7,986 listings,  55 of 207 notices joined
+IN flipkart.com    7,986 listings,  55 of 207 notices joined
+                 ------                                    
+listings adjudicated                          23,655
 ```
 
 Stage one runs on the Code worker over search HTML, which is cheap and returns

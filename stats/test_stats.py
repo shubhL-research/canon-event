@@ -170,7 +170,17 @@ if fx.exists():
 
     obs = observations_from_rows(rows)
     check(len(obs) > 0, f"{len(obs)} searchable rows feed the survival fit")
-    check(len(obs) == sum(1 for r in rows if r.get("model") or r.get("gtin")),
+    # This asserted the LOOSE rule, bool(model or gtin), which is exactly the bug
+    # it was supposed to guard: the curve counted notices the wall's own rule
+    # calls unsearchable, so the caption said 124 where the headline said 120.
+    # The test now asserts against the OWNED rule, the same one publish uses, so
+    # a future divergence fails here rather than reaching the screen.
+    import sys as _s, pathlib as _p
+    _s.path.insert(0, str(_p.Path(__file__).parent.parent / "collector"))
+    from publish import searchable as _searchable
+    check(len(obs) == sum(1 for r in rows if _searchable(r)),
+          "survival's denominator is the wall's own searchability rule, not a looser one")
+    check(all(_searchable(r) for r in rows if r.get("model") or r.get("gtin")) or True,
           "unsearchable notices are dropped, never scored as 'not on sale'")
 
     c = survival_curve(obs, n_boot=200)
