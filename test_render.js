@@ -608,6 +608,30 @@ if (fs.existsSync(LIVE)) {
   console.log("");
 }
 
+/* THE BLACKOUT MUST NOT CLAIM MORE REDACTION THAN IT PERFORMS.
+
+   It said "Every figure on this page is withheld" while the unsearchable figure
+   published its value and interval four inches below, correctly: that figure is
+   computed from the regulators' corpus, no collector touches it, and it survives
+   a blackout by construction. The claim was false and it gave away the more
+   interesting fact, which is that this board can go black and still have
+   something true on it. */
+{
+  const bo = run("blackout");
+  console.log("the blackout state");
+  check(!/Every figure on this page is withheld/.test(bo.nodes.verdict.innerHTML),
+        "the blackout does not claim every figure is withheld");
+  check(/survives this|does not is still here/.test(bo.nodes.verdict.innerHTML),
+        "the blackout names the figure that survives it");
+  // The collector-dependent figure really is redacted.
+  check(/is not published|Withheld:/.test(bo.nodes.figures.innerHTML),
+        "the survival figure is redacted in blackout");
+  // And the corpus figure really is still there.
+  check(/name nothing a machine can search for/.test(bo.nodes.figures.innerHTML),
+        "the corpus figure still publishes in blackout");
+  console.log("");
+}
+
 /* A MISTYPED STATE MUST NOT BECOME A FIXTURE.
 
    The resolver read `if (!doc) doc = all.v1`, so ?state=blackut, or any typo, or

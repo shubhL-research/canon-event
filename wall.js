@@ -186,7 +186,19 @@
         '<p class="clause">implausible_cleanliness fired: observed drop ' +
         pct(doc.global_blackout.observed_drop) + " against a " +
         pct(doc.global_blackout.threshold) + " threshold. " +
-        "Every figure on this page is withheld until a sweep corroborates it.</p>";
+        /* NOT "every figure", because one of them is still standing four inches
+           below this sentence and a reader can see it.
+           The unsearchable rate is computed from the regulators' own published
+           corpus. No collector touches it, so no collector failure can
+           contaminate it, and it survives a blackout by construction. Its own
+           caption says "no scraper touches this figure". Claiming everything is
+           withheld while publishing that one is a contradiction a reader meets
+           without scrolling, and it gives away the more interesting fact: this
+           board can go black and still have something true left on it. */
+        "Every figure that depends on a collector is withheld until a sweep " +
+        "corroborates it. The one that does not is still here: the share of " +
+        "notices nobody can search for is computed from the regulators' own " +
+        "corpus, so it survives this.</p>";
     } else if (withheld.length) {
       var a = withheld[0];
       body =
