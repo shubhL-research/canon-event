@@ -539,6 +539,49 @@ if (fs.existsSync(LIVE)) {
   }
 }
 
+/* THE HEADLINE MUST NOT CLAIM MORE THAN THE SWEEP MEASURED.
+
+   The survival figure read "of recalled products we could search for ARE STILL
+   ON SALE TODAY". That is a statement about the world, and act 06 of the same
+   page disproves it: four of those exact notices were found on sale by hand,
+   including the Acer scooter at $379.99 with a live buy control. All four sit
+   inside this denominator and all four are counted as not-found, because that is
+   what the sweep genuinely returned from the three marketplaces it covers.
+
+   The number was never wrong. The sentence was. A zero is a fact about where you
+   looked and becomes a claim about the world only if you let it. */
+if (fs.existsSync(LIVE)) {
+  const out = run("v1", LIVE);
+  const fig = out.nodes.figures.innerHTML;
+  console.log("the survival claim");
+
+  const WORLD_CLAIMS = [
+    /are still on sale today/i,
+    /are not on sale/i,
+    /no recalled products? (are|is) /i,
+  ];
+  for (const re of WORLD_CLAIMS) {
+    check(!re.test(fig),
+          "the survival figure does not claim " + re.source + " about the world");
+  }
+  check(/in the three marketplaces we swept/.test(fig),
+        "the survival figure names the markets it covers");
+
+  // And it must name the rows that contradict it, counted from the payload.
+  const src = fs.readFileSync(LIVE, "utf8");
+  const doc = JSON.parse(src.slice(src.indexOf("{"), src.lastIndexOf(";")));
+  const refs = new Set((doc.hunt?.findings || []).map((f) => f.authority + " " + f.ref));
+  const inDenom = doc.rows.filter((r) => r.source && refs.has(r.source.authority + " " + r.source.ref));
+  if (inDenom.length) {
+    check(fig.includes(inDenom.length + " of these " + doc.stats.survival.d),
+          "the survival basis names the " + inDenom.length +
+          " hand-found rows sitting inside its own denominator");
+    check(/See act 06/.test(fig),
+          "the survival basis points at the act that contradicts it");
+  }
+  console.log("");
+}
+
 /* A MISTYPED STATE MUST NOT BECOME A FIXTURE.
 
    The resolver read `if (!doc) doc = all.v1`, so ?state=blackut, or any typo, or

@@ -247,6 +247,36 @@
      method names are not removed, they move to ACT IV: a reader who does not
      know what a Wilson interval is should still be able to leave with the
      finding, and a reader who does should be able to check it. */
+  /* THE FIGURE USED TO CLAIM SOMETHING THE SAME PAGE DISPROVES.
+
+     It read "of recalled products we could search for ARE STILL ON SALE TODAY",
+     which is a statement about the world. Act 06, six acts further down, shows
+     four of those exact notices on sale: the Acer scooter at $379.99 with a live
+     buy control. All four are inside this denominator of 180 and all four are
+     counted here as not on sale, because that is genuinely what the sweep
+     returned when it looked in the three marketplaces it covers.
+
+     So the number is right and the sentence was wrong. A zero is a fact about
+     where we looked, and it becomes a claim about the world only if you let it.
+     The claim now says which markets it covers, and the basis line names the
+     four rows that contradict it rather than leaving a reader to find the
+     contradiction themselves six screens later.
+
+     The count is computed, not typed, so if a future sweep finds one of them the
+     sentence corrects itself. */
+  var SURVIVAL_CLAIM = "of recalled products we could search for were found on " +
+    "sale in the three marketplaces we swept";
+
+  function huntInDenominator(doc) {
+    var h = (doc.hunt || {}).findings || [];
+    if (!h.length || !doc.rows) return 0;
+    var refs = {};
+    h.forEach(function (f) { refs[f.authority + " " + f.ref] = true; });
+    return doc.rows.filter(function (r) {
+      return r.source && refs[r.source.authority + " " + r.source.ref];
+    }).length;
+  }
+
   function figure(value, claim, basis, cls) {
     return '<div class="figure ' + (cls || "") + '">' +
       '<div class="figure-value">' + value + "</div>" +
@@ -334,7 +364,7 @@
        exactly the number the bar is covering. */
     if (s.survival.contaminated) {
       out.push(figure("",
-        "of recalled products we could search for are still on sale today",
+        SURVIVAL_CLAIM,
         "Withheld: a collector was too broken for this figure to be trustworthy. " +
         "The count exists and is not published.",
         "is-withheld"));
@@ -342,10 +372,16 @@
       out.push(figure(
         '<span class="count" data-to="' + (s.survival.v * 100).toFixed(1) +
           '" data-suffix="%">0</span>',
-        "of recalled products we could search for are still on sale today",
+        SURVIVAL_CLAIM,
         s.survival.n + " of " + s.survival.d + " searchable notices · 95% confidence " +
           pct(s.survival.ci95[0]) + " to " + pct(s.survival.ci95[1]) +
-          (s.survival.partial ? " · " + esc(s.survival.partial) : "")));
+          (s.survival.partial ? " · " + esc(s.survival.partial) : "") +
+          (huntInDenominator(doc)
+            ? " · " + huntInDenominator(doc) + " of these " + s.survival.d +
+              " were later found on sale by hand, in markets no arm covers. " +
+              "They are counted as not-found here because that is what the sweep " +
+              "returned. See act 06."
+            : "")));
     }
 
     /* NEVER CHECKABLE. Computed entirely from the free government corpus, so no
