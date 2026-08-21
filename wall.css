@@ -147,9 +147,16 @@ body {
 .arm.state-NOT_SWEPT .arm-copy { color: var(--ink-3); }
 .arm.state-NOT_SWEPT .arm-state { border-style: dashed; color: var(--ink-3); }
 .arm.state-NOT_SWEPT .arm-attest { border-top-color: var(--rule-strong); }
-.arm.state-STALE { background: repeating-linear-gradient(45deg,
+/* The hatch is added by is-stale as well as by state-STALE, because staleness
+   is decided in the browser at render time while the arm state was decided at
+   sweep time. They are different facts and an arm can be both: DEGRADED because
+   its join coverage fell short, AND stale because a judge is reading it two days
+   later. The class is added on top of the state, never in place of it, so the
+   card keeps saying why it degraded. */
+.arm.state-STALE, .arm.is-stale { background: repeating-linear-gradient(45deg,
   var(--surface), var(--surface) 2px, var(--hatch) 2px, var(--hatch) 4px); }
-.arm.state-STALE .arm-copy, .arm.state-STALE .arm-attest { color: var(--ink-3); }
+.arm.state-STALE .arm-copy, .arm.state-STALE .arm-attest,
+.arm.is-stale .arm-copy, .arm.is-stale .arm-attest { color: var(--ink-3); }
 
 .coverage { height: 4px; background: var(--surface-sunk); }
 .coverage > i { display: block; height: 100%; background: var(--hazard); }

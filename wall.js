@@ -59,6 +59,47 @@
     return clock + " · " + rel;
   }
 
+
+  /* Freshness has to be decided at RENDER time, and it never was.
+
+     collector/health.py computes age as (now - swept_at) where now IS the moment
+     of publishing, so the age is always about zero and the freshness detector
+     reported fired:false in every payload ever written. That is a category
+     error: a freshness check that runs at publish time asks whether the data was
+     fresh when it was written, which it always was.
+
+     The question the page needs answered is whether the data is fresh WHEN
+     SOMEONE IS LOOKING AT IT, and only the browser can answer that. Judging
+     happens days after a sweep. The footer legend already promises hatched rows
+     and frozen day counters past a four-hour bound, and without this the page
+     serves a three-day-old capture as current while printing the bound that
+     contradicts it, directly beside a detector card reading "quiet".
+
+     This makes the wall look MORE degraded on judging day, not less, which is
+     the correct direction: the project's thesis executing on its own page with
+     nobody in the loop. */
+  function ageS(doc) {
+    var t = Date.parse(doc.swept_at);
+    if (isNaN(t)) return null;
+    var d = Math.floor((Date.now() - t) / 1000);
+    // A fixture can carry a swept_at in the future. That is not staleness, and
+    // freshness() already refuses to call it "ago" for the same reason.
+    return d < 0 ? null : d;
+  }
+
+  function isStale(doc) {
+    var a = ageS(doc);
+    return a !== null && typeof doc.freshness_bound_s === "number" &&
+           a > doc.freshness_bound_s;
+  }
+
+  function ageWords(s) {
+    if (s === null) return "an unknown age";
+    var h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60);
+    if (h >= 24) return Math.floor(h / 24) + "d " + (h % 24) + "h";
+    return h + "h " + m + "m";
+  }
+
   // ------------------------------------------------------------ MISSING path
 
   /* Bright Data omits absent keys rather than nulling them. A missing key is not
@@ -320,6 +361,28 @@
             : commas(listings) + " listings adjudicated from " + j.inputs + " inputs. ") +
           j.fails + " fails.";
       case "DEGRADED":
+        /* Two different faults land in this state and they are not the same
+           story. fail_rate_above_bound means the inputs came back empty.
+           join_key_coverage_below_bound means they came back FULL of listings
+           that matched nothing. Printing the first sentence over the second gave
+           "0 of 207 inputs returned no row" on three arms carrying 24,679
+           adjudicated listings between them: a clean sentence over a degraded
+           collector, which is the one thing this page may never print. The
+           reason is in the payload, so it decides which sentence is true. */
+        /* Guarded on the field itself, not on the reason. A fixture arm can
+           carry the reason without the counts, and a sentence built from a
+           missing number reads "only undefined of undefined notices", which
+           is worse than the sentence it replaced. */
+        if (a.reason === "join_key_coverage_below_bound" &&
+            typeof j.joined === "number" && typeof j.inputs === "number" &&
+            typeof j.fails === "number" && j.inputs) {
+          return "Partial. " + (listings === null ? "This arm" : commas(listings) +
+            " listings were") + " returned and adjudicated, but only " + j.joined +
+            " of " + j.inputs + " notices matched one, which is " +
+            pct(j.joined / j.inputs) + " against an 80% bound. The shortfall is " +
+            "notices nothing matched, not inputs that failed: " + j.fails +
+            " inputs failed. Rows are shown and counts carry a partial stamp.";
+        }
         return "Partial. " + j.fails + " of " + j.inputs + " inputs returned no row and no " +
           "archived empty-result page. Rows from this arm are shown. Counts carry a partial stamp.";
       case "WITHHELD":
@@ -341,14 +404,26 @@
     }
   }
 
-  /* The coverage bar is what the arm brought back against what it was asked for.
-     data_lines is a RED count, so dividing it by inputs drew a bar at zero for an
-     arm that had in fact returned thousands of listings. Listings first, the
-     collector's own success rate second, and no bar at all when the payload
-     carries neither: an undrawn bar is honest, a bar at zero is not. */
+  /* The coverage bar is JOIN coverage, which is the thing that actually degraded.
+
+     It used to divide listings by inputs. Those are different units: 14,632
+     listings against 207 notices is 70.68, and the bar was drawn at width
+     7068.6%, a solid hazard-red rule overflowing its card and bleeding off the
+     right edge of the page. On the deployed default view, beside the Bright
+     Data section.
+
+     The honest fraction is notices that matched a listing over notices asked
+     for, which is exactly what health.py measured to decide DEGRADED in the
+     first place (join_key_coverage 0.4589 against a bound of 0.8). Listings per
+     notice is a useful number, but it is a rate, not a proportion, and nothing
+     that can exceed 1 belongs in a bar. */
   function coverage(j) {
-    if (typeof j.listings === "number" && j.inputs) return j.listings / j.inputs;
-    if (typeof j.success_rate === "number") return j.success_rate;
+    if (typeof j.joined === "number" && j.inputs) {
+      return Math.max(0, Math.min(1, j.joined / j.inputs));
+    }
+    if (typeof j.success_rate === "number") {
+      return Math.max(0, Math.min(1, j.success_rate));
+    }
     return null;
   }
 
@@ -373,6 +448,7 @@
   }
 
   function renderArms(doc) {
+    var armsStale = isStale(doc);
     var byCode = {};
     doc.arms.forEach(function (a) { byCode[a.code] = a; });
     var order = ARM_ORDER.slice();
@@ -416,7 +492,10 @@
         attest = "exit not attested on this sweep";
       }
 
-      return '<div class="arm state-' + a.state + '">' +
+      /* is-stale is ADDED to the state class, never substituted for it. Setting
+         a.state = "STALE" would erase join_key_coverage_below_bound from the
+         card, which is adding one caveat by deleting a truer one. */
+      return '<div class="arm state-' + a.state + (armsStale ? " is-stale" : "") + '">' +
         '<div class="arm-head">' +
           '<span class="arm-code">' + esc(a.code) + "</span>" +
           '<span class="arm-host">' + esc(a.host) + "</span>" +
@@ -459,6 +538,9 @@
   }
 
   function renderRows(doc) {
+    // Past the freshness bound every day counter is frozen, not just the ones an
+    // unmeasured arm froze. The number was already static; this marks it.
+    var rowsStale = isStale(doc);
     var rows = displayOrder(doc.rows);
     var maxDays = Math.max.apply(null, rows.map(function (r) { return r.days; }));
     var shown = rows.slice(0, PAGE_CAP);
@@ -522,7 +604,8 @@
         '<div class="chips">' + chips + "</div>" +
         '<div class="c-bar"><div class="track"><i style="width:' +
           ((r.days / maxDays) * 100).toFixed(2) + '%"></i></div>' +
-          '<div class="days' + (r.days_frozen ? " frozen" : "") + '">' + commas(r.days) + "</div></div>" +
+          '<div class="days' + ((r.days_frozen || rowsStale) ? " frozen" : "") + '">' +
+            commas(r.days) + "</div></div>" +
         '<div class="c-tier"><span class="tier-box t-' + r.tier + '">' + r.tier + "</span>" +
           '<div class="cap">' + (r.evidence ? esc(r.evidence.captured_at.slice(11, 19)) + "Z" : "not captured") +
           "</div></div>" +
@@ -868,6 +951,23 @@
     if (!d) { node.innerHTML = ""; return; }
     var sum = doc.detector_summary || {};
 
+    /* The freshness card is recomputed here from the render clock, because the
+       payload's copy of it was decided at publish time and is structurally
+       always false. Everything else on this board is a fact about the sweep and
+       is read as published. This one is a fact about NOW. */
+    var stale = isStale(doc);
+    if (stale && d.freshness) {
+      d = JSON.parse(JSON.stringify(d));
+      d.freshness = {
+        fired: true,
+        scope: d.freshness.scope || "whole board",
+        note: "This sweep is " + ageWords(ageS(doc)) + " past its " +
+              Math.round(doc.freshness_bound_s / 3600) + "h freshness bound. The " +
+              "rows below are what the last sweep found, not a claim about what " +
+              "is on sale now, and the day counters are frozen at that capture.",
+      };
+    }
+
     var cards = Object.keys(d).map(function (k) {
       var v = d[k];
       return '<div class="det' + (v.fired ? " is-fired" : "") + '">' +
@@ -880,8 +980,13 @@
 
     node.innerHTML =
       '<h2 class="act-head"><span class="act-num">05</span> What was watching</h2>' +
-      '<p class="act-lede">' + (sum.fired || 0) + " of " + (sum.total || 0) +
-        " detectors fired on this sweep. " + esc(sum.note || "") + "</p>" +
+      '<p class="act-lede">' + ((sum.fired || 0) + (stale ? 1 : 0)) + " of " +
+        (sum.total || 0) + " detectors " +
+        (stale ? "are firing as you read this" : "fired on this sweep") + ". " +
+        esc(sum.note || "") +
+        (stale ? " One of them is firing now rather than at sweep time: freshness " +
+                 "is a fact about the moment you are looking, so it is decided in " +
+                 "your browser and not in the payload." : "") + "</p>" +
       '<div class="det-grid">' + cards + "</div>";
   }
 
@@ -1326,6 +1431,18 @@
         note.textContent = "Rows below are frozen at the last sweep that "
           + "corroborated them and are historical, not current. No row here is a "
           + "claim about what is on sale right now.";
+      }
+    } else if (isStale(doc)) {
+      /* Reuses the node the blackout path already owns, already styled, already
+         in the markup. The blackout branch wins when both are true, so the two
+         notes never argue: a withheld verdict is a stronger statement than a
+         stale one and saying both would dilute it. */
+      var sn = el("historicalNote");
+      if (sn) {
+        sn.textContent = "This sweep is " + ageWords(ageS(doc)) + " past its "
+          + Math.round(doc.freshness_bound_s / 3600) + "h freshness bound. The rows "
+          + "below are what the last sweep found, not a claim about what is on "
+          + "sale right now, and every day count is frozen at that capture.";
       }
     }
   }

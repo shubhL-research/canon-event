@@ -44,7 +44,7 @@ function makeNode(id) {
   };
 }
 
-function run(variant, livePath) {
+function run(variant, livePath, nowMs) {
   const nodes = {};
   // Every element the renderer writes into. "figures" and the two notes were
   // added with the five-act restructure and were missing here, so nothing the
@@ -69,7 +69,12 @@ function run(variant, livePath) {
     },
     location: { search: variant === "v1" ? "" : "?state=" + variant },
     URLSearchParams,
-    Date,
+    // Freshness is the one thing on this page decided by the reader's clock
+    // rather than by the payload, so it can only be tested by moving the clock.
+    Date: nowMs === undefined ? Date : new Proxy(Date, {
+      get: (t, k) => (k === "now" ? () => nowMs : Reflect.get(t, k)),
+      construct: (t, a) => (a.length ? new t(...a) : new t(nowMs)),
+    }),
     Math,
     console,
   };
@@ -348,6 +353,88 @@ console.log("\nreceipt card");
         "every RED row carries an identity re-assertion needle");
   check(red.every((r) => r.evidence.assertion.context.includes(r.evidence.assertion.needle)),
         "every needle actually appears in its own captured context");
+}
+
+/* FRESHNESS, tested by moving the clock forward.
+
+   The suite had zero coverage of the word STALE. It could not have had any: the
+   payload's own freshness detector is computed at publish time, where the age is
+   always zero, so nothing in a static payload can ever be stale. The condition
+   only exists in a browser, hours later, which is exactly when a judge opens it.
+
+   So the clock is moved instead. Once past the bound the page must say so in
+   three places, and all three matter: the note above the rows, the detector
+   card, and the summary count that would otherwise contradict its own card. */
+/* The acts are a numbered sequence and must actually be one.
+
+   Two acts both printed 04 for as long as the Bright Data act existed, so the
+   page read 01 02 03 04 05 06 04. Half the numbers are static in wall.html and
+   half are written by the renderer, which is why neither file looked wrong on
+   its own. They are only wrong together, so they are checked together. */
+{
+  const markup = fs.readFileSync(path.join(ROOT, "wall.html"), "utf8");
+  const js = fs.readFileSync(path.join(ROOT, "wall.js"), "utf8");
+  const nums = [];
+  for (const src of [markup, js]) {
+    for (const m of src.matchAll(/act-num">(\d+)</g)) nums.push(m[1]);
+  }
+  const dupes = nums.filter((n, i) => nums.indexOf(n) !== i);
+  check(dupes.length === 0,
+        "every act number is unique (duplicated: " + [...new Set(dupes)].join(", ") + ")");
+
+  const sorted = [...nums].sort();
+  const expected = nums.map((_, i) => String(i + 1).padStart(2, "0"));
+  check(JSON.stringify(sorted) === JSON.stringify(expected),
+        "act numbers run 01.." + expected[expected.length - 1] +
+        " with no gaps (found " + sorted.join(" ") + ")");
+
+  // Every rail destination must exist, or the only wayfinding on a very long
+  // page silently drops the reader nowhere.
+  const railTargets = [...markup.matchAll(/<a href="#([\w-]+)"><span class="rail-dot"/g)]
+    .map((m) => m[1]);
+  check(railTargets.length > 0, "the rail has entries");
+  for (const t of railTargets) {
+    check(markup.includes('id="' + t + '"'),
+          'rail target #' + t + " exists in the document");
+  }
+}
+
+if (fs.existsSync(LIVE)) {
+  const src = fs.readFileSync(LIVE, "utf8");
+  const doc = JSON.parse(src.slice(src.indexOf("{"), src.lastIndexOf(";")));
+  const sweptAt = Date.parse(doc.swept_at);
+  const bound = doc.freshness_bound_s * 1000;
+
+  console.log("freshness, clock moved past the bound");
+
+  const fresh = run("v1", LIVE, sweptAt + bound - 60000);
+  check(fresh.nodes.historicalNote.textContent === "",
+        "inside the bound the page claims no staleness");
+  check(!/freshness bound\. The/.test(fresh.nodes.detectors.innerHTML),
+        "inside the bound the freshness detector stays quiet");
+
+  const stale = run("v1", LIVE, sweptAt + bound + 60000);
+  check(/past its \d+h freshness bound/.test(stale.nodes.historicalNote.textContent),
+        "past the bound the page states its own staleness above the rows");
+  // Scoped to the freshness CARD. "det is-fired" also matches join_key_coverage,
+  // which fires on every sweep, so the looser pattern passed even with the stale
+  // path disabled: another assertion that could not fail.
+  check(/past its \d+h freshness bound/.test(stale.nodes.detectors.innerHTML),
+        "past the bound the freshness detector fires and states the age");
+  check(/2 of 8 detectors/.test(stale.nodes.detectors.innerHTML),
+        "the detector summary counts the firing freshness card");
+  check(/days frozen/.test(stale.nodes.wall.innerHTML),
+        "past the bound every day counter is marked frozen");
+  check(/arm state-\w+ is-stale/.test(stale.nodes.armRail.innerHTML),
+        "the stale hatch is added to the arm state, not substituted for it");
+  check(/join_key_coverage|notices matched one/.test(stale.nodes.armRail.innerHTML),
+        "the arm still says why it degraded after going stale");
+
+  // A fixture with a swept_at in the future must never be called stale.
+  const future = run("v1", LIVE, sweptAt - 3600000);
+  check(future.nodes.historicalNote.textContent === "",
+        "a clock behind the sweep is not staleness");
+  console.log("");
 }
 
 console.log(failures ? `\n${failures} FAILURES` : "\nall checks passed");
