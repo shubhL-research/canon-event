@@ -1567,6 +1567,9 @@
           adv.n, "deliberate near-misses", adv.note);
       }
       var bothHold = (!ctl || ctl.all_red) && (!adv || adv.all_discarded);
+      var realRed = (((doc.hunt || {}).findings) || []).filter(function (f) {
+        return f.code_verdict === "RED";
+      })[0];
       proof =
         '<div class="mp">' +
           "<h3>Before you believe the zero</h3>" +
@@ -1575,6 +1578,26 @@
             "products are not on sale, or the matcher never fires. These two " +
             "sets separate them, and the wall is worth nothing without both.</p>" +
           '<div class="mp-grid">' + cards + "</div>" +
+          /* THE OBVIOUS ATTACK ON THE LEFT-HAND CARD, ANSWERED WITH EVIDENCE
+             ALREADY IN THIS REPOSITORY.
+
+             Both control sets are inputs we chose. A sceptic is right to say
+             that 13 planted rows passing proves the matcher fires on 13 rows we
+             wrote, and says nothing about a real marketplace page.
+
+             Act 06 settles it. data/hunt/rederive.py runs the SAME classify()
+             over four pages fetched from live retail sites and committed
+             unmodified, and one of them comes back RED. That is the matcher
+             firing on a page nobody here authored, which is the one thing a
+             synthetic control can never demonstrate.
+
+             Computed, not asserted: if the hunt ever stops containing a
+             code-verdict of RED, this sentence stops appearing. */
+          (realRed ? '<p class="mp-real">And not only on rows we wrote. The same ' +
+            "classifier returns RED on " + esc(realRed.product) + ", a page " +
+            "fetched from a live retailer and committed to this repository " +
+            "unmodified. Planted controls prove the matcher fires on inputs we " +
+            "chose; that one proves it fires on a page nobody here authored.</p>" : "") +
           '<p class="mp-close">' + esc(bothHold
             ? "Both hold. The matcher accepts what it should and refuses what it "
               + "should, so the zero is a statement about the three marketplaces "
