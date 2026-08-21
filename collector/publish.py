@@ -800,6 +800,25 @@ def main(argv):
                     reports=health_doc.get("reports") or [],
                     variant="trial" if health_doc.get("trial_slice") else "live")
 
+    # A STABLE NAME FOR THE PUBLISHED SWEEP.
+    #
+    # Every replay mints a new sweep id, so any document naming the sweep file
+    # goes stale the moment the sweep is re-scored. The README's primary-evidence
+    # pointer is exactly such a document, and pointing it at a moving target is
+    # how it came to name a superseded 60-notice trial in the first place.
+    #
+    # published.jsonl is a copy, not a rename: the timestamped file stays as the
+    # record of that run. This is the one a reader is told to open.
+    stable = ROOT / "data" / "sweeps" / "published.jsonl"
+    stable.write_text(path.read_text(encoding="utf-8"), encoding="utf-8")
+    (ROOT / "data" / "sweeps" / "published.txt").write_text(
+        ("This is a copy of %s, the sweep data/live.js currently publishes. "
+         "Written by collector/publish.py. The timestamped original stays in "
+         "place as the record of that run; this name exists so a document "
+         "can point at the published sweep without going stale when it is "
+         "re-scored." % path.name),
+        encoding="utf-8")
+
     out = ROOT / "data" / ("live-%s.json" % path.stem)
     out.write_text(json.dumps(payload, indent=1, ensure_ascii=False) + "\n",
                    encoding="utf-8")

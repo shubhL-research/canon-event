@@ -1,0 +1,1 @@
+This is a copy of s_20260821T2052Zreplay.jsonl, the sweep data/live.js currently publishes. Written by collector/publish.py. The timestamped original stays in place as the record of that run; this name exists so a document can point at the published sweep without going stale when it is re-scored.

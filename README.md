@@ -79,9 +79,9 @@ One full sweep, 20 August 2026. **All 207 notices, all three arms, both regulato
 | Notices swept | 207 of 207. 103 CPSC and 104 EU Safety Gate |
 | Arms swept | US `amazon.com`, DE `kaufland.de`, IN `flipkart.com`. **All three DEGRADED**, on join-key coverage below bound |
 | Search loads | 1,107 issued. 369 unique URLs per arm, three arms. The plan is 2 queries for each of 180 searchable notices, 360 per arm; the extra 9 per arm are notices an older, looser searchability test accepted and this page reports as unsearchable. See SCRAPER-STUDIO.md |
-| Listings adjudicated | 23,811. US 13,782, DE 2,043, IN 7,986 |
+| Listings adjudicated | 23,813. US 13,784, DE 2,043, IN 7,986 |
 | Notices that got any candidate | US 95, DE 59, IN 55, of 207 queried per arm |
-| Listings discarded | 23,811, every one |
+| Listings discarded | 23,813, every one |
 | Rows reaching RED | 0, across all 621 notice-arm pairs |
 | Still buyable | **0 of 180 searchable notices, Wilson 95% CI [0, 2.1]** |
 | Unsearchable | 13.0%, 27 of 207. CPSC 20.4%, Safety Gate 5.8% |
@@ -143,7 +143,7 @@ finding about any product or seller.
 
 ## The sweep found nothing. Then we looked somewhere else.
 
-Three arms adjudicated 23,811 listings across 207 notices and returned **zero RED**. That number is
+Three arms adjudicated 23,813 listings across 207 notices and returned **zero RED**. That number is
 easy to misread as good news, and it is not news at all until you can tell it apart from a matcher
 that is stuck off. Positive controls already prove the matcher fires: 13 planted rows must all reach
 RED, and they do. So the zero is real *for the three markets we swept*.
@@ -252,7 +252,7 @@ something are the by-authority ones, US 24.3% [17.0, 33.4] against an EU rate of
 split is shown wherever the pooled number appears. Any comparison that averages the two regulators together describes this file
 and nothing more.
 
-### Survival is 0 of 176, from all 207 notices on three arms, every one of them degraded
+### Survival is 0 of 178, from all 207 notices on three arms, every one of them degraded
 
 Zero listings reached RED. That is a real measurement and it is reported as one, with a Wilson
 interval of [0.0, 2.1] rather than as a bare zero, because 176 observations cannot exclude a small
@@ -260,7 +260,7 @@ survival rate. This paragraph carried [0, 6.2] on 58 observations for days after
 described was superseded, three lines under a heading that already said the right denominator.
 
 What it is not: it is not a clean measurement. All 207 notices were queried on all three arms, and
-**every one of the three came back DEGRADED**, joining 91, 110 and 55 notices of 207 to any candidate
+**every one of the three came back DEGRADED**, joining 92, 110 and 55 notices of 207 to any candidate
 at all. **A degraded arm makes the zero a floor rather than an estimate.** A listing an arm failed to
 match could exist and we would not know. The wall labels the figure partial for that reason and does
 not round it up into a claim that recalls work.
@@ -416,7 +416,7 @@ only when both hold at capture time:
 
 Identity re-assertion exists because Amazon substitutes ASINs on stale URLs. Without it, a live buy
 button on the *wrong* product scores as a hazard still on sale, which is the worst mistake this
-system could make. It is the entire reason 23,811 listings were discarded in the current sweep: the
+system could make. It is the entire reason 23,813 listings were discarded in the current sweep: the
 recalled identifier was never re-asserted on the page that came back.
 
 A model string alone does not settle identity either. Model numbers are not globally unique, so a
@@ -560,7 +560,7 @@ it, in `data/sweeps/` and `examples/`:
 
 | | |
 |---|---|
-| `s_20260821T2041Zreplay.jsonl` | Every notice-arm verdict for the published sweep, one row each |
+| `published.jsonl` | Every notice-arm verdict for the published sweep, one row each |
 | `sweep-2026-08-20.csv` | A superseded 60-notice trial. Not the published sweep and not a current figure |
 | `s_*.jsonl` | Raw sweep rows |
 | `s_*-health.json` | What every detector concluded, per sweep |
@@ -588,7 +588,7 @@ to check the claim rather than take it:
 | File | What it is |
 |---|---|
 | `raw-row-kaufland-de.json` | One row exactly as Scraper Studio returned it, field names and all |
-| `s_20260821T2041Zreplay.jsonl` | **The sweep this wall publishes.** 207 notices, one row each, all three arm verdicts per row |
+| `published.jsonl` | **The sweep this wall publishes.** 207 notices, one row each, all three arm verdicts per row |
 | `sweep-2026-08-20.csv` | A **superseded** 60-notice trial, 180 notice-arm verdicts. Its summary still carries the retracted 46.4% unsearchable rate and a survival interval of [0, 6.2] on 58 observations. Kept as the record of what that run produced, not as a current figure. See "The unsearchable rate was wrong" above |
 
 The field names in the raw row were chosen by the Scraper Studio AI Agent when it

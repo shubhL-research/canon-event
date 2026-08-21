@@ -145,23 +145,24 @@ def main():
     #
     # README's "The primary evidence" table offered sweep-2026-08-20.csv as "the
     # full three-arm sweep". It is a 60-notice trial whose summary still carries
-    # the retracted 46.4% unsearchable rate and a survival interval of [0, 6.2]
-    # on 58 observations. A judge following the project's own pointer found it
-    # committing the error the README apologises for, on four headline numbers.
-    import re as _re
+    # the retracted 46.4% unsearchable rate. A judge following the project's own
+    # pointer found it committing the error the README apologises for.
+    #
+    # It must name data/sweeps/published.jsonl, which publish.py rewrites on
+    # every publish. A timestamped name goes stale the moment a sweep is
+    # re-scored, which is how the pointer drifted onto a superseded file.
     readme = (ROOT / "README.md").read_text(encoding="utf-8")
-    sweep_id = doc.get("sweep_id", "")
-    stem = _re.sub(r"[^A-Za-z0-9]", "", sweep_id)
-    named = _re.findall(r"s_2026\d{4}T\d{4}Z\w*\.jsonl", readme)
-    if named:
-        published = [n for n in named if _re.sub(r"[^A-Za-z0-9]", "", n).startswith(stem[:14])]
-        if not published:
-            problems.append(
-                "README names %s as evidence but the wall publishes %s. The "
-                "primary-evidence pointer must name the sweep on screen."
-                % (named[0], sweep_id))
-    else:
-        problems.append("README's primary-evidence table names no sweep file at all")
+    stable = ROOT / "data" / "sweeps" / "published.jsonl"
+    if "published.jsonl" not in readme:
+        problems.append("README's primary-evidence table must name "
+                        "data/sweeps/published.jsonl, the stable pointer to the "
+                        "sweep on screen, not a timestamped file that goes stale")
+    if not stable.exists():
+        problems.append("data/sweeps/published.jsonl is missing: nothing points "
+                        "a reader at the sweep the wall publishes")
+    elif len([l for l in stable.read_text(encoding="utf-8").splitlines() if l.strip()]) != len(doc["rows"]):
+        problems.append("data/sweeps/published.jsonl holds a different number of "
+                        "rows than the payload publishes")
 
     # The arms must also add up to the total they are printed beside, which is
     # the one sum a judge can do in their head on the page itself.

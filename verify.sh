@@ -24,9 +24,6 @@ echo
 echo "== source bytes: no collapsed escapes =="
 python3 check_sources.py
 echo
-echo "== prose figures against the payload =="
-python3 check_docs.py
-echo
 echo "== collector normalizer =="
 python3 collector/test_normalize.py
 echo
@@ -57,4 +54,12 @@ echo
 echo "== wall renderer, headless =="
 node test_render.js
 echo
+# Ordering matters and it was wrong. check_docs.py reads data/live.js, and
+# republish.py REWRITES data/live.js. Running the check BEFORE republish
+# validated the prose against a payload the next step then changed, so the docs
+# could pass here and still disagree with the wall a judge opens.
+echo "== prose figures against the payload republish just wrote =="
+python3 check_docs.py
+echo
+
 echo "ALL CHECKS PASSED"

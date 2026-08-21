@@ -73,14 +73,35 @@ DISQUALIFIERS = [
     # The rule the accepting branch states about itself is "distinctive enough
     # that a marketplace search returns the product rather than a category". A
     # capacity is the definition of a category.
+    # A CAPACITY IS NOT A MODEL NUMBER, and this one reached the wall.
+    #
+    # CPSC 26537 recalls "Kitchen HQ Thermal Insulated Bowls" and publishes
+    # "10-cup" in the model field. It has letters, digits and four characters,
+    # so the accepting branch took it and the sweep searched three marketplaces
+    # for "10-cup". It found a 10 Cup Programmable Coffee Maker and adjudicated
+    # it RED against a recall about bowls catching fire. That branch claims the
+    # token is "distinctive enough that a marketplace search returns the product
+    # rather than a category", and a capacity is the definition of a category.
+    #
+    # SINGLE-LETTER UNITS REQUIRE A SEPARATOR. The first version of this pattern
+    # allowed the unit to sit flush against the number, so it read the trailing
+    # W of "11064W" as watts and disqualified a real model number, silently
+    # dropping CPSC 26529 (Broqixin Pool Drain Covers) out of the corpus. A rule
+    # written to stop a false RED had started causing false NOT-SEARCHABLE,
+    # which is the quieter and worse direction.
     ("capacity", re.compile(
-        r"^\s*\d+(\.\d+)?\s*[-\s]?\s*(cup|cups|qt|quart|quarts|l|litre|litres|"
-        r"liter|liters|ml|oz|ounce|ounces|gal|gallon|gallons|lb|lbs|pound|pounds|"
-        r"kg|g|gram|grams|pk|pack|count|ct|piece|pieces|pc|pcs|inch|inches|in|ft|"
-        r"foot|feet|mm|cm|m|w|watt|watts|v|volt|volts|ah|mah|amp|amps)\s*$", re.I)),
-    # Battery designations name a cell type, not a product.
+        r"^\s*\d+(\.\d+)?\s*[-\s]\s*(cup|cups|qt|quart|quarts|litre|litres|liter|liters|ml|oz|ounce|ounces|"
+        r"gal|gallon|gallons|lb|lbs|pound|pounds|kg|gram|grams|pack|count|piece|"
+        r"pieces|inch|inches|foot|feet|watt|watts|volt|volts|amp|amps|l|g|w|v|"
+        r"m|ct|pk|pc|pcs|in|ft|mm|cm|ah|mah)\s*$", re.I)),
+    # Multi-character units may sit flush against the number: "500ml", "12pack".
+    ("capacity_flush", re.compile(
+        r"^\s*\d+(\.\d+)?\s*(cups?|quarts?|litres?|liters?|ml|ounces?|gallons?|pounds?|grams?|"
+        r"packs?|pieces?|inches|watts?|volts?|amps?|mah)\s*$", re.I)),
+    # Battery designations name a cell type, not a product a shopper can find:
+    # searching CR2032 returns every CR2032 on the marketplace.
     ("battery_type", re.compile(
-        r"^\s*(cr|lr|sr|aa|aaa|c|d|9v)\s*-?\s*\d{0,4}\s*$", re.I)),
+        r"^\s*(cr|lr|sr|aa|aaa|9v)\s*-?\s*\d{0,4}\s*$", re.I)),
 ]
 
 # A token that survives as an actual identifier.

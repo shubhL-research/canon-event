@@ -384,6 +384,10 @@ _FITS_PREPOSITION = re.compile(r"\b(for|fits|fit)\s+[\w&.\-]*\s*$", re.I)
 # false DISCARD, which is the dangerous direction: it suppresses a real finding
 # rather than publishing a false one. A guard against false positives that
 # creates false negatives has moved the error, not removed it.
+_ACCESSORY_NOUN = re.compile(
+    r"\b(case|cover|charger|adapter|adaptor|batter|strap|mount|stand|bag|"
+    r"holder|hoist|protector|sleeve|pouch|cord|cable|hose|filter|lid)", re.I)
+
 _UI_CHROME = (
     "quantity for", "decrease quantity", "increase quantity", "search for",
     "results for", "reviews for", "review for", "question for", "notify me",
@@ -392,7 +396,7 @@ _UI_CHROME = (
 )
 
 
-def accessory_context(page_text, needle, width=120):
+def accessory_context(page_text, needle, width=120, expected_name=None):
     """Is the identifier on this page because the listing FITS the product?
 
     WHY THIS EXISTS
@@ -422,16 +426,43 @@ def accessory_context(page_text, needle, width=120):
     if pat is None:
         return None
     low = text.lower()
+
+    # WHEN THE RECALLED PRODUCT IS ITSELF AN ACCESSORY, THESE MARKERS ARE NOT
+    # EVIDENCE OF ANYTHING.
+    #
+    # This corpus recalls Flaunt MagSafe Battery Chargers, Broqixin Pool Drain
+    # Covers, EEMB Lithium Battery Packs and Ceiling Hoists with Straps. The
+    # genuine listing for a recalled drain cover says "cover for", and for a
+    # recalled charger says "charger for". Discarding on that would hide exactly
+    # the products we are looking for, which is the quiet failure direction: a
+    # false RED gets argued about, a false DISCARD is never seen.
+    #
+    # So a marker is disregarded when the recalled product's own name contains
+    # the same noun.
+    live = _ACCESSORY_MARKERS
+    if expected_name:
+        name = str(expected_name).lower()
+        live = tuple(mk for mk in _ACCESSORY_MARKERS
+                     if not any(w in name for w in mk.split() if len(w) > 3))
+
     for m in pat.finditer(text):
         lo = max(0, m.start() - width)
         window = low[lo:m.end() + width]
-        for marker in _ACCESSORY_MARKERS:
+        for marker in live:
             if marker in window:
                 return marker.strip()
         # "... Blower Tube for Echo PB-5810H": the words immediately before the
         # identifier say the listing fits it. Checked on the raw slice so the
         # brand between "for" and the identifier is allowed for.
         before = text[lo:m.start()]
+        # The positional check is suppressed entirely when the recalled product
+        # IS an accessory-type item. "Flaunt MagSafe Battery Charger for iPhone"
+        # is that charger's own listing, and "for" is how such a product is
+        # always described. Losing the positional guard on those notices is the
+        # right trade: a false RED is loud and gets hand-verified, a false
+        # DISCARD is silent and hides the thing we are looking for.
+        if _ACCESSORY_NOUN.search(str(expected_name or "")):
+            continue
         if _FITS_PREPOSITION.search(before):
             tail = before.lower()[-60:]
             if not any(ui in tail for ui in _UI_CHROME):
@@ -528,7 +559,7 @@ def brand_conflict(page_text, expected_brand):
     return want not in norm_needle(page_text)
 
 
-def classify(raw, expected_brand=None):
+def classify(raw, expected_brand=None, expected_name=None):
     """RED, AMBER or DISCARDED, with the reason recorded either way."""
     err = pick(raw, "error")
     if present(err):
@@ -587,7 +618,8 @@ def classify(raw, expected_brand=None):
     # brand rule, because these listings often carry the RIGHT brand: a BenQ
     # carry case really is made by BenQ.
     if matched:
-        marker = accessory_context(pick(raw, "page_text"), needle)
+        marker = accessory_context(pick(raw, "page_text"), needle,
+                                   expected_name=expected_name)
         if marker:
             return "DISCARDED", [{"code": "accessory_or_compatible",
                                   "reason": "the identifier appears next to "
@@ -630,7 +662,7 @@ def normalize(raw, seed):
     never taken from the marketplace: the hazard sentence, reference and
     publication date come from the notice, always.
     """
-    tier, discarded = classify(raw, seed.get("brand"))
+    tier, discarded = classify(raw, seed.get("brand"), seed.get("name"))
     needle = pick(raw, "needle")
 
     row = {
