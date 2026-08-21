@@ -67,7 +67,7 @@
   function field(label, value, opts) {
     opts = opts || {};
     var present = value !== undefined && value !== null && value !== "";
-    var cls = "field" + (present ? "" : " is-missing") + (opts.mono ? " mono-v" : "");
+    var cls = "field" + (present ? "" : " is-missing");
     var shown = present ? esc(value) : "MISSING";
     return '<div class="' + cls + '">' +
       '<div class="k">' + esc(label) + "</div>" +
@@ -236,11 +236,11 @@
 
     if (s.border_escape.v === null) {
       out.push(instrument("Border escape", "PENDING",
-        esc(s.border_escape.pending.slice(0, 64)) + "…", "is-apparatus is-pending"));
+        esc(s.border_escape.pending.slice(0, 64)) + "…", "is-pending"));
     } else {
       out.push(instrument("Border escape", pct(s.border_escape.v),
         s.border_escape.n + " of " + s.border_escape.d + " · " + ci(s.border_escape.ci95),
-        "is-apparatus " + struck(s.border_escape)));
+        struck(s.border_escape)));
     }
 
     /* Precision carries its interval next to the number it qualifies, never in a
@@ -249,11 +249,11 @@
        and prints the count still needed. */
     if (s.precision.v === null) {
       out.push(instrument("Precision", "PENDING", esc(s.precision.pending),
-        "is-apparatus is-pending"));
+        "is-pending"));
     } else {
       out.push(instrument("Precision", pct(s.precision.v),
         s.precision.n + " of " + s.precision.d + " hand-verified · " + ci(s.precision.ci95),
-        "is-apparatus"));
+        ""));
     }
 
     /* Recall is not directly measured: capture-recapture across the two query
@@ -268,20 +268,20 @@
         ? "overlap " + rc.m_both + " of " + rc.observed + " observed · " : "";
       out.push(instrument("Recall", "NOT ESTIMABLE",
         "capture-recapture · " + overlap + esc(rc.reportable_note),
-        "is-apparatus is-pending"));
+        "is-pending"));
     } else {
       out.push(instrument("Recall, floor", "≥ " + Math.round(rc.missed_floor) + " missed",
         "capture-recapture, " + esc(rc.estimator.split(" ")[0]) + " · lower bound",
-        "is-apparatus"));
+        ""));
     }
 
     out.push(instrument("Arms measured", s.arms_measured.n + " of " + s.arms_measured.d,
       doc.arms.map(function (a) { return a.code + " " + a.state.toLowerCase(); }).join(" · "),
-      "is-apparatus"));
+      ""));
 
     out.push(instrument("Last sweep", '<span style="font-size:11px">' +
       esc(freshness(doc.swept_at)) + "</span>",
-      "freshness bound " + doc.freshness_bound_s / 3600 + "h", "is-apparatus"));
+      "freshness bound " + doc.freshness_bound_s / 3600 + "h", ""));
 
     /* Defensive because a payload is data, and data can be short a key.
        A missing stat used to throw inside renderInstruments and halt boot() after
@@ -291,7 +291,7 @@
        already obeys. */
     if (s.credits) {
       out.push(instrument("Search loads", commas(s.credits.used),
-        "of " + commas(s.credits.cap) + " budgeted", "is-apparatus"));
+        "of " + commas(s.credits.cap) + " budgeted", ""));
     }
 
     el("instruments").innerHTML = out.join("");
@@ -787,6 +787,46 @@
       }).join("");
     }
 
+    /* The platform's own telemetry, where it DISAGREES with our board.
+
+       Our `fails` is computed from what the collector returned to us. That is
+       self-reported health, and self-reported health cannot see a page that
+       never arrived. Bright Data's monitoring flagged a 20% page failure on a US
+       collection on 2026-08-20; every health file we wrote that day recorded
+       fails: 0 for the US arm. Neither number is wrong and they are not in
+       contradiction: they measure different things.
+
+       Their number is NOT written into our field. Overwriting ours with theirs
+       would erase the discrepancy, which is the only interesting thing here. A
+       board that can only see its own output has a blind spot shaped exactly
+       like this, and a project whose whole claim is "never show a clean screen
+       over a broken scraper" has to say so about itself first. */
+    var pjBlock = "";
+    var pjs = doc.platform_jobs;
+    if (pjs && pjs.jobs && pjs.jobs.length) {
+      var jobCards = pjs.jobs.map(function (j) {
+        return '<div class="pj-card">' +
+          '<div class="pj-head"><span class="pj-name">' + esc(j.collector_name) +
+            '</span><span class="pj-rate">' + pct(j.success_rate) + " success</span></div>" +
+          '<dl class="pj-facts">' +
+            "<div><dt>job</dt><dd>" + esc(j.job_id) + "</dd></div>" +
+            "<div><dt>started</dt><dd>" + esc(j.started_at) + "</dd></div>" +
+            "<div><dt>trigger</dt><dd>" + esc(j.trigger_type) + "</dd></div>" +
+            "<div><dt>pages</dt><dd>" + j.pages + ", " + j.errors + " failed</dd></div>" +
+            "<div><dt>they reported</dt><dd>" + pct(j.success_rate) + "</dd></div>" +
+            "<div><dt>we recorded</dt><dd>" + esc(j.our_board_said) + "</dd></div>" +
+          "</dl>" +
+          '<p class="pj-reconcile">' + esc(j.reconciliation) + "</p>" +
+        "</div>";
+      }).join("");
+      pjBlock =
+        '<h3 class="platform-sub">Where the platform disagreed with our own health board</h3>' +
+        '<p class="act-lede">' + esc(pjs._why_this_file_exists) + "</p>" +
+        '<div class="pj-grid">' + jobCards + "</div>" +
+        '<p class="pj-limit"><b>One job, not a rate.</b> ' + esc(pjs._limitation) +
+        " " + esc(pjs._provenance) + "</p>";
+    }
+
     var cr = (doc.stats && doc.stats.credits) || {};
 
     node.innerHTML =
@@ -804,6 +844,7 @@
           '<p class="act-lede">' + esc(heals.note) + "</p>" +
           '<div class="heal-grid">' + healBlock + "</div>"
         : "") +
+      pjBlock +
       '<p class="platform-foot">' + esc(p.seed_layer) +
         (cr.cap ? " Credits used this sweep: " + commas(cr.used || 0) + " of " +
                   commas(cr.cap) + "." : "") + "</p>";
@@ -844,6 +885,86 @@
       '<div class="det-grid">' + cards + "</div>";
   }
 
+  // ------------------------------------------------------------------ hunt
+
+  function renderHunt(doc) {
+    var node = el("hunt");
+    if (!node) return;
+    var h = doc.hunt;
+    if (!h || !h.findings || !h.findings.length) { node.innerHTML = ""; return; }
+
+    var reds = h.findings.filter(function (f) { return f.published_verdict === "RED"; }).length;
+
+    var items = h.findings.map(function (f) {
+      var red = f.published_verdict === "RED";
+
+      // Only the facts that were actually captured. A market with no note gets
+      // no note rather than an invented one.
+      var facts = [
+        ["market", f.market],
+        ["identifier", f.identifier + " (" + f.identifier_kind +
+          (f.gtin_check_digit_valid ? ", check digit valid" : "") + ")"],
+        ["re-asserted", f.identifier_occurrences_on_page + "x on page"],
+        ["buy control", f.buy_control],
+        ["price shown", f.price_shown],
+        ["availability", f.availability],
+        ["fetched", f.fetched_at],
+        ["adjudicator", f.code_verdict === f.published_verdict
+          ? "classify() -> " + f.code_verdict
+          : "classify() -> " + f.code_verdict + ", published " + f.published_verdict]
+      ].filter(function (kv) { return kv[1]; });
+
+      var dl = facts.map(function (kv) {
+        return "<div><dt>" + esc(kv[0]) + "</dt><dd>" + esc(String(kv[1])) + "</dd></div>";
+      }).join("");
+
+      var caveat = "";
+      if (f.caveat) {
+        caveat = '<p class="hunt-caveat"><b>' +
+          (f.downgraded_by_hand ? "held down by hand" : "why this is not red") +
+          "</b>" + esc(f.caveat) + "</p>";
+      } else if (f.why_it_holds) {
+        caveat = '<p class="hunt-caveat"><b>why this one holds</b>' +
+          esc(f.why_it_holds) + "</p>";
+      }
+
+      var ev = f.evidence_file
+        ? '<a class="hunt-evidence" href="' + esc(f.evidence_file) +
+          '">the page we fetched, committed</a>'
+        : "";
+
+      return '<article class="hunt-item' + (red ? " is-red" : "") + '">' +
+        '<div class="hunt-top">' +
+          '<span class="hunt-chip ' + (red ? "is-red" : "is-amber") + '">' +
+            esc(f.published_verdict) + "</span>" +
+          '<span class="hunt-ref">' + esc(f.authority) + " " + esc(f.ref) + "</span>" +
+          '<span class="hunt-name">' + esc(f.product) + "</span>" +
+        "</div>" +
+        '<p class="hunt-hazard">' + esc(f.hazard) + "</p>" +
+        '<dl class="hunt-facts">' + dl + "</dl>" +
+        caveat + ev +
+      "</article>";
+    }).join("");
+
+    node.innerHTML =
+      '<h2 class="act-head"><span class="act-num">06</span> ' +
+        "What three marketplaces could not see</h2>" +
+      '<p class="act-lede">' + esc(h._why_it_exists || "") + "</p>" +
+      '<p class="hunt-banner"><b>These are not sweep results.</b> ' +
+        "Every row below was fetched by hand, one URL at a time, from a market " +
+        "no collector arm covers. They are adjudicated by the same classifier " +
+        "the sweep uses, over pages committed to this repository, and " +
+        "<b>they change no statistic on this page</b>. Survival is still " +
+        esc(String(doc.stats.survival.n)) + " of " +
+        esc(String(doc.stats.survival.d)) + ", because that figure describes " +
+        "the three arms and these rows are not from the three arms.</p>" +
+      '<div class="hunt-list">' + items + "</div>" +
+      '<p class="hunt-close">' +
+        (reds ? "" : "") +
+        '<span class="hunt-punch">' + esc(h.the_honest_sentence || "") + "</span> " +
+        esc(h.what_this_does_not_establish || "") + "</p>";
+  }
+
   // ---------------------------------------------------------------- panels
 
   function renderNotSeen(doc) {
@@ -861,6 +982,111 @@
     var unseen = unreported ? "not estimable" : "≥ " + Math.round(rc.missed_floor);
     var recallNote = unreported ? rc.reportable_note : rc.note;
 
+    /* THE MATCHER PROOF, both halves.
+
+       This sweep's headline is a ZERO, and a zero has two possible causes: the
+       products are not there, or the matcher never fires. The wall used to
+       publish only the adversarial half, which proves the matcher does not
+       OVER-fire. That is the wrong half to show on its own. It answers an
+       attack nobody was making and leaves the one question a zero actually
+       raises completely open.
+
+       Both sets have existed and passed since they were written. control.json
+       was produced on every single run and read by nobody, because publish.py
+       had an adversarial() reader and no controls() reader. So the strongest
+       available answer to "is your zero real" sat on disk, unpublished.
+
+       Rendered as a pair, deliberately, because neither half means anything
+       alone: a matcher that discards everything passes the adversarial set
+       perfectly, and a matcher that reddens everything passes the controls
+       perfectly. Only both together say the zero describes the market. */
+    var ctl = s.positive_control_set, adv = s.adversarial_precision_set;
+    var proof = "";
+    if (ctl || adv) {
+      var card = function (title, ok, okText, badText, n, unit, note) {
+        return '<div class="mp-card' + (ok ? "" : " is-broken") + '">' +
+          '<div class="mp-head"><span class="mp-title">' + esc(title) + "</span>" +
+            '<span class="mp-state">' + (ok ? "HOLDS" : "BROKEN") + "</span></div>" +
+          '<div class="mp-count">' + n + " <span>" + esc(unit) + "</span></div>" +
+          '<div class="mp-result">' + esc(ok ? okText : badText) + "</div>" +
+          '<p class="mp-note">' + esc(note) + "</p>" +
+        "</div>";
+      };
+      var cards = "";
+      if (ctl) {
+        cards += card("Does it fire at all?", ctl.all_red,
+          "All " + ctl.n + " reached RED.",
+          "A CONTROL FELL OUT OF RED. This is a recall bug and blocks the freeze.",
+          ctl.n, "planted must-RED controls", ctl.note);
+      }
+      if (adv) {
+        cards += card("Does it fire at nothing?", adv.all_discarded,
+          "All " + adv.n + " were discarded.",
+          "A NEAR-MISS REACHED RED. This is a precision bug and blocks the freeze.",
+          adv.n, "deliberate near-misses", adv.note);
+      }
+      var bothHold = (!ctl || ctl.all_red) && (!adv || adv.all_discarded);
+      proof =
+        '<div class="mp">' +
+          "<h3>Before you believe the zero</h3>" +
+          '<p class="lede">A sweep that finds nothing has two possible ' +
+            "explanations, and they look identical from the outside: the " +
+            "products are not on sale, or the matcher never fires. These two " +
+            "sets separate them, and the wall is worth nothing without both.</p>" +
+          '<div class="mp-grid">' + cards + "</div>" +
+          '<p class="mp-close">' + esc(bothHold
+            ? "Both hold. The matcher accepts what it should and refuses what it "
+              + "should, so the zero is a statement about the three marketplaces "
+              + "we swept rather than about our own code. It is still only a "
+              + "statement about those three: Act 06 is what happened when we "
+              + "looked somewhere else."
+            : "One of these is broken, so no verdict on this page should be "
+              + "read as a measurement until it is fixed.") + "</p>" +
+        "</div>";
+    }
+
+    /* QUERY COVERAGE, and the one place this project can check a method rather
+       than argue for it.
+
+       Capture-recapture is normally unfalsifiable: you estimate N precisely
+       because you cannot count it. Here the denominator is the regulators' own
+       published corpus, so N is known exactly, and the estimator can be run
+       against a known answer.
+
+       Kept separate from the LISTINGS line above it. That one is unmeasured and
+       says so. This one counts NOTICES, which is a different unit, and putting
+       the two figures in the same sentence would be the denominator confusion
+       this project has already shipped once. */
+    var qc = s.query_coverage, qcBlock = "";
+    if (qc && qc.reportable) {
+      var v = qc.validation;
+      qcBlock =
+        '<div class="qc">' +
+          "<h3>Checking the method against a known answer</h3>" +
+          '<p class="lede">Our two query strategies, brand-plus-model and ' +
+            "model alone, are two capture occasions. Chapman's estimator turns " +
+            "their overlap into an estimate of how many notices were surfaceable " +
+            "at all, and it never gets to be checked, because the whole reason " +
+            "you estimate a population is that you cannot count it. Here we can: " +
+            "the corpus is published by the regulators.</p>" +
+          '<div class="qc-figs">' +
+            '<div><span class="qc-n">' + qc.observed + "</span>" +
+              "<span>notices surfaced by at least one strategy</span></div>" +
+            '<div><span class="qc-n">' + qc.n_hat + "</span>" +
+              "<span>estimated surfaceable, se " + qc.se + "</span></div>" +
+            '<div><span class="qc-n">' + v.known_corpus + "</span>" +
+              "<span>searchable notices, counted not estimated</span></div>" +
+            '<div><span class="qc-n">' + v.absolute_error + "</span>" +
+              "<span>absolute error against the known corpus</span></div>" +
+          "</div>" +
+          '<p class="qc-note">' + esc(v.note) + "</p>" +
+          '<p class="qc-note">At least ' + Math.round(qc.missed_floor) +
+            " searchable notices were surfaced by neither strategy, against " +
+            qc.surfaced_by_neither + " observed to have been missed. " +
+            esc(qc.note) + "</p>" +
+        "</div>";
+    }
+
     el("notSeen").innerHTML =
       "<h2>What we did not see</h2>" +
       '<p class="lede">A dashboard that only shows what it found is a dashboard that lies. ' +
@@ -871,10 +1097,8 @@
         "<dt>Listings we estimate we never saw at all</dt><dd>" + unseen + "</dd>" +
       "</dl>" +
       '<p class="lede" style="margin-top:16px">' + esc(recallNote) + "</p>" +
-      '<p class="lede">Adversarial precision set: ' + s.adversarial_precision_set.n +
-      " deliberate near-misses fed to the matcher, " +
-      (s.adversarial_precision_set.all_discarded ? "all discarded" : "ONE REACHED RED") + ". " +
-      esc(s.adversarial_precision_set.note) + "</p>";
+      qcBlock +
+      proof;
   }
 
   /* The prompt budgeter is deterministic and hard-capped. Fixed priority order:
@@ -1056,6 +1280,7 @@
     section("curve", function () { renderCurve(doc); });
     section("platform", function () { renderPlatform(doc); });
     section("detectors", function () { renderDetectors(doc); });
+    section("hunt", function () { renderHunt(doc); });
     section("notSeen", function () { renderNotSeen(doc); });
     section("healLedger", function () { renderHeal(doc); });
     section("provenance", function () { renderProvenance(doc); });

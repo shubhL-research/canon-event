@@ -36,6 +36,9 @@ echo
 echo "== heal ledger =="
 python3 collector/ledger.py
 echo
+echo "== hunt findings re-derived from committed pages =="
+python3 data/hunt/rederive.py
+echo
 echo "== republish the wall payload =="
 python3 collector/republish.py
 echo

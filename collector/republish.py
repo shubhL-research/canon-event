@@ -135,6 +135,28 @@ def main():
             "on this page was recomputed from the current corpus and the current "
             "rules.")
 
+    # PLATFORM TELEMETRY. Bright Data's own numbers about our collections.
+    #
+    # Deliberately NOT merged into arms[].job. Our `fails` is self-measured from
+    # collector output; theirs is measured at the fetch layer, and a page that
+    # never reached us is invisible to ours by construction. Writing their number
+    # into our field would erase exactly the discrepancy that makes it worth
+    # showing, so the two are carried side by side and reconciled in words.
+    pj = ROOT / "data" / "platform-jobs.json"
+    if pj.exists():
+        built["platform_jobs"] = json.loads(pj.read_text(encoding="utf-8"))
+
+    # THE HUNT. Kept in its own key, never merged into `rows`.
+    #
+    # These were fetched by hand, one URL at a time, from markets no collector
+    # covers. They are not adjudicated sweep output. Mixing a hand-found row into
+    # the collector results would be the single most dishonest thing this project
+    # could do, so they travel in a separate key, render in a separate section,
+    # and touch no statistic.
+    hunt_f = ROOT / "data" / "hunt.json"
+    if hunt_f.exists():
+        built["hunt"] = json.loads(hunt_f.read_text(encoding="utf-8"))
+
     # THE ARITHMETIC. republish recomputed it with reports=[], which produced
     # arms=0 and therefore "0 search loads, submitted as 0 batch jobs". The wall
     # then told a judge, in three separate places, that Bright Data did no work:

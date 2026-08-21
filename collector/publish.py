@@ -49,6 +49,7 @@ sys.path.insert(0, str(ROOT / "data"))
 
 from wilson import proportion, wilson                        # noqa: E402
 from recapture import from_rows as recapture_from_rows       # noqa: E402
+from recapture import from_notices as recapture_from_notices  # noqa: E402
 from survival import survival_curve, observations_from_rows  # noqa: E402
 from make_fixture import hazard_class                        # noqa: E402
 from normalize import gtin_check_digit_ok                    # noqa: E402
@@ -488,6 +489,31 @@ def adversarial():
             "by_kind": doc["by_kind"], "note": doc["note"]}
 
 
+def controls():
+    """The positive control set, if it has been run. Absent rather than faked.
+
+    THE PAIR IS THE CLAIM, AND HALF OF IT WAS INVISIBLE
+    ---------------------------------------------------
+    adversarial.json shows the matcher REFUSES what it should: 21 deliberately
+    confusable near-misses, every one discarded. It has always been published.
+    control.json shows the matcher ACCEPTS what it should: 13 known-good products
+    carrying real recall identifiers, on pages written in each marketplace's own
+    vocabulary, every one reaching RED. It was written on every run and read by
+    nobody.
+
+    That asymmetry mattered more here than almost anywhere, because this sweep's
+    headline is a ZERO. A wall that proves only "we do not over-fire" leaves the
+    single question a zero raises unanswered: is the matcher firing at all. Both
+    halves are needed before a zero describes the market rather than the code.
+    """
+    path = ROOT / "data" / "control.json"
+    if not path.exists():
+        return None
+    doc = json.loads(path.read_text(encoding="utf-8"))
+    return {"n": doc["n"], "all_red": doc["all_red"],
+            "by_kind": doc["by_kind"], "note": doc["note"]}
+
+
 def annotate(rows):
     """Attach the hazard classification the hero sentence is computed from."""
     for row in rows:
@@ -568,6 +594,14 @@ def build(rows, health_doc, seeds, reports=None, graded=None, variant="live",
     probes = adversarial()
     if probes:
         stats["adversarial_precision_set"] = probes
+    ctrl = controls()
+    if ctrl:
+        stats["positive_control_set"] = ctrl
+
+    # Query coverage, over the unit the two-strategy design was actually built
+    # around. Separate key from stats["precision"]["recall"], which is the
+    # RED-row version and is correctly unreportable in a sweep with no RED rows.
+    stats["query_coverage"] = recapture_from_notices(rows, searchable)
 
     return {
         "sweep_id": health_doc["sweep_id"],

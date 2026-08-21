@@ -697,7 +697,7 @@ def build_fixture(variant, rows, stats):
         try:
             t = live.read_text(encoding="utf-8")
             src = json.loads(t[t.index("{"):t.rindex(";")])
-            for key in ("platform", "heals", "detectors", "detector_summary"):
+            for key in ("platform", "heals", "detectors", "detector_summary", "hunt", "platform_jobs"):
                 if src.get(key):
                     base[key] = src[key]
             base.setdefault("provenance", {})["platform_from_live"] = (
