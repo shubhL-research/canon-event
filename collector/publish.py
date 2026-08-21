@@ -556,9 +556,9 @@ def arithmetic(seeds, reports):
             "notices, %d per arm.%s%s"
             % (planned // arms if arms else planned, arms, planned,
                searchable_seeds, searchable_seeds * 2,
-               (" The archive re-scored here holds %d fewer per arm: it was "
-                "fetched before the searchability rule was tightened."
-                % (searchable_seeds * 2 - (planned // arms)))
+               (" %d of those query strings repeat across notices, so the plan "
+                "issues %d distinct URLs per arm."
+                % (searchable_seeds * 2 - (planned // arms), planned // arms))
                if arms and searchable_seeds * 2 > (planned // arms) else
                (" The archive holds %d more per arm, from notices an older and "
                 "looser searchability test accepted and this page now reports as "

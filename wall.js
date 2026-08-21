@@ -1223,7 +1223,7 @@
       attBlock +
       pjBlock +
       '<p class="platform-foot">' + esc(p.seed_layer) +
-        (cr.cap ? " Page loads issued this sweep: " + commas(cr.used || 0) +
+        (cr.cap ? " Page loads in this sweep's plan: " + commas(cr.used || 0) +
                   " against a self-imposed cap of " + commas(cr.cap) +
                   ". That is loads planned and issued, not a billing figure: what " +
                   "a load costs is the platform's to state and not ours, so the " +

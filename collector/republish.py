@@ -220,23 +220,26 @@ def main():
             # as unsearchable. needle_for now calls the owned rule and a fresh
             # plan comes out at exactly 360, but the archive records what
             # happened and is not rewritten to match what should have.
+            # ONE SENTENCE, NOT TWO. publish.py was corrected and this second
+            # copy was not, and this is the copy the wall renders, so the fix
+            # never reached the page: it still said "issued" for a replay and
+            # printed "the extra -7 per arm".
+            #
+            # And the cause was invented. The 7 is not the archive and not the
+            # searchability rule. plan_arm emits 356 query tuples per arm which
+            # collapse to 349 distinct URLs, because four query strings repeat
+            # across notices: two Estrosa notices both reduce to "Smalto", two
+            # Helmo Milano notices both reduce to "SQ-903".
             per = pl // arms_n
             sear = ar.get("searchable_seeds") or 0
-            expect = sear * 2
-            if per != expect and sear:
-                ar["working"] = (
-                    "%d unique URLs per arm x %d arms = %d search loads issued. "
-                    "The plan is 2 queries for each of %d searchable notices, "
-                    "%d per arm; the extra %d per arm are notices an older and "
-                    "looser searchability test accepted, and which this page "
-                    "reports as unsearchable. The archive is left as it is."
-                    % (per, arms_n, pl, sear, expect, per - expect))
-            else:
-                ar["working"] = (
-                    "%d unique URLs planned per arm x %d arms = %d search loads, "
-                    "2 queries for each of %d searchable notices of %d."
-                    % (per, arms_n, pl, sear,
-                       ar.get("corpus_seeds") or ar.get("notices") or 207))
+            planned = sear * 2
+            ar["working"] = (
+                "%d planned queries per arm, 2 for each of %d searchable "
+                "notices, collapse to %d unique URLs because %d query strings "
+                "repeat across notices. %d unique URLs x %d arms = %d search "
+                "URLs in the plan for this corpus. This publish re-scored "
+                "archived rows and issued none."
+                % (planned, sear, per, planned - per, per, arms_n, pl))
 
         w = built["stats"]["arithmetic"].get("working") or ""
         if "0 batch jobs" in w:

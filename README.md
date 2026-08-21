@@ -78,7 +78,7 @@ One full sweep, 20 August 2026. **All 207 notices, all three arms, both regulato
 |---|---|
 | Notices swept | 207 of 207. 103 CPSC and 104 EU Safety Gate |
 | Arms swept | US `amazon.com`, DE `kaufland.de`, IN `flipkart.com`. **All three DEGRADED**, on join-key coverage below bound |
-| Search loads | 1,107 issued. 369 unique URLs per arm, three arms. The plan is 2 queries for each of 180 searchable notices, 360 per arm; the extra 9 per arm are notices an older, looser searchability test accepted and this page reports as unsearchable. See SCRAPER-STUDIO.md |
+| Search loads | 1,047 in the plan. 349 unique URLs per arm x 3 arms: 2 queries for each of 178 searchable notices, 356 per arm, 7 of which collide because four query strings repeat across notices. The committed archive holds rows for 130 US, 190 DE and 100 IN distinct URLs; a query that returned nothing leaves no row, so the issued count is not recoverable from it |
 | Listings adjudicated | 23,813. US 13,784, DE 2,043, IN 7,986 |
 | Notices that got any candidate | US 95, DE 59, IN 55, of 207 queried per arm |
 | Listings discarded | 23,813, every one |
@@ -88,7 +88,7 @@ One full sweep, 20 August 2026. **All 207 notices, all three arms, both regulato
 | Precision | not computed, and cannot be. There are no RED rows to hand-verify |
 | Border escape | pending. The India arm is DEGRADED, so nothing is claimed outside the EU |
 | Exit attestation | **none.** Every arm renders "exit not attested on this sweep". Three heals tried to add it in-stage and all three were refused for stripping the extraction; five heals were run in total and four were refused |
-| Credits | not stated. 1,107 is page loads planned and issued, which is what the collector controls. The billing figure is on the account, not in the sweep output |
+| Credits | not stated. 1,047 is page loads PLANNED, which is what the collector controls; this publish re-scored archived rows and issued none. The billing figure is on the account, not in the sweep output |
 
 **All three arms are DEGRADED and that is not a footnote.** Each returned
 thousands of listings and joined fewer than half its notices to a candidate: 95,

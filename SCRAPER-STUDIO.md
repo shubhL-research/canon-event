@@ -65,26 +65,25 @@ alone, which are also the two capture occasions the recall estimate uses. 180 of
 the 207 notices carry a searchable identifier, so the plan is **360 unique URLs
 per arm, 1,080 across the three**.
 
-The archive holds **369 per arm, 1,107 in total**, and the nine-URL gap is not a
-rounding difference. The sweep that produced this archive used a looser
-searchability test than the wall publishes: `needle_for` accepted any non-empty
-identifier, while the wall decides searchability with
-`extract/identifier.py:classify`, which rejects a GTIN failing its own check
-digit, a bare `P1`, and a model field reading `Year 2026 Teryx4 H2`. The two
-disagreed on 8 notices, so the sweep queried 8 that this page reports as having
-no searchable identifier at all.
+The archive holds rows for **130 distinct search URLs on US, 190 on DE and 100
+on IN**, 420 in total. That is not the issued count and cannot be: a query that
+returned nothing emits no row, so the archive records what came back rather than
+what went out. The issued count is not recoverable from what is committed.
 
-That is now fixed at the source: `needle_for` calls the owned rule, and a fresh
-plan comes out at exactly 360. The archive is left as it is and reported as it
-is, because rewriting a record of what happened to match what should have
-happened is the one repair this project may never make. Searching extra notices
-cannot manufacture a finding, only turn up more, so the zero is unaffected. The
-claim and the behaviour now agree, and until the next sweep the difference
-between them is stated here rather than smoothed over.
+The 369 that used to stand here was never an archive figure. It was the size of a
+plan recomputed at replay time from whatever the corpus and the searchability
+rule happened to be that day, which is why the same archive was credited with
+232, 348 and 1,107 loads on three different days. It is reported as a plan now,
+and a plan is what it always was.
+
+The 7-URL difference between 356 planned queries and 349 distinct URLs is neither
+the archive nor the searchability rule, which is what this document previously
+claimed. Four query strings repeat across notices: two Estrosa notices both
+reduce to `Smalto`, two Helmo Milano notices both reduce to `SQ-903`.
 
 ```
-360 unique URLs planned per arm x 3 arms  =   1,080 planned
-369 unique URLs held in the archive x 3   =   1,107 actually issued
+349 unique URLs planned per arm x 3 arms  =   1,047 in the plan
+archive holds rows for 130 US / 190 DE / 100 IN distinct URLs
 US amazon.com    13,784 listings,  92 of 207 notices joined
 DE kaufland.de   2,043 listings, 110 of 207 notices joined
 IN flipkart.com  7,986 listings,  55 of 207 notices joined

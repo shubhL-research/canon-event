@@ -164,6 +164,53 @@ def main():
         problems.append("data/sweeps/published.jsonl holds a different number of "
                         "rows than the payload publishes")
 
+    # NO SURFACE MAY CALL A PLAN AN ISSUED COUNT.
+    #
+    # planned_loads on the replay path is len(plan_arm(...)) recomputed at replay
+    # time, so the same committed archive was credited with 232, 348 and 1,107
+    # "issued" loads on three different days as the corpus and the searchability
+    # rule moved. The README says of this publish: "No new fetch and no new
+    # credits." A replay issues nothing.
+    #
+    # publish.py was corrected and republish.py carried a second, unfixed copy of
+    # the same sentence, which is the copy the wall renders, so the fix never
+    # reached the page. This checks the rendered value, not the source.
+    working = (doc["stats"].get("arithmetic") or {}).get("working", "")
+    for banned in ("loads issued", "planned and issued", "actually issued"):
+        if banned in working:
+            problems.append("stats.arithmetic.working says %r for a payload whose "
+                            "sweep id is %s. A replay issues nothing."
+                            % (banned, doc.get("sweep_id")))
+    if "-" in working.split("because")[0] and "extra -" in working:
+        problems.append("stats.arithmetic.working prints a negative count as an "
+                        "'extra': %r" % working[:90])
+
+    # And the archive claim, which the archive itself can settle.
+    raw_dir = ROOT / "data" / "sweeps" / "raw"
+    if raw_dir.exists():
+        import json as _j
+        counts = {}
+        # Named `arm_file`, not `f`: `f` is the facts dict in this scope and
+        # shadowing it made every figure comparison below read a Path.
+        for arm_file in sorted(raw_dir.glob("*.jsonl")):
+            urls = set()
+            for line in arm_file.read_text(encoding="utf-8").splitlines():
+                if not line.strip():
+                    continue
+                try:
+                    u = (_j.loads(line).get("input") or {}).get("url")
+                except Exception:
+                    continue
+                if u:
+                    urls.add(u)
+            counts[arm_file.stem] = len(urls)
+        doc_text = (ROOT / "SCRAPER-STUDIO.md").read_text(encoding="utf-8")
+        for arm, n in counts.items():
+            if str(n) not in doc_text:
+                problems.append("SCRAPER-STUDIO.md does not state the %d distinct "
+                                "search URLs the committed archive holds for %s"
+                                % (n, arm))
+
     # The arms must also add up to the total they are printed beside, which is
     # the one sum a judge can do in their head on the page itself.
     parts = f["US_listings"] + f["DE_listings"] + f["IN_listings"]
