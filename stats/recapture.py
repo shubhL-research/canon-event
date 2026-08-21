@@ -101,3 +101,73 @@ def from_rows(rows):
     n2 = sum(1 for r in red if r["found_by_query"] in ("model_only", "both"))
     m = sum(1 for r in red if r["found_by_query"] == "both")
     return chapman(n1, n2, m)
+
+
+def from_notices(rows, is_searchable):
+    """Capture-recapture over NOTICES, which is the unit the design specified.
+
+    WHY THIS EXISTS ALONGSIDE from_rows()
+    -------------------------------------
+    from_rows() counts only RED rows, on the reasoning that a row which never
+    resolved to a confirmed listing was not captured in the sense the estimator
+    requires. That is defensible, and in a sweep with zero RED rows it is also
+    uncomputable: every count is 0, m is 0, and the figure correctly reports
+    itself unreportable. The wall then says recall is unmeasured.
+
+    But the two query strategies are run per NOTICE, not per RED row, and a
+    notice is captured when a strategy surfaced any candidate listing for it at
+    all. That is the capture event the two-strategy design was built around, and
+    `found_by_query` is populated for it on every joined notice. Restricting to
+    RED discards all of it.
+
+    So both are computed. from_rows() answers "how many recalled products still
+    on sale did we miss", which this sweep cannot answer. This answers "how many
+    notices did our own query strategies fail to surface", which it can.
+
+    THE PART THAT MAKES THIS UNUSUAL
+    --------------------------------
+    Capture-recapture is normally unfalsifiable: you estimate N precisely because
+    you cannot count it. Here the denominator is the regulators' own published
+    corpus, so N is known exactly. The estimate can be checked against it rather
+    than trusted, which is a validation this method almost never gets.
+
+    Read the check carefully in the direction it actually runs. The estimator's
+    target is "notices with a findable listing", which is AT MOST the searchable
+    corpus and may be less, because a notice can have no listing anywhere in the
+    three markets. So agreement bounds the estimator rather than confirming it.
+    """
+    sear = [r for r in rows if is_searchable(r)]
+    n1 = sum(1 for r in sear if r.get("found_by_query") in ("brand_model", "both"))
+    n2 = sum(1 for r in sear if r.get("found_by_query") in ("model_only", "both"))
+    m = sum(1 for r in sear if r.get("found_by_query") == "both")
+
+    out = chapman(n1, n2, m)
+    known = len(sear)
+    neither = sum(1 for r in sear if not r.get("found_by_query"))
+
+    out["unit"] = "notice"
+    out["corpus_n"] = known
+    out["surfaced_by_neither"] = neither
+    out["validation"] = {
+        "known_corpus": known,
+        "estimated": out["n_hat"],
+        "absolute_error": round(abs(known - out["n_hat"]), 2),
+        "within_1_se": abs(known - out["n_hat"]) <= (out["se"] or float("inf")),
+        "note": ("Capture-recapture is normally unfalsifiable, because N is estimated "
+                 "precisely when it cannot be counted. Here the denominator is the "
+                 "regulators' own corpus, so N is known exactly and the estimator can "
+                 "be checked instead of trusted. Read the check in the direction it "
+                 "runs: the target population is notices with a findable listing, which "
+                 "is at most the searchable corpus and may be smaller, since a notice "
+                 "can have no listing in any of the three markets. Agreement therefore "
+                 "bounds the estimator rather than confirming it."),
+    }
+    out["note"] = ("Capture unit is the NOTICE: a notice counts as captured by a strategy "
+                   "when that strategy surfaced any candidate listing for it. The two "
+                   "strategies share the model token and are positively correlated, which "
+                   "inflates the overlap and deflates N-hat, so the miss count is a LOWER "
+                   "bound on our blindness rather than an estimate of it. This measures "
+                   "our own query coverage. It says nothing about how many recalled "
+                   "products are on sale, which is a different question this sweep did "
+                   "not answer.")
+    return out

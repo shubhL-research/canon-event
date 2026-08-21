@@ -49,6 +49,7 @@ sys.path.insert(0, str(ROOT / "data"))
 
 from wilson import proportion, wilson                        # noqa: E402
 from recapture import from_rows as recapture_from_rows       # noqa: E402
+from recapture import from_notices as recapture_from_notices  # noqa: E402
 from survival import survival_curve, observations_from_rows  # noqa: E402
 from make_fixture import hazard_class                        # noqa: E402
 from normalize import gtin_check_digit_ok                    # noqa: E402
@@ -596,6 +597,11 @@ def build(rows, health_doc, seeds, reports=None, graded=None, variant="live",
     ctrl = controls()
     if ctrl:
         stats["positive_control_set"] = ctrl
+
+    # Query coverage, over the unit the two-strategy design was actually built
+    # around. Separate key from stats["precision"]["recall"], which is the
+    # RED-row version and is correctly unreportable in a sweep with no RED rows.
+    stats["query_coverage"] = recapture_from_notices(rows, searchable)
 
     return {
         "sweep_id": health_doc["sweep_id"],

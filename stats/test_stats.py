@@ -15,9 +15,14 @@ import random
 import sys
 
 sys.path.insert(0, str(pathlib.Path(__file__).parent))
+# The OWNED searchability rule, imported rather than restated. Three different
+# definitions of "searchable notice" once produced three different denominators
+# on the same page (120, 124 and 180), so this file is not allowed its own.
+sys.path.insert(0, str(pathlib.Path(__file__).parent.parent / "collector"))
 
 from wilson import wilson, proportion, Z95            # noqa: E402
 from recapture import chapman, from_rows              # noqa: E402
+from publish import searchable as _searchable         # noqa: E402
 from survival import (pava_non_increasing, step_at,   # noqa: E402
                       survival_curve, observations_from_rows)
 
@@ -194,6 +199,30 @@ if fx.exists():
     print(f"       recapture: n1={rc['n1_brand_model']} n2={rc['n2_model_only']} "
           f"m={rc['m_both']} -> at least {rc['missed_floor']:.0f} missed")
     check(rc["n_hat"] >= rc["observed"], "recapture estimate exceeds what was observed")
+    # Notice-level query coverage. The properties worth pinning are the ones a
+    # careless edit would break silently: the capture unit, the fact that the
+    # corpus is COUNTED rather than estimated, and that the two never get mixed.
+    from recapture import from_notices
+    qc = from_notices(rows, _searchable)
+    print(f"       query coverage: {qc['observed']} of {qc['corpus_n']} surfaced, "
+          f"N-hat {qc['n_hat']} (se {qc['se']}), error "
+          f"{qc['validation']['absolute_error']}")
+    check(qc["unit"] == "notice", "query coverage declares its capture unit")
+    check(qc["corpus_n"] == sum(1 for r in rows if _searchable(r)),
+          "the known corpus is counted from the rows, not estimated")
+    check(qc["n_hat"] >= qc["observed"],
+          "notice-level estimate exceeds what was observed")
+    check(qc["observed"] + qc["surfaced_by_neither"] == qc["corpus_n"],
+          "surfaced plus missed accounts for every searchable notice")
+    check(qc["validation"]["absolute_error"]
+          == round(abs(qc["corpus_n"] - qc["n_hat"]), 2),
+          "the validation error is derived, not asserted")
+    # The estimator must never claim MORE surfaceable notices than exist to be
+    # surfaced by more than its own stated uncertainty. If it does, either the
+    # capture counts are wrong or the corpus is.
+    check(qc["n_hat"] - qc["corpus_n"] <= (qc["se"] or 0),
+          "estimate does not exceed the known corpus beyond one standard error")
+
 
     p = proportion(doc["stats"]["survival"]["n"], doc["stats"]["survival"]["d"], "survival")
     check(p["ci95"] == doc["stats"]["survival"]["ci95"],

@@ -1045,6 +1045,48 @@
         "</div>";
     }
 
+    /* QUERY COVERAGE, and the one place this project can check a method rather
+       than argue for it.
+
+       Capture-recapture is normally unfalsifiable: you estimate N precisely
+       because you cannot count it. Here the denominator is the regulators' own
+       published corpus, so N is known exactly, and the estimator can be run
+       against a known answer.
+
+       Kept separate from the LISTINGS line above it. That one is unmeasured and
+       says so. This one counts NOTICES, which is a different unit, and putting
+       the two figures in the same sentence would be the denominator confusion
+       this project has already shipped once. */
+    var qc = s.query_coverage, qcBlock = "";
+    if (qc && qc.reportable) {
+      var v = qc.validation;
+      qcBlock =
+        '<div class="qc">' +
+          "<h3>Checking the method against a known answer</h3>" +
+          '<p class="lede">Our two query strategies, brand-plus-model and ' +
+            "model alone, are two capture occasions. Chapman's estimator turns " +
+            "their overlap into an estimate of how many notices were surfaceable " +
+            "at all, and it never gets to be checked, because the whole reason " +
+            "you estimate a population is that you cannot count it. Here we can: " +
+            "the corpus is published by the regulators.</p>" +
+          '<div class="qc-figs">' +
+            '<div><span class="qc-n">' + qc.observed + "</span>" +
+              "<span>notices surfaced by at least one strategy</span></div>" +
+            '<div><span class="qc-n">' + qc.n_hat + "</span>" +
+              "<span>estimated surfaceable, se " + qc.se + "</span></div>" +
+            '<div><span class="qc-n">' + v.known_corpus + "</span>" +
+              "<span>searchable notices, counted not estimated</span></div>" +
+            '<div><span class="qc-n">' + v.absolute_error + "</span>" +
+              "<span>absolute error against the known corpus</span></div>" +
+          "</div>" +
+          '<p class="qc-note">' + esc(v.note) + "</p>" +
+          '<p class="qc-note">At least ' + Math.round(qc.missed_floor) +
+            " searchable notices were surfaced by neither strategy, against " +
+            qc.surfaced_by_neither + " observed to have been missed. " +
+            esc(qc.note) + "</p>" +
+        "</div>";
+    }
+
     el("notSeen").innerHTML =
       "<h2>What we did not see</h2>" +
       '<p class="lede">A dashboard that only shows what it found is a dashboard that lies. ' +
@@ -1055,6 +1097,7 @@
         "<dt>Listings we estimate we never saw at all</dt><dd>" + unseen + "</dd>" +
       "</dl>" +
       '<p class="lede" style="margin-top:16px">' + esc(recallNote) + "</p>" +
+      qcBlock +
       proof;
   }
 
