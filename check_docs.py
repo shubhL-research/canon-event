@@ -120,6 +120,27 @@ def main():
             if stale in text:
                 problems.append("DEMO.md still scripts the stale figure %r" % stale)
 
+    # THE HERO AND THE REGULATOR BLOCK MUST RECONCILE.
+    #
+    # The hero says every EU alert carries a barcode and N of them pass their own
+    # check digit. The regulator block, three screens down, says M EU notices are
+    # unsearchable. Those are the same notices seen from two directions. If they
+    # ever stop agreeing, one of the two is wrong and a reader can see it without
+    # leaving the page.
+    hero = doc["stats"].get("hero") or {}
+    eu = (doc["stats"].get("unsearchable_by_authority") or {}).get("SAFETY_GATE")
+    if eu and hero.get("eu_barcode_total"):
+        invalid = hero["eu_barcode_total"] - hero["eu_barcode_valid"]
+        if invalid != eu["n"]:
+            problems.append(
+                "the hero implies %d EU barcodes are unusable (%d of %d fail their "
+                "check digit) while the regulator block reports %d EU notices "
+                "unsearchable. Same notices, two directions, two answers."
+                % (invalid, invalid, hero["eu_barcode_total"], eu["n"]))
+        if str(hero["eu_barcode_valid"]) not in hero.get("sentence", ""):
+            problems.append("the hero sentence does not state the %d it validated"
+                            % hero["eu_barcode_valid"])
+
     # The arms must also add up to the total they are printed beside, which is
     # the one sum a judge can do in their head on the page itself.
     parts = f["US_listings"] + f["DE_listings"] + f["IN_listings"]

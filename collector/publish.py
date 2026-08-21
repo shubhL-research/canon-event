@@ -286,9 +286,28 @@ def hero(rows, seeds):
     # those notices. A sentence the codebase disproves cannot lead the page.
     uns = unsearchable(seeds)
     empty = CPSC_MODEL_FIELD_EMPTY
+
+    # "Every one of 104 EU alerts carries a barcode" is TRUE and it is not the
+    # whole truth, which on a page like this is the same problem. Six of those
+    # barcodes fail their own modulo-10 check digit, which is why the regulator
+    # block on the same screen reports 5.8% of EU notices unsearchable. A reader
+    # who notices both is entitled to ask which it is, and the answer should be
+    # on the first line rather than inferred from two figures three screens
+    # apart.
+    #
+    # Saying so is also stronger, not weaker: it shows the barcodes were
+    # VALIDATED rather than counted. Computed from the corpus, never typed, so it
+    # cannot drift from the rule that produces the unsearchable figure.
+    eu = [x for x in seeds if x.get("authority") == "SAFETY_GATE"]
+    eu_valid = sum(1 for x in eu if gtin_check_digit_ok((x.get("gtin") or "").strip()))
+
     out["sentence"] = ("The US recall feed has a model-number field. It is empty on "
                        "%d of %d product records. Every one of %d EU alerts carries "
-                       "a barcode." % (empty["empty"], empty["checked"], empty["eu_with_barcode"]))
+                       "a barcode, and %d of them pass their own check digit."
+                       % (empty["empty"], empty["checked"], empty["eu_with_barcode"],
+                          eu_valid))
+    out["eu_barcode_valid"] = eu_valid
+    out["eu_barcode_total"] = len(eu)
     out["basis"] = "unsearchable_fallback"
     out["fallback_reason"] = (
         "No listing reached RED in this sweep: no recalled identifier was "
