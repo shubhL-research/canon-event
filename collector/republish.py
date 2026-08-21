@@ -135,6 +135,17 @@ def main():
             "on this page was recomputed from the current corpus and the current "
             "rules.")
 
+    # PLATFORM TELEMETRY. Bright Data's own numbers about our collections.
+    #
+    # Deliberately NOT merged into arms[].job. Our `fails` is self-measured from
+    # collector output; theirs is measured at the fetch layer, and a page that
+    # never reached us is invisible to ours by construction. Writing their number
+    # into our field would erase exactly the discrepancy that makes it worth
+    # showing, so the two are carried side by side and reconciled in words.
+    pj = ROOT / "data" / "platform-jobs.json"
+    if pj.exists():
+        built["platform_jobs"] = json.loads(pj.read_text(encoding="utf-8"))
+
     # THE HUNT. Kept in its own key, never merged into `rows`.
     #
     # These were fetched by hand, one URL at a time, from markets no collector

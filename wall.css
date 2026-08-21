@@ -1213,3 +1213,24 @@ body { overflow-x: clip; max-width: 100%; }
 @media (max-width: 1279px) { .hunt-facts { grid-template-columns: 1fr 1fr; } }
 @media (max-width: 719px)  { .hunt-facts { grid-template-columns: 1fr; }
                              .hunt-list { padding-left: 16px; } }
+
+/* --------------------------------------------------- platform telemetry
+   Their number beside ours. The card is deliberately NOT styled as an alarm:
+   an 80% success rate on an 8-page job is not a crisis, it is a disagreement
+   between two instruments, and dressing it in hazard red would overclaim it in
+   exactly the direction this project spends its whole time refusing. */
+.pj-grid { display: grid; gap: 16px; margin-top: 24px; }
+.pj-card { border: 1px solid var(--rule-strong); border-left: 3px solid var(--flux); padding: 18px 20px; }
+.pj-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+.pj-name { font-family: var(--font-machine); font-size: 13px; font-weight: 700; }
+.pj-rate { font-family: var(--font-machine); font-size: 13px; font-weight: 700; color: var(--flux); }
+.pj-facts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px 20px; margin: 16px 0 0; }
+.pj-facts dt {
+  font-family: var(--font-machine); font-size: 9px; letter-spacing: 0.12em;
+  text-transform: uppercase; color: var(--ink-3);
+}
+.pj-facts dd { margin: 3px 0 0; font-family: var(--font-machine); font-size: 12px; color: var(--ink); overflow-wrap: anywhere; }
+.pj-reconcile { margin: 16px 0 0; font-size: 13px; line-height: 1.55; color: var(--ink-2); max-width: 74ch; }
+.pj-limit { margin-top: 16px; font-size: 13px; line-height: 1.55; color: var(--ink-2); max-width: 74ch; }
+.pj-limit b { color: var(--ink); }
+@media (max-width: 719px) { .pj-facts { grid-template-columns: 1fr 1fr; } }

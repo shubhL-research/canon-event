@@ -1,0 +1,22 @@
+{
+  "_what": "Bright Data's OWN telemetry about our collections, recorded where it disagrees with our health board.",
+  "_why_this_file_exists": "Our health board computes `fails` from what the collector returned to us. That is self-reported health, and self-reported health cannot see a page that never reached us. On 2026-08-20 the platform's monitoring flagged a 20% page failure on a US collection while our own board recorded fails: 0 for the US arm on that day. Neither number is wrong. They measure different things, and the distance between them is a real limitation of every health board that only reads its own output. This project exists to refuse clean screens over broken scrapers, so the honest move is to publish both numbers and name the gap, not to quietly adopt theirs or ignore it.",
+  "_provenance": "Transcribed from a Bright Data 'Low success rate' alert email, subject line \"Low success rate for canon-us\", received 2026-08-21. It is operator-supplied evidence, not an API read: we do not currently poll the platform for job telemetry, which is itself the finding. Nothing here is inferred and nothing is rounded.",
+  "_limitation": "This is ONE job. It is not a success rate for the sweep, for the US arm, or for any other collection, and it must never be presented as one. Eight pages is a small run and 2 failures out of 8 carries an interval far too wide to characterise anything.",
+  "jobs": [
+    {
+      "collector_name": "canon-us",
+      "collector_id": null,
+      "collector_id_note": "The alert names the collector 'canon-us'. This project has run more than one US collector (c_mt01usw31e8y5ubqjs on the current sweep, c_mt1fh690ebsllah9n in heal US-002), and the alert does not carry an id. Mapping the name to an id would be a guess, so it is left null.",
+      "job_id": "j_mt1o3e1m1ewc7fweo7",
+      "started_at": "2026-08-20T15:20:33Z",
+      "trigger_type": "CLI",
+      "pages": 8,
+      "errors": 2,
+      "success_rate": 0.80,
+      "reported_by": "Bright Data collection monitoring",
+      "our_board_said": "fails: 0 for the US arm in every health file written on 2026-08-20",
+      "reconciliation": "Not a contradiction. Our `fails` counts inputs that returned neither a row nor an archived empty-result page, computed from collector output. The platform counts pages it could not collect. A page that failed at the fetch layer and returned nothing is a failure to them and simply an absent input to us. We could not have seen these two without being told."
+    }
+  ]
+}

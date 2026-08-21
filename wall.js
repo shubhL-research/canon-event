@@ -787,6 +787,46 @@
       }).join("");
     }
 
+    /* The platform's own telemetry, where it DISAGREES with our board.
+
+       Our `fails` is computed from what the collector returned to us. That is
+       self-reported health, and self-reported health cannot see a page that
+       never arrived. Bright Data's monitoring flagged a 20% page failure on a US
+       collection on 2026-08-20; every health file we wrote that day recorded
+       fails: 0 for the US arm. Neither number is wrong and they are not in
+       contradiction: they measure different things.
+
+       Their number is NOT written into our field. Overwriting ours with theirs
+       would erase the discrepancy, which is the only interesting thing here. A
+       board that can only see its own output has a blind spot shaped exactly
+       like this, and a project whose whole claim is "never show a clean screen
+       over a broken scraper" has to say so about itself first. */
+    var pjBlock = "";
+    var pjs = doc.platform_jobs;
+    if (pjs && pjs.jobs && pjs.jobs.length) {
+      var jobCards = pjs.jobs.map(function (j) {
+        return '<div class="pj-card">' +
+          '<div class="pj-head"><span class="pj-name">' + esc(j.collector_name) +
+            '</span><span class="pj-rate">' + pct(j.success_rate) + " success</span></div>" +
+          '<dl class="pj-facts">' +
+            "<div><dt>job</dt><dd>" + esc(j.job_id) + "</dd></div>" +
+            "<div><dt>started</dt><dd>" + esc(j.started_at) + "</dd></div>" +
+            "<div><dt>trigger</dt><dd>" + esc(j.trigger_type) + "</dd></div>" +
+            "<div><dt>pages</dt><dd>" + j.pages + ", " + j.errors + " failed</dd></div>" +
+            "<div><dt>they reported</dt><dd>" + pct(j.success_rate) + "</dd></div>" +
+            "<div><dt>we recorded</dt><dd>" + esc(j.our_board_said) + "</dd></div>" +
+          "</dl>" +
+          '<p class="pj-reconcile">' + esc(j.reconciliation) + "</p>" +
+        "</div>";
+      }).join("");
+      pjBlock =
+        '<h3 class="platform-sub">Where the platform disagreed with our own health board</h3>' +
+        '<p class="act-lede">' + esc(pjs._why_this_file_exists) + "</p>" +
+        '<div class="pj-grid">' + jobCards + "</div>" +
+        '<p class="pj-limit"><b>One job, not a rate.</b> ' + esc(pjs._limitation) +
+        " " + esc(pjs._provenance) + "</p>";
+    }
+
     var cr = (doc.stats && doc.stats.credits) || {};
 
     node.innerHTML =
@@ -804,6 +844,7 @@
           '<p class="act-lede">' + esc(heals.note) + "</p>" +
           '<div class="heal-grid">' + healBlock + "</div>"
         : "") +
+      pjBlock +
       '<p class="platform-foot">' + esc(p.seed_layer) +
         (cr.cap ? " Credits used this sweep: " + commas(cr.used || 0) + " of " +
                   commas(cr.cap) + "." : "") + "</p>";
