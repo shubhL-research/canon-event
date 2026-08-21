@@ -1125,3 +1125,83 @@ body { overflow-x: clip; max-width: 100%; }
 }
 .det-note { font-size: 13px; color: var(--ink-2); line-height: 1.45; margin-top: 10px; }
 @media (max-width: 1279px) { .det-grid { grid-template-columns: 1fr 1fr; } }
+
+
+/* ------------------------------------------------------------------ act 06
+   THE HUNT. Hand-found rows, kept unmistakably apart from the sweep.
+
+   The separation is done three ways at once, because one way is a caption a
+   reader can skip: the act sits below the sweep, its whole body is inset behind
+   a heavy left rule, and it opens with a banner that says what these rows are
+   not. A judge who reads only the banner still cannot mistake them for sweep
+   output.
+
+   Red is rationed on this wall to accusations. One row here is an accusation
+   and earns it. The rest are amber and take amber. */
+.act-hunt { margin-top: 96px; }
+.hunt-banner {
+  margin-top: 24px; padding: 14px 18px;
+  border: 1px solid var(--rule-strong); border-left: 3px solid var(--ink);
+  background: var(--paper-hero);
+  font-family: var(--font-machine); font-size: 11px; line-height: 1.6;
+  letter-spacing: 0.04em; text-transform: uppercase; color: var(--ink-2);
+}
+.hunt-banner b { color: var(--ink); }
+.hunt-list { margin-top: 28px; border-left: 3px solid var(--rule-strong); padding-left: 28px; }
+.hunt-item { padding: 24px 0; border-bottom: 1px solid var(--rule); }
+.hunt-item:first-child { padding-top: 4px; }
+.hunt-item:last-child { border-bottom: none; }
+
+.hunt-top { display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; }
+.hunt-chip {
+  font-family: var(--font-machine); font-size: 10px; font-weight: 700;
+  letter-spacing: 0.14em; padding: 4px 9px; color: var(--ink-inv);
+  background: var(--unknown);
+}
+.hunt-chip.is-red   { background: var(--hazard); }
+.hunt-chip.is-amber { background: var(--amber); }
+.hunt-ref { font-family: var(--font-machine); font-size: 11px; color: var(--ink-3); letter-spacing: 0.06em; }
+.hunt-name { font-size: 17px; font-weight: 700; letter-spacing: -0.01em; }
+.hunt-hazard { margin: 10px 0 0; max-width: 62ch; font-size: 14px; line-height: 1.5; color: var(--ink-2); }
+.hunt-item.is-red .hunt-hazard { color: var(--hazard-deep); font-weight: 600; }
+
+.hunt-facts {
+  display: grid; grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px 20px; margin-top: 16px;
+}
+.hunt-facts dt {
+  font-family: var(--font-machine); font-size: 9px; letter-spacing: 0.12em;
+  text-transform: uppercase; color: var(--ink-3);
+}
+.hunt-facts dd {
+  margin: 3px 0 0; font-family: var(--font-machine); font-size: 12px;
+  color: var(--ink); overflow-wrap: anywhere;
+}
+
+/* A caveat is not a footnote. Where a row is weaker than it looks, the reason
+   sits in the row at reading size, not under an asterisk. */
+.hunt-caveat {
+  margin-top: 16px; padding: 12px 16px; background: var(--paper-hero);
+  border-left: 2px solid var(--amber);
+  font-size: 13px; line-height: 1.55; color: var(--ink-2); max-width: 74ch;
+}
+.hunt-caveat b {
+  display: block; font-family: var(--font-machine); font-size: 9px;
+  letter-spacing: 0.12em; text-transform: uppercase; color: var(--amber);
+  margin-bottom: 5px;
+}
+.hunt-evidence {
+  display: inline-block; margin-top: 12px; font-family: var(--font-machine);
+  font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--ink-2); text-decoration: none;
+  border-bottom: 1px solid var(--rule-strong); padding-bottom: 2px;
+}
+.hunt-evidence:hover { color: var(--flux); border-color: var(--flux); }
+.hunt-close {
+  margin-top: 32px; padding-top: 20px; border-top: 2px solid var(--rule-ink);
+  max-width: 68ch; font-size: 15px; line-height: 1.6;
+}
+.hunt-close .hunt-punch { font-weight: 700; color: var(--ink); }
+@media (max-width: 1279px) { .hunt-facts { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 719px)  { .hunt-facts { grid-template-columns: 1fr; }
+                             .hunt-list { padding-left: 16px; } }

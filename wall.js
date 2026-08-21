@@ -844,6 +844,86 @@
       '<div class="det-grid">' + cards + "</div>";
   }
 
+  // ------------------------------------------------------------------ hunt
+
+  function renderHunt(doc) {
+    var node = el("hunt");
+    if (!node) return;
+    var h = doc.hunt;
+    if (!h || !h.findings || !h.findings.length) { node.innerHTML = ""; return; }
+
+    var reds = h.findings.filter(function (f) { return f.published_verdict === "RED"; }).length;
+
+    var items = h.findings.map(function (f) {
+      var red = f.published_verdict === "RED";
+
+      // Only the facts that were actually captured. A market with no note gets
+      // no note rather than an invented one.
+      var facts = [
+        ["market", f.market],
+        ["identifier", f.identifier + " (" + f.identifier_kind +
+          (f.gtin_check_digit_valid ? ", check digit valid" : "") + ")"],
+        ["re-asserted", f.identifier_occurrences_on_page + "x on page"],
+        ["buy control", f.buy_control],
+        ["price shown", f.price_shown],
+        ["availability", f.availability],
+        ["fetched", f.fetched_at],
+        ["adjudicator", f.code_verdict === f.published_verdict
+          ? "classify() -> " + f.code_verdict
+          : "classify() -> " + f.code_verdict + ", published " + f.published_verdict]
+      ].filter(function (kv) { return kv[1]; });
+
+      var dl = facts.map(function (kv) {
+        return "<div><dt>" + esc(kv[0]) + "</dt><dd>" + esc(String(kv[1])) + "</dd></div>";
+      }).join("");
+
+      var caveat = "";
+      if (f.caveat) {
+        caveat = '<p class="hunt-caveat"><b>' +
+          (f.downgraded_by_hand ? "held down by hand" : "why this is not red") +
+          "</b>" + esc(f.caveat) + "</p>";
+      } else if (f.why_it_holds) {
+        caveat = '<p class="hunt-caveat"><b>why this one holds</b>' +
+          esc(f.why_it_holds) + "</p>";
+      }
+
+      var ev = f.evidence_file
+        ? '<a class="hunt-evidence" href="' + esc(f.evidence_file) +
+          '">the page we fetched, committed</a>'
+        : "";
+
+      return '<article class="hunt-item' + (red ? " is-red" : "") + '">' +
+        '<div class="hunt-top">' +
+          '<span class="hunt-chip ' + (red ? "is-red" : "is-amber") + '">' +
+            esc(f.published_verdict) + "</span>" +
+          '<span class="hunt-ref">' + esc(f.authority) + " " + esc(f.ref) + "</span>" +
+          '<span class="hunt-name">' + esc(f.product) + "</span>" +
+        "</div>" +
+        '<p class="hunt-hazard">' + esc(f.hazard) + "</p>" +
+        '<dl class="hunt-facts">' + dl + "</dl>" +
+        caveat + ev +
+      "</article>";
+    }).join("");
+
+    node.innerHTML =
+      '<h2 class="act-head"><span class="act-num">06</span> ' +
+        "What three marketplaces could not see</h2>" +
+      '<p class="act-lede">' + esc(h._why_it_exists || "") + "</p>" +
+      '<p class="hunt-banner"><b>These are not sweep results.</b> ' +
+        "Every row below was fetched by hand, one URL at a time, from a market " +
+        "no collector arm covers. They are adjudicated by the same classifier " +
+        "the sweep uses, over pages committed to this repository, and " +
+        "<b>they change no statistic on this page</b>. Survival is still " +
+        esc(String(doc.stats.survival.n)) + " of " +
+        esc(String(doc.stats.survival.d)) + ", because that figure describes " +
+        "the three arms and these rows are not from the three arms.</p>" +
+      '<div class="hunt-list">' + items + "</div>" +
+      '<p class="hunt-close">' +
+        (reds ? "" : "") +
+        '<span class="hunt-punch">' + esc(h.the_honest_sentence || "") + "</span> " +
+        esc(h.what_this_does_not_establish || "") + "</p>";
+  }
+
   // ---------------------------------------------------------------- panels
 
   function renderNotSeen(doc) {
@@ -1056,6 +1136,7 @@
     section("curve", function () { renderCurve(doc); });
     section("platform", function () { renderPlatform(doc); });
     section("detectors", function () { renderDetectors(doc); });
+    section("hunt", function () { renderHunt(doc); });
     section("notSeen", function () { renderNotSeen(doc); });
     section("healLedger", function () { renderHeal(doc); });
     section("provenance", function () { renderProvenance(doc); });

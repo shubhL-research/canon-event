@@ -136,6 +136,46 @@ finding about any product or seller.
 
 ---
 
+## The sweep found nothing. Then we looked somewhere else.
+
+Three arms adjudicated 23,655 listings across 207 notices and returned **zero RED**. That number is
+easy to misread as good news, and it is not news at all until you can tell it apart from a matcher
+that is stuck off. Positive controls already prove the matcher fires: 13 planted rows must all reach
+RED, and they do. So the zero is real *for the three markets we swept*.
+
+The question that leaves open is whether it is real anywhere else. We tested it the only way that
+settles it, by hand, in markets no arm covers:
+
+| | |
+|---|---|
+| **CPSC 26453, Acer AES015 electric scooter** | Recalled because the front tube can fold down mid-ride. Live on a US closeout retailer at $379.99, `Add to Cart`, "Item is in stock". The model string appears 11 times on the page. The word *recall* appears zero times. `classify()` returns **RED**. |
+| **Safety Gate SR/01715/26, Maxi-Cosi FamilyFix Slide Pro** | An ISOFIX base whose indicator can read *correctly fitted* when the seat is not attached. Live in France at 239,99 EUR, `Ajouter au panier`, GTIN check digit valid. **AMBER**, because our DE arm's buy labels are German and we have no French arm. The rule was not widened to catch it. |
+| **CPSC 24346, Siemens SolarReady meter combo** | `classify()` returns **RED**. We publish **AMBER**. The recall is scoped to a date stamp on an internal label that no listing can show, and the seller's "may be of older version, date codes, or design" is consistent with that window without proving it. This is the only row where our judgement is more conservative than our code. |
+| **Safety Gate SR/03121/25, Kraft&Dele KD1872 welder** | Accessible live parts. Live in Poland, `Do koszyka`. **AMBER**: the buy control was only confirmable in raw HTML, so it was read from markup rather than seen by the adjudicator. |
+
+**None of this touches a statistic.** Survival stays 0 of 180 with its interval, because that figure
+describes the three arms and these rows are not from the three arms. A hand-found row was chosen by
+someone who was looking for it, so it carries a selection bias a systematic sweep does not, and it
+can never be used to estimate a rate. It lives in `data/hunt.json`, renders in its own act behind a
+banner saying exactly this, and is kept out of `rows` entirely.
+
+What it *can* do is tell you which of the two readings of the zero is correct. The pages themselves
+are committed in `data/hunt/`, and every verdict above is re-derived from them on every run:
+
+```
+python3 data/hunt/rederive.py
+```
+
+That harness re-counts the identifier occurrences, asserts the buy control against the page's own
+bytes, re-runs `classify()`, and fails if any published verdict is stronger than what the code
+supports. It has already caught two wrong numbers and one mislabelled verdict in this very table.
+
+> We looked in three marketplaces and found nothing. We looked in a fourth and found it in an
+> afternoon. The distance between those two sentences is the whole problem with checking whether
+> recalls work.
+
+---
+
 ## Weaknesses, before anything else
 
 A limitation named first cannot be used against you. A limitation a judge finds first is the whole

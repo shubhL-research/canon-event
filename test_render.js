@@ -51,7 +51,7 @@ function run(variant, livePath) {
   // renderer put in them was ever checked.
   const ids = ["verdict", "figures", "instruments", "armRail", "wall", "pager",
                "curve", "notSeen", "healLedger", "provenance", "machinery",
-               "sortNote", "historicalNote", "rail", "platform", "detectors"];
+               "sortNote", "historicalNote", "rail", "platform", "detectors", "hunt"];
   ids.forEach((i) => (nodes[i] = makeNode(i)));
 
   const sandbox = {
@@ -156,6 +156,31 @@ if (fs.existsSync(LIVE)) {
         "the live payload renders a headline");
   check(out.nodes.figures.innerHTML.indexOf("figure-claim") > -1,
         "the live payload renders its two figures");
+
+  // ACT 06. The hunt rows are the only rows on this page that were found by
+  // hand, so the two things that keep them honest are load-bearing and tested:
+  // the banner disclaiming them as sweep results, and the fact that they leave
+  // the sweep's own denominator alone. A hunt section that renders its findings
+  // WITHOUT the disclaimer is worse than one that renders nothing.
+  const hunt = out.nodes.hunt ? out.nodes.hunt.innerHTML : "";
+  if (hunt) {
+    check(/These are not sweep results/.test(hunt),
+          "the hunt act disclaims itself as non-sweep output");
+    check(/hunt-item/.test(hunt), "the hunt act renders its findings");
+    check(/hunt-chip is-red/.test(hunt),
+          "the hunt act renders the confirmed RED as red");
+    check(/hunt-evidence/.test(hunt),
+          "every hunt finding links the committed page it was derived from");
+    // The number in the banner must be the sweep's real denominator, not a
+    // figure the hunt inflated. If a hand-found row ever reaches `survival`,
+    // this is the assertion that catches it.
+    const src = fs.readFileSync(LIVE, "utf8");
+    const doc = JSON.parse(src.slice(src.indexOf("{"), src.lastIndexOf(";")));
+    check(hunt.indexOf(`${doc.stats.survival.n} of ${doc.stats.survival.d}`) > -1,
+          "the hunt banner quotes the sweep's untouched survival denominator");
+    check(doc.hunt.findings.every((f) => !("days" in f) && !("tier" in f)),
+          "no hunt finding carries sweep row fields");
+  }
   console.log("");
 } else {
   console.log("live payload: none published, skipping\n");

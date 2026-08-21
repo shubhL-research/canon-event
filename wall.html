@@ -112,6 +112,17 @@
        was answered by an inventory no judge could see. -->
   <section class="act act-detectors" id="detectors"></section>
 
+  <!-- ACT 06. The hunt. Rendered in its own act, downstream of the sweep and
+       visually separated from it, because these rows were found BY HAND and a
+       hand-found row has weaker provenance than an adjudicated one. It was
+       chosen by someone who was looking for it, so it carries a selection bias
+       a systematic sweep does not, and it can never be used to estimate a rate.
+       Mixing one into the arms would be the single most dishonest thing this
+       project could do, so they live in a different file and a different act.
+       Every verdict here is re-derived from a committed page by
+       data/hunt/rederive.py, which fails the build if a number drifts. -->
+  <section class="act act-hunt" id="hunt"></section>
+
   <!-- ACT V — the other half of the measurement. -->
   <section class="act act-gaps" id="actGaps" aria-labelledby="gapsHead">
     <h2 class="act-head" id="gapsHead">
