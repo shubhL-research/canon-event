@@ -30,8 +30,8 @@
     "method": "isotonic regression (PAVA), nonparametric MLE for current-status data",
     "assumption": "survival is monotone non-increasing in days since recall",
     "confound": "Age is confounded with cohort: a 2024 recall is not exchangeable with a 2026 one. This is a cross-sectional age profile, not a within-product survival trajectory.",
-    "n": 188,
-    "n_still_buyable": 101,
+    "n": 180,
+    "n_still_buyable": 99,
     "blocks": [
       {
         "from_day": 15,
@@ -264,26 +264,26 @@
       {
         "from_day": 35,
         "to_day": 70,
-        "survival": 0.9118,
-        "n": 34
+        "survival": 0.9394,
+        "n": 33
       },
       {
         "from_day": 70,
         "to_day": 106,
-        "survival": 0.6071,
-        "n": 28
+        "survival": 0.5769,
+        "n": 26
       },
       {
         "from_day": 113,
         "to_day": 714,
-        "survival": 0.2692,
-        "n": 52
+        "survival": 0.2745,
+        "n": 51
       },
       {
         "from_day": 714,
         "to_day": 736,
-        "survival": 0.037,
-        "n": 27
+        "survival": 0.0435,
+        "n": 23
       },
       {
         "from_day": 736,
@@ -348,7 +348,7 @@
           0.2065,
           1.0
         ],
-        "support": 188,
+        "support": 180,
         "block_n": 1,
         "thin": true,
         "publishable": false
@@ -360,44 +360,44 @@
           0.2065,
           1.0
         ],
-        "support": 159,
+        "support": 151,
         "block_n": 1,
         "thin": true,
         "publishable": false
       },
       {
         "day": 90,
-        "survival": 0.6071,
+        "survival": 0.5769,
         "ci95": [
-          0.4241,
-          0.7643
+          0.3895,
+          0.7446
         ],
-        "support": 96,
-        "block_n": 28,
+        "support": 91,
+        "block_n": 26,
         "thin": false,
         "publishable": true
       },
       {
         "day": 365,
-        "survival": 0.2692,
+        "survival": 0.2745,
         "ci95": [
-          0.1677,
-          0.4025
+          0.1711,
+          0.4095
         ],
-        "support": 51,
-        "block_n": 52,
+        "support": 47,
+        "block_n": 51,
         "thin": false,
         "publishable": true
       },
       {
         "day": 730,
-        "survival": 0.037,
+        "survival": 0.0435,
         "ci95": [
-          0.0066,
-          0.1828
+          0.0077,
+          0.2099
         ],
         "support": 10,
-        "block_n": 27,
+        "block_n": 23,
         "thin": false,
         "publishable": true
       },

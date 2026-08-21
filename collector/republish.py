@@ -95,6 +95,26 @@ def main():
     seeds_doc = json.loads((ROOT / "data" / "seeds.json").read_text(encoding="utf-8"))
     corpus = seeds_doc["seeds"]
 
+    # REPAIR THE ARCHIVED STUBS. Rows for notices no arm returned a candidate for
+    # were serialised without `model` and `gtin`, and both denominators decide
+    # searchability by looking for exactly those keys. So 60 of the 180 searchable
+    # notices were silently dropped from the survival denominator: precisely the
+    # ones where nothing was found, which is the strongest not-on-sale evidence
+    # the sweep produced.
+    #
+    # The identifier is restored from the seed the row was built from. Nothing is
+    # invented: the notice always carried it, the row lost it in serialisation.
+    by_ref = {s["ref"]: s for s in corpus}
+    repaired = 0
+    for r in rows:
+        seed = by_ref.get(r.get("source", {}).get("ref"))
+        if not seed:
+            continue
+        if seed.get("model") and not r.get("model"):
+            r["model"] = seed["model"]; repaired += 1
+        if seed.get("gtin") and not r.get("gtin"):
+            r["gtin"] = seed["gtin"]
+
     # Only the notices this sweep actually visited carry sweep-scoped figures.
     swept_refs = {r["source"]["ref"] for r in rows}
     swept = [s for s in corpus if s["ref"] in swept_refs]
@@ -134,6 +154,18 @@ def main():
         # reports that do not exist on a replay, so a zero there is a fact we do
         # not have rather than a fact that is zero, and beside a real load count
         # it reads as a collector that ran nothing.
+        # The carried string was written by an older publish and asserts a
+        # multiplication that does not hold. Rebuild it from the figures the
+        # archive actually carries rather than carrying a false sentence forward.
+        ar = built["stats"]["arithmetic"]
+        pl, arms_n = ar.get("search_page_loads") or 0, ar.get("arms") or 0
+        if pl and arms_n:
+            ar["working"] = ("%d unique URLs planned per arm x %d arms = %d search "
+                             "loads, from %d searchable of %d notices."
+                             % (pl // arms_n, arms_n, pl,
+                                ar.get("searchable_seeds") or 0,
+                                ar.get("corpus_seeds") or ar.get("notices") or 207))
+
         w = built["stats"]["arithmetic"].get("working") or ""
         if "0 batch jobs" in w:
             built["stats"]["arithmetic"]["working"] = w.split(", submitted as")[0].rstrip(". ") + "."
@@ -242,6 +274,7 @@ def main():
     s = built["stats"]
     u, ua = s["unsearchable"], s.get("unsearchable_by_authority") or {}
     print(f"  republished from {src.name}")
+    print(f"  identifiers restored onto {repaired} archived stub rows")
     print(f"  rows {len(rows)}   arms {[a['code'] for a in built.get('arms', [])]}")
     print()
     print(f"  unsearchable  {u['v']:.1%}  {u['n']}/{u['d']}  CI [{u['ci95'][0]:.1%}, {u['ci95'][1]:.1%}]")

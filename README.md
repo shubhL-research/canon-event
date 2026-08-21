@@ -5,7 +5,7 @@
 Governments recall products for burning, choking and killing people. Nobody measures whether those
 products actually leave the shelves. CANON EVENT checks whether recalled products are still buyable
 right now, from geo-accurate exit IPs in three markets, and refuses to show a clean screen when its
-own scraper is broken. One trial sweep has run, over 60 of 207 notices and two of the three arms.
+own scraper is broken. One full sweep has run, over all 207 notices and all three arms, every one of them degraded.
 Nothing here has been swept at full scale, and the numbers say so on their face.
 
 ---
@@ -72,20 +72,29 @@ grows with every recall. The number of exceptions has never moved off zero.
 
 ## What has actually been measured
 
-One trial sweep, 19 August 2026. **60 of 207 notices, two of the three arms.**
+One full sweep, 20 August 2026. **All 207 notices, all three arms, both regulators.**
 
 | | |
 |---|---|
-| Notices swept | 60 of 207, all of them Safety Gate. **No CPSC notice has been swept yet** |
-| Arms swept | US `amazon.com` DEGRADED, DE `kaufland.de` MEASURED, IN `flipkart.com` MEASURED |
-| Listings adjudicated | 16,025. US 6,886, DE 1,066, IN 8,073 |
-| Notices that got any candidate at all | US 33, DE 58, IN 56, of 60 queried per arm |
-| Listings discarded | 16,025, every one |
-| Rows reaching RED | 0, across all 180 notice-arm pairs |
-| Still buyable | 0 of 58 searchable notices, Wilson 95% CI [0, 6.2] |
+| Notices swept | 207 of 207. 103 CPSC and 104 EU Safety Gate |
+| Arms swept | US `amazon.com`, DE `kaufland.de`, IN `flipkart.com`. **All three DEGRADED**, on join-key coverage below bound |
+| Search loads | 1,107. 369 unique URLs planned per arm, three arms |
+| Listings adjudicated | 23,655. US 14,632, DE 1,037, IN 7,986 |
+| Notices that got any candidate | US 95, DE 59, IN 55, of 207 queried per arm |
+| Listings discarded | 23,655, every one |
+| Rows reaching RED | 0, across all 621 notice-arm pairs |
+| Still buyable | **0 of 180 searchable notices, Wilson 95% CI [0, 2.1]** |
+| Unsearchable | 13.0%, 27 of 207. CPSC 20.4%, Safety Gate 5.8% |
 | Precision | not computed, and cannot be. There are no RED rows to hand-verify |
-| Border escape | pending. Scored against swept seeds only, and the swept set is entirely EU |
-| Credits spent | not carried in this payload. The figure is on the collector account, not in the sweep output, so it is not stated rather than estimated |
+| Border escape | pending. The India arm is DEGRADED, so nothing is claimed outside the EU |
+| Exit attestation | **none.** Every arm renders "exit not attested on this sweep". Three heals tried to add it in-stage and all three were refused for stripping the extraction |
+| Credits | not stated. 1,107 is page loads planned and issued, which is what the collector controls. The billing figure is on the account, not in the sweep output |
+
+**All three arms are DEGRADED and that is not a footnote.** Each returned
+thousands of listings and joined fewer than half its notices to a candidate: 95,
+59 and 55 of 207. A degraded arm makes the zero a floor rather than an estimate.
+It says nothing recalled was confirmed among what we could see, not that nothing
+recalled is there.
 
 **The corpus could barely have produced a hit on two of the three arms, and that
 has to be said before anyone else says it.** Every notice in this sweep is an EU
@@ -108,7 +117,7 @@ The payload the wall reads is `data/live.js`. It stamps itself:
 
 ```
 fixture   false
-stamp     LIVE MEASUREMENT. TRIAL SLICE, 60 of 207 notices.
+stamp     LIVE MEASUREMENT. Republished from the archived sweep payload.
           Denominators are not the full corpus.
 ```
 
@@ -198,17 +207,23 @@ something are the by-authority ones, US 20.4% against an EU rate between 0.0% an
 split is shown wherever the pooled number appears. Any comparison that averages the two regulators together describes this file
 and nothing more.
 
-### Survival is 0 of 58, from 60 of 207 notices on two of three arms
+### Survival is 0 of 180, from all 207 notices on three arms, every one of them degraded
 
 Zero listings reached RED. That is a real measurement and it is reported as one, with a Wilson
 interval of [0, 6.2] rather than as a bare zero, because 58 observations cannot exclude a survival
 rate of 6%.
 
-What it is not: it is not a sweep of the corpus. 60 of 207 notices were queried, all of them Safety
-Gate, so no US recall has been tested at all. Two arms of three ran, and one of those two came back
-DEGRADED. **A degraded arm makes the zero a floor rather than an estimate.** A listing that arm
-failed to match could exist. The wall labels the figure partial for that reason and does not round it
-up into a claim that recalls work.
+What it is not: it is not a clean measurement. All 207 notices were queried on all three arms, and
+**every one of the three came back DEGRADED**, joining 95, 59 and 55 notices of 207 to any candidate
+at all. **A degraded arm makes the zero a floor rather than an estimate.** A listing an arm failed to
+match could exist and we would not know. The wall labels the figure partial for that reason and does
+not round it up into a claim that recalls work.
+
+The other limit is the pairing. CPSC notices ran against `amazon.com`, which is the market where a US
+recall could plausibly still be listed, and that is the one arm where the question was posed fairly.
+The EU notices ran against `kaufland.de`, which is fair, and against `flipkart.com` and `amazon.com`,
+which are not: European regional retail stock is not listed there in the first place. A null result on
+those pairings says more about distribution than about recall enforcement.
 
 ### Precision is not computed at all
 
@@ -315,7 +330,7 @@ Figures that the failure contaminates are struck through. Figures it does not to
 > There is no green in this interface. The absence of a red row is not evidence of safety.
 
 That distinction is doing work in the current sweep. The DE arm returned listings and matched none of
-them, which is a measurement, so survival stays live at 0 of 58. The IN arm's join-key coverage fell
+them, which is a measurement, so survival stays live at 0 of 180. The IN arm's join-key coverage fell
 below its bound, which is a failure of ours, so border escape is withheld rather than reported as a
 zero. The two look identical in a row count and are opposite in meaning.
 
@@ -355,7 +370,7 @@ only when both hold at capture time:
 
 Identity re-assertion exists because Amazon substitutes ASINs on stale URLs. Without it, a live buy
 button on the *wrong* product scores as a hazard still on sale, which is the worst mistake this
-system could make. It is the entire reason 16,025 listings were discarded in the current sweep: the
+system could make. It is the entire reason 23,655 listings were discarded in the current sweep: the
 recalled identifier was never re-asserted on the page that came back.
 
 A model string alone does not settle identity either. Model numbers are not globally unique, so a
@@ -561,7 +576,7 @@ so on screen.
 
 | URL | State |
 |---|---|
-| `wall.html` | **Live.** Trial sweep, 60 of 207 notices, DE measured, IN degraded, zero RED |
+| `wall.html` | **Live.** Full sweep, 207 of 207 notices, all three arms DEGRADED, zero RED |
 | `wall.html?state=v1` | Fixture. Base sweep, DE withheld, with a rejected heal |
 | `wall.html?state=healing` | Fixture. Heal in flight, IN stale |
 | `wall.html?state=gate` | Fixture. Proposed template awaiting approval |

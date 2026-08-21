@@ -203,9 +203,23 @@ def observations_from_rows(rows):
     convert our own blindness into evidence of safety, which is the exact
     failure this project exists to refuse.
     """
+    # ONE searchability rule, imported rather than re-implemented.
+    #
+    # This used bool(model or gtin), which is looser than the rule the wall
+    # publishes: it counted 4 notices the owned rule calls unsearchable, so the
+    # curve reported 124 where the headline reported 120 and both called
+    # themselves "searchable notices". Two numbers for one denominator on one
+    # screen means neither can be checked.
+    try:
+        import sys, pathlib as _pl
+        sys.path.insert(0, str(_pl.Path(__file__).parent.parent / "collector"))
+        from publish import searchable as _searchable
+    except Exception:
+        _searchable = lambda r: bool(r.get("model") or r.get("gtin"))
+
     out = []
     for r in rows:
-        searchable = bool(r.get("model") or r.get("gtin"))
+        searchable = _searchable(r)
         if not searchable:
             continue
         out.append((r["days"], r["tier"] == "RED"))
