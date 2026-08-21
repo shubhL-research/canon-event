@@ -62,6 +62,25 @@ DISQUALIFIERS = [
     ("bare_years", re.compile(r"^\s*(19|20)\d{2}(\s*,\s*(19|20)\d{2})*\s*$")),
     ("dimensions", re.compile(r"\d+\s*(\"|inch|cm|mm)\s*[wWhHdD]\b")),
     ("not_specified", re.compile(r"^\s*(not specified|n/?a|none|various|multiple)\s*$", re.I)),
+    # A CAPACITY IS NOT A MODEL NUMBER, and this one reached the wall.
+    #
+    # CPSC 26537 recalls "Kitchen HQ Thermal Insulated Bowls" and publishes
+    # "10-cup" in the model field. It has letters, it has digits, it is four
+    # characters, so STRONG accepted it and the sweep went looking for "10-cup"
+    # on three marketplaces. It found a 10 Cup Programmable Coffee Maker and
+    # adjudicated it RED against a recall about bowls catching fire.
+    #
+    # The rule the accepting branch states about itself is "distinctive enough
+    # that a marketplace search returns the product rather than a category". A
+    # capacity is the definition of a category.
+    ("capacity", re.compile(
+        r"^\s*\d+(\.\d+)?\s*[-\s]?\s*(cup|cups|qt|quart|quarts|l|litre|litres|"
+        r"liter|liters|ml|oz|ounce|ounces|gal|gallon|gallons|lb|lbs|pound|pounds|"
+        r"kg|g|gram|grams|pk|pack|count|ct|piece|pieces|pc|pcs|inch|inches|in|ft|"
+        r"foot|feet|mm|cm|m|w|watt|watts|v|volt|volts|ah|mah|amp|amps)\s*$", re.I)),
+    # Battery designations name a cell type, not a product.
+    ("battery_type", re.compile(
+        r"^\s*(cr|lr|sr|aa|aaa|c|d|9v)\s*-?\s*\d{0,4}\s*$", re.I)),
 ]
 
 # A token that survives as an actual identifier.

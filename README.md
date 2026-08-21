@@ -79,9 +79,9 @@ One full sweep, 20 August 2026. **All 207 notices, all three arms, both regulato
 | Notices swept | 207 of 207. 103 CPSC and 104 EU Safety Gate |
 | Arms swept | US `amazon.com`, DE `kaufland.de`, IN `flipkart.com`. **All three DEGRADED**, on join-key coverage below bound |
 | Search loads | 1,107 issued. 369 unique URLs per arm, three arms. The plan is 2 queries for each of 180 searchable notices, 360 per arm; the extra 9 per arm are notices an older, looser searchability test accepted and this page reports as unsearchable. See SCRAPER-STUDIO.md |
-| Listings adjudicated | 24,679. US 14,632, DE 2,061, IN 7,986 |
+| Listings adjudicated | 23,811. US 13,782, DE 2,043, IN 7,986 |
 | Notices that got any candidate | US 95, DE 59, IN 55, of 207 queried per arm |
-| Listings discarded | 24,679, every one |
+| Listings discarded | 23,811, every one |
 | Rows reaching RED | 0, across all 621 notice-arm pairs |
 | Still buyable | **0 of 180 searchable notices, Wilson 95% CI [0, 2.1]** |
 | Unsearchable | 13.0%, 27 of 207. CPSC 20.4%, Safety Gate 5.8% |
@@ -138,7 +138,7 @@ finding about any product or seller.
 
 ## The sweep found nothing. Then we looked somewhere else.
 
-Three arms adjudicated 24,679 listings across 207 notices and returned **zero RED**. That number is
+Three arms adjudicated 23,811 listings across 207 notices and returned **zero RED**. That number is
 easy to misread as good news, and it is not news at all until you can tell it apart from a matcher
 that is stuck off. Positive controls already prove the matcher fires: 13 planted rows must all reach
 RED, and they do. So the zero is real *for the three markets we swept*.
@@ -254,7 +254,7 @@ interval of [0, 6.2] rather than as a bare zero, because 58 observations cannot 
 rate of 6%.
 
 What it is not: it is not a clean measurement. All 207 notices were queried on all three arms, and
-**every one of the three came back DEGRADED**, joining 95, 111 and 55 notices of 207 to any candidate
+**every one of the three came back DEGRADED**, joining 91, 110 and 55 notices of 207 to any candidate
 at all. **A degraded arm makes the zero a floor rather than an estimate.** A listing an arm failed to
 match could exist and we would not know. The wall labels the figure partial for that reason and does
 not round it up into a claim that recalls work.
@@ -410,7 +410,7 @@ only when both hold at capture time:
 
 Identity re-assertion exists because Amazon substitutes ASINs on stale URLs. Without it, a live buy
 button on the *wrong* product scores as a hazard still on sale, which is the worst mistake this
-system could make. It is the entire reason 24,679 listings were discarded in the current sweep: the
+system could make. It is the entire reason 23,811 listings were discarded in the current sweep: the
 recalled identifier was never re-asserted on the page that came back.
 
 A model string alone does not settle identity either. Model numbers are not globally unique, so a

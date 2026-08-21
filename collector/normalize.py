@@ -343,6 +343,165 @@ def context_around(page_text, needle, width=90):
     return ("..." if start else "") + str(page_text)[start:end] + ("..." if end < len(str(page_text)) else "")
 
 
+# A listing that names the recalled product because it FITS it is not the
+# recalled product. These are the phrases marketplaces use to say so.
+#
+# Matched against the text immediately around the identifier, not the whole
+# page, because a page can legitimately mention compatibility further down while
+# still selling the product itself.
+_ACCESSORY_MARKERS = (
+    # Only phrases that describe THE ITEM BEING SOLD as a part, a case or a
+    # substitute. Anything that merely describes a product's purpose was removed
+    # after it fired on a genuine Siemens listing whose own copy reads "an
+    # integrated energy management solution DESIGNED FOR industrial and
+    # commercial applications". "designed for", "suitable for", "for use with",
+    # "works with" and a bare "accessory" all describe real products constantly,
+    # and discarding on them suppresses findings rather than false ones.
+    "compatible with", "compatible for", "fits ", "fit for", "fits for",
+    "replacement for", "replacement part", "replacement parts", "spare part",
+    "spares for", "carry case", "carrying case", "travel case", "travel box",
+    "hard case", "cover for", "case for", "screen protector", "adapter for",
+    "charger for", "battery for", "strap for", "mount for", "stand for",
+    "bag for", "accessories for", "oem replacement",
+)
+
+# The strongest signal of all, and the one a marker list keeps missing.
+#
+# "MaxLLTo Replacement E165000291 Blower Tube FOR Echo PB-5810H" survived every
+# phrase above. The pattern is positional rather than lexical: the identifier is
+# preceded by "for", because the listing is naming what the item FITS rather than
+# what it IS.
+#
+# Note that a brand check cannot rescue this. That listing legitimately says
+# "Echo", so the brand agrees; it is the framing that disagrees. Which is why the
+# accessory test runs before the brand test and not instead of it.
+_FITS_PREPOSITION = re.compile(r"\b(for|fits|fit)\s+[\w&.\-]*\s*$", re.I)
+
+# Storefront chrome that says "for <product>" without meaning "fits <product>".
+#
+# The positional check above fired on a GENUINE Siemens listing because Shopify
+# labels its quantity stepper "Decrease quantity for MC2442S1200SC". That is a
+# false DISCARD, which is the dangerous direction: it suppresses a real finding
+# rather than publishing a false one. A guard against false positives that
+# creates false negatives has moved the error, not removed it.
+_UI_CHROME = (
+    "quantity for", "decrease quantity", "increase quantity", "search for",
+    "results for", "reviews for", "review for", "question for", "notify me",
+    "price for", "shipping for", "checkout for", "add to cart for",
+    "wishlist for", "compare for", "available for", "in stock for",
+)
+
+
+def accessory_context(page_text, needle, width=120):
+    """Is the identifier on this page because the listing FITS the product?
+
+    WHY THIS EXISTS
+    ---------------
+    Fixing brand_conflict removed a check that had been suppressing RED on all
+    103 CPSC notices. What surfaced was not four findings. It was four listings
+    that name a recalled product without being it:
+
+        BenQ Hard Carry Case GV31 Portable Projector Travel Box
+        Caltric Starter Motor Compatible with Yamaha Golf Cart Drive2
+        BLOWER TUBE FITS PB-5810T, PB-5810H ... Replacement for ECHO OEM
+        10 Cup Programmable Coffee Maker      (against a recall for bowls)
+
+    reassert() answers "does the identifier appear on this page". It cannot
+    answer "is this page selling that product", and for accessories those two
+    questions have opposite answers. brand_conflict was accidentally covering
+    the gap, badly and only for notices whose brand string happened not to
+    match, and the moment it was corrected the gap was visible.
+
+    Publishing any of those four as RED would be a hazard claim against a seller
+    who did nothing wrong, which is the single worst thing this project could do.
+    """
+    if not present(page_text) or not present(needle):
+        return None
+    text = str(page_text)
+    pat = needle_pattern(needle)
+    if pat is None:
+        return None
+    low = text.lower()
+    for m in pat.finditer(text):
+        lo = max(0, m.start() - width)
+        window = low[lo:m.end() + width]
+        for marker in _ACCESSORY_MARKERS:
+            if marker in window:
+                return marker.strip()
+        # "... Blower Tube for Echo PB-5810H": the words immediately before the
+        # identifier say the listing fits it. Checked on the raw slice so the
+        # brand between "for" and the identifier is allowed for.
+        before = text[lo:m.start()]
+        if _FITS_PREPOSITION.search(before):
+            tail = before.lower()[-60:]
+            if not any(ui in tail for ui in _UI_CHROME):
+                return "for"
+    return None
+
+
+# Corporate suffixes and the address clause a regulator appends to a company
+# name. Trimmed only from the END of the name, never from the middle, so
+# "Inc Industries" stays intact if a brand really is called that.
+_CORP_SUFFIX = (
+    "incorporated", "inc", "llc", "l l c", "ltd", "limited", "co", "corp",
+    "corporation", "company", "gmbh", "bv", "b v", "sa", "s a", "srl", "s r l",
+    "ag", "nv", "n v", "plc", "pty", "pte", "kg", "oy", "ab", "as", "aps",
+    "sarl", "spa", "s p a", "group", "holdings", "international", "usa",
+    "america", "americas", "north america",
+)
+
+
+def brand_core(brand):
+    """The distinctive part of a manufacturer name.
+
+    WHY THIS EXISTS, AND IT IS THE WORST BUG THIS PROJECT HAS SHIPPED
+    -----------------------------------------------------------------
+    brand_conflict() asked whether the WHOLE expected brand string appeared in
+    the page text. CPSC does not publish a brand. It publishes the recalling
+    firm's full legal identity plus its address:
+
+        "ECHO Inc., of Lake Zurich, Illinois"
+        "Zhejiang Changying Car Industry Co. LTD, of China"
+
+    A marketplace page selling that product says "ECHO". It will never contain
+    the regulator's address clause, so norm_needle(expected) was never a
+    substring of norm_needle(page), so brand_conflict returned True for every
+    CPSC notice. brand_conflict is checked at normalize.py:424 on any needle that
+    is not a valid GTIN, and all 103 CPSC seeds carry gtin: null.
+
+    So RED was structurally unreachable for 103 of the 207 notices. Half the
+    corpus could not have produced a finding whatever was on the page, and the
+    published zero was, for that half, a fact about this function.
+
+    The fix trims the address clause and trailing corporate suffixes and compares
+    what is left. That WIDENS the matcher, which is the direction this project is
+    normally most careful about, so it is bounded: a core shorter than four
+    characters is treated as unknown rather than as agreement, and unknown has
+    never been a conflict here.
+    """
+    if not brand:
+        return ""
+    b = str(brand)
+    # CPSC's address clause. "ECHO Inc., of Lake Zurich, Illinois" -> "ECHO Inc."
+    for sep in (", of ", " of "):
+        if sep in b:
+            head = b.split(sep)[0]
+            if len(norm_needle(head)) >= 3:
+                b = head
+                break
+    # dba names: the trading name is what a marketplace shows.
+    for marker in (" dba ", " d/b/a ", ", dba ", ", d/b/a "):
+        if marker in b.lower():
+            tail = re.split(marker, b, flags=re.I)[-1]
+            if len(norm_needle(tail)) >= 3:
+                b = tail
+                break
+    words = [w for w in re.split(r"[\s,]+", b) if w]
+    while words and norm_needle(words[-1]) in _CORP_SUFFIX:
+        words.pop()
+    return " ".join(words) if words else b
+
+
 def brand_conflict(page_text, expected_brand):
     """Does the page name a DIFFERENT manufacturer than the notice does?
 
@@ -360,8 +519,11 @@ def brand_conflict(page_text, expected_brand):
     """
     if not present(page_text) or not expected_brand:
         return False
-    want = norm_needle(expected_brand)
-    if len(want) < 3:
+    # The DISTINCTIVE part, not the regulator's legal identity. See brand_core.
+    want = norm_needle(brand_core(expected_brand))
+    if len(want) < 4:
+        # Too short to be evidence either way. Unknown is not disagreement, and
+        # treating it as one is what made this check discard the world.
         return False
     return want not in norm_needle(page_text)
 
@@ -421,6 +583,18 @@ def classify(raw, expected_brand=None):
     # A model number is NOT globally unique. Two manufacturers can ship the same
     # string, so there the page must also name the maker or the claim could land
     # on a company that never built the recalled product.
+    # An accessory that names the product is not the product. Checked before the
+    # brand rule, because these listings often carry the RIGHT brand: a BenQ
+    # carry case really is made by BenQ.
+    if matched:
+        marker = accessory_context(pick(raw, "page_text"), needle)
+        if marker:
+            return "DISCARDED", [{"code": "accessory_or_compatible",
+                                  "reason": "the identifier appears next to "
+                                            "\"%s\": this listing names the "
+                                            "recalled product because it fits "
+                                            "it, and is not it" % marker}]
+
     if matched and not is_gtin and brand_conflict(pick(raw, "page_text"), expected_brand):
         return "AMBER", [{"code": "brand_conflict",
                           "reason": "identifier re-asserted but the page does not name the "

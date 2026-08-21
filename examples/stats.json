@@ -30,8 +30,8 @@
     "method": "isotonic regression (PAVA), nonparametric MLE for current-status data",
     "assumption": "survival is monotone non-increasing in days since recall",
     "confound": "Age is confounded with cohort: a 2024 recall is not exchangeable with a 2026 one. This is a cross-sectional age profile, not a within-product survival trajectory.",
-    "n": 180,
-    "n_still_buyable": 99,
+    "n": 176,
+    "n_still_buyable": 97,
     "blocks": [
       {
         "from_day": 15,
@@ -270,14 +270,14 @@
       {
         "from_day": 70,
         "to_day": 106,
-        "survival": 0.5769,
-        "n": 26
+        "survival": 0.5652,
+        "n": 23
       },
       {
         "from_day": 113,
         "to_day": 714,
-        "survival": 0.2745,
-        "n": 51
+        "survival": 0.28,
+        "n": 50
       },
       {
         "from_day": 714,
@@ -348,7 +348,7 @@
           0.2065,
           1.0
         ],
-        "support": 180,
+        "support": 176,
         "block_n": 1,
         "thin": true,
         "publishable": false
@@ -360,32 +360,32 @@
           0.2065,
           1.0
         ],
-        "support": 151,
+        "support": 147,
         "block_n": 1,
         "thin": true,
         "publishable": false
       },
       {
         "day": 90,
-        "survival": 0.5769,
+        "survival": 0.5652,
         "ci95": [
-          0.3895,
-          0.7446
+          0.3681,
+          0.7437
         ],
-        "support": 91,
-        "block_n": 26,
+        "support": 89,
+        "block_n": 23,
         "thin": false,
         "publishable": true
       },
       {
         "day": 365,
-        "survival": 0.2745,
+        "survival": 0.28,
         "ci95": [
-          0.1711,
-          0.4095
+          0.1747,
+          0.4167
         ],
         "support": 47,
-        "block_n": 51,
+        "block_n": 50,
         "thin": false,
         "publishable": true
       },

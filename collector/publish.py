@@ -529,22 +529,37 @@ def arithmetic(seeds, reports):
         # as unsearchable. needle_for now calls the owned rule and a fresh plan
         # comes out at exactly 360, but the archive records what happened and is
         # not rewritten to match what should have.
-        "working": (("%d unique URLs per arm x %d arms = %d search loads issued. "
-                     "The plan is 2 queries per searchable notice, %d x 2 = %d per "
-                     "arm; the extra %d per arm were notices an older, looser "
-                     "searchability test accepted and this page reports as "
-                     "unsearchable"
-                     % (planned // arms if arms else planned, arms, planned,
-                        searchable_seeds, searchable_seeds * 2,
-                        (planned // arms if arms else planned) - searchable_seeds * 2))
-                    if arms and (planned // arms) != searchable_seeds * 2 else
-                    ("%d unique URLs planned per arm x %d arms = %d search loads, "
-                     "2 queries for each of %d searchable notices of %d"
-                     % (planned // arms if arms else planned, arms, planned,
-                        searchable_seeds, len(seeds))))
-                   + ((", submitted as %d batch jobs."
-                       % sum(r.get("batches", 0) for r in reports))
-                      if sum(r.get("batches", 0) for r in reports) else "."),
+        # PLANNED, NOT ISSUED, AND THE GAP HAS A SIGN.
+        #
+        # This said "issued" for a figure that on a replay is the size of a plan
+        # recomputed at replay time from the CURRENT corpus: sweep.py sets
+        # planned_loads = len(by_url) from plan_arm(), not from anything the
+        # archive records. The same archive was credited with 232, 348 and 1,107
+        # loads on three different days as the corpus and the searchability rule
+        # moved underneath it, while the README says of this publish "No new
+        # fetch and no new credits". A replay issues nothing.
+        #
+        # And the gap clause assumed the archive held MORE URLs than the plan.
+        # Tightening the searchability rule made it hold fewer, so it printed
+        # "the extra -7 per arm".
+        "working": (
+            "%d unique URLs per arm x %d arms = %d search loads in the plan for "
+            "this corpus. The plan is 2 queries for each of %d searchable "
+            "notices, %d per arm.%s%s"
+            % (planned // arms if arms else planned, arms, planned,
+               searchable_seeds, searchable_seeds * 2,
+               (" The archive re-scored here holds %d fewer per arm: it was "
+                "fetched before the searchability rule was tightened."
+                % (searchable_seeds * 2 - (planned // arms)))
+               if arms and searchable_seeds * 2 > (planned // arms) else
+               (" The archive holds %d more per arm, from notices an older and "
+                "looser searchability test accepted and this page now reports as "
+                "unsearchable." % ((planned // arms) - searchable_seeds * 2))
+               if arms and (planned // arms) > searchable_seeds * 2 else "",
+               (" Submitted as %d batch jobs."
+                % sum(r.get("batches", 0) for r in reports))
+               if sum(r.get("batches", 0) for r in reports) else
+               " This publish re-scored archived rows and issued none.")),
         # Counted, not typed. This sentence carried a hardcoded 96 from a corpus
         # pull that missed the CPSC Description key, and the seed correction left
         # it stating a number the same block contradicts two lines above.

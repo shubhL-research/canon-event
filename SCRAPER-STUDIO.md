@@ -85,11 +85,11 @@ between them is stated here rather than smoothed over.
 ```
 360 unique URLs planned per arm x 3 arms  =   1,080 planned
 369 unique URLs held in the archive x 3   =   1,107 actually issued
-US amazon.com    14,632 listings,  95 of 207 notices joined
-DE kaufland.de    2,061 listings, 111 of 207 notices joined
+US amazon.com    13,782 listings,  91 of 207 notices joined
+DE kaufland.de    2,043 listings, 110 of 207 notices joined
 IN flipkart.com    7,986 listings,  55 of 207 notices joined
                  ------                                    
-listings adjudicated                          24,679
+listings adjudicated                          23,811
 ```
 
 Stage one runs on the Code worker over search HTML, which is cheap and returns

@@ -1,0 +1,189 @@
+{
+  "sweep_id": "s_2026-08-21T20:32Z-replay",
+  "swept_at": "2026-08-21T20:32:43Z",
+  "arms": {
+    "DE": {
+      "state": "DEGRADED",
+      "reason": "join_key_coverage_below_bound",
+      "rows": 0,
+      "listings": 2043,
+      "fails": 0,
+      "inputs": 207,
+      "joined": 110,
+      "collector_id": "c_mt00jidz6zhqjbpew"
+    },
+    "IN": {
+      "state": "DEGRADED",
+      "reason": "join_key_coverage_below_bound",
+      "rows": 0,
+      "listings": 7986,
+      "fails": 0,
+      "inputs": 207,
+      "joined": 55,
+      "collector_id": "c_mt03cj5z2fo651wy8q"
+    },
+    "US": {
+      "state": "DEGRADED",
+      "reason": "join_key_coverage_below_bound",
+      "rows": 4,
+      "listings": 14538,
+      "fails": 0,
+      "inputs": 207,
+      "joined": 94,
+      "collector_id": "c_mt01usw31e8y5ubqjs"
+    }
+  },
+  "detectors": {
+    "identity_reassertion": {
+      "fired": false,
+      "scope": "per row",
+      "note": "Every RED row re-asserted its identifier on the fetched page.",
+      "checked": 4,
+      "offending": null,
+      "inconclusive": false
+    },
+    "zero_is_a_fault": {
+      "fired": false,
+      "scope": "per claim",
+      "note": "DE returned 2043 listings and adjudicated every one.",
+      "arm": "DE",
+      "inconclusive": false
+    },
+    "join_key_coverage": {
+      "fired": true,
+      "scope": "per arm",
+      "note": "Tracked separately from row count. An arm can return thousands of clean rows that match nothing, and a row-count check passes it happily.",
+      "arm": "DE",
+      "coverage": 0.5314,
+      "bound": 0.8,
+      "inconclusive": false
+    },
+    "sibling_differential": {
+      "fired": false,
+      "scope": "across arms",
+      "note": "No arm has collapsed against its siblings across two sweeps.",
+      "collapsed": [
+        "DE",
+        "IN"
+      ],
+      "holding": [
+        "US"
+      ],
+      "requires": "persistence across two sweeps",
+      "inconclusive": false
+    },
+    "implausible_cleanliness": {
+      "fired": false,
+      "scope": "whole board",
+      "note": "The previous sweep also reached zero RED, so the proportional drop this detector measures is zero over zero, which has no value. That is not the same as nothing having got worse, and it is not the same as there being no prior sweep, which is what this used to say.",
+      "threshold": 0.4,
+      "red_before": null,
+      "red_now": 4,
+      "inconclusive": true
+    },
+    "currency_fingerprint": {
+      "fired": false,
+      "scope": "per row",
+      "note": "Every DE row must carry EUR, every IN row INR, every US row USD. Kills a country-drift failure class that cross-arm comparison is blind to.",
+      "offending": null,
+      "inconclusive": false
+    },
+    "schema_drift": {
+      "fired": false,
+      "scope": "per arm",
+      "note": "Every field the collectors returned is mapped by the contract.",
+      "drifted": null,
+      "inconclusive": false
+    },
+    "freshness": {
+      "fired": false,
+      "scope": "whole board",
+      "note": "Rows older than the freshness bound are historical. DAY counters freeze at last capture rather than continuing to count.",
+      "age_s": 0,
+      "bound_s": 14400,
+      "inconclusive": false
+    }
+  },
+  "reports": [
+    {
+      "in": 2043,
+      "out": 2043,
+      "orphaned": 0,
+      "by_code": {
+        "AMBER": 2039,
+        "brand_conflict": 4
+      },
+      "currency_mismatch": 0,
+      "by_query": {
+        "model_only": 841,
+        "brand_model": 1202
+      },
+      "listings": 2043,
+      "arm": "DE",
+      "collector_id": "c_mt00jidz6zhqjbpew",
+      "planned_loads": 353,
+      "batches": 0,
+      "fetch_errors": [],
+      "replayed": true,
+      "raw_rows": 2090,
+      "unclaimed_rows": 47,
+      "unmapped_fields": [],
+      "with_language": 1005,
+      "with_currency": 2037
+    },
+    {
+      "in": 7986,
+      "out": 7986,
+      "orphaned": 0,
+      "by_code": {
+        "AMBER": 7986
+      },
+      "currency_mismatch": 0,
+      "by_query": {
+        "model_only": 3802,
+        "brand_model": 4184
+      },
+      "listings": 7986,
+      "arm": "IN",
+      "collector_id": "c_mt03cj5z2fo651wy8q",
+      "planned_loads": 353,
+      "batches": 0,
+      "fetch_errors": [],
+      "replayed": true,
+      "raw_rows": 8073,
+      "unclaimed_rows": 87,
+      "unmapped_fields": [],
+      "with_language": 7986,
+      "with_currency": 3568
+    },
+    {
+      "in": 14538,
+      "out": 14538,
+      "orphaned": 0,
+      "by_code": {
+        "AMBER": 13643,
+        "brand_conflict": 848
+      },
+      "currency_mismatch": 0,
+      "by_query": {
+        "brand_model": 3384,
+        "model_only": 11154
+      },
+      "listings": 14538,
+      "arm": "US",
+      "collector_id": "c_mt01usw31e8y5ubqjs",
+      "planned_loads": 353,
+      "batches": 0,
+      "fetch_errors": [],
+      "replayed": true,
+      "raw_rows": 14632,
+      "unclaimed_rows": 94,
+      "unmapped_fields": [],
+      "with_language": 12148,
+      "with_currency": 13453
+    }
+  ],
+  "verdict": "Partial for DE, IN, US. Figures computed from the seed corpus are unaffected and remain live.",
+  "blackout": false,
+  "replayed_from_archive": true
+}

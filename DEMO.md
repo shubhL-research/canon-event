@@ -38,13 +38,13 @@ quotes the figures as they stand today:
 | Where | Figure as scripted |
 |---|---|
 | Hero sentence | `The US recall feed has a model-number field. It is empty on 183 of 183 product records. Every one of 104 EU alerts carries a barcode, and 98 of them pass their own check digit.` |
-| Figure 1 | `0.0%` still on sale, `0 of 180 searchable notices`, CI `0.0% to 2.1%` |
-| Figure 2 | `13.0%` unsearchable, `27 of 207 notices` |
-| Regulators | CPSC `20.4%` unsearchable against Safety Gate `5.8%`, intervals do not overlap |
+| Figure 1 | `0.0%` still on sale, `0 of 176 searchable notices`, CI `0.0% to 2.1%` |
+| Figure 2 | `15.0%` unsearchable, `31 of 207 notices` |
+| Regulators | CPSC `24.3%` unsearchable against Safety Gate `5.8%`, intervals do not overlap |
 | Discard panel | `identifier not reasserted 246`, `brand conflict 15`, `no join key 4` |
 | Ledger | `207 rows`, `173 AMBER`, `34 DISCARDED`, `0 RED` |
-| Arm rail | all three `DEGRADED`, join coverage `45.9%` US, `53.6%` DE, `26.6%` IN against an 80% bound |
-| Listings adjudicated | `24,679` across three arms. Shot 1 says this as words, so check it against the arm rail before recording |
+| Arm rail | all three `DEGRADED`, join coverage `44.0%` US, `53.1%` DE, `26.6%` IN against an 80% bound |
+| Listings adjudicated | `23,811` across three arms. Shot 1 says this as words, so check it against the arm rail before recording |
 | Detectors | `2 of 8 firing`, `3 could not run` |
 | Act 06 | one confirmed RED found by hand, Acer AES015 at `$379.99`, outside the sweep |
 | Every arm | `exit not attested on this sweep` |
@@ -141,7 +141,7 @@ hazard-ruled line beneath it naming the scooter.
 
 > Governments recall products for burning, choking and killing children. Nobody
 > checks whether those products actually leave the shelves. We checked. Three
-> marketplaces, two regulators, twenty four thousand six hundred and seventy nine
+> marketplaces, two regulators, twenty three thousand eight hundred and eleven
 > listings, and the sweep came back with nothing. Then we looked somewhere it does
 > not cover, and found a recalled electric scooter on sale.
 
