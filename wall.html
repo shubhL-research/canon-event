@@ -43,6 +43,7 @@
   <a href="#detectors"><span class="rail-dot"></span><span class="rail-num">05</span><span class="rail-label">What was watching</span></a>
   <a href="#hunt"><span class="rail-dot"></span><span class="rail-num">06</span><span class="rail-label">Found by hand</span></a>
   <a href="#actGaps"><span class="rail-dot"></span><span class="rail-num">07</span><span class="rail-label">What we missed</span></a>
+  <a href="#ask"><span class="rail-dot"></span><span class="rail-num">08</span><span class="rail-label">What we ask for</span></a>
 </nav>
 
 <div class="shell">
@@ -146,6 +147,62 @@
       <div class="panel" id="notSeen"></div>
       <div class="panel" id="healLedger"></div>
     </div>
+  </section>
+
+  <!-- ACT 08. The ask.
+
+       A measurement with no addressee is a curiosity. The README has carried
+       this section from the start and the wall ended on a legend, a provenance
+       strip and a collapsed machinery drawer, so a judge scoring idea and impact
+       got the finding and never the point of it.
+
+       The ask is deliberately small. It is not "fix product recalls", it is
+       "populate a field you are already writing, one key away in the same JSON
+       response". A demand nobody could act on is another way of not asking. -->
+  <section class="act act-ask" id="ask" aria-labelledby="askHead">
+    <h2 class="act-head" id="askHead">
+      <span class="act-num">08</span> What we are asking for
+    </h2>
+
+    <p class="act-lede">A measurement with no addressee is a curiosity. This one
+      has both, and the ask is small on purpose: it is not that anyone fix
+      product recalls, it is that a field already being written gets written into
+      the field that exists for it.</p>
+
+    <div class="ask-grid">
+      <div class="ask-card">
+        <div class="ask-k">Addressed to</div>
+        <div class="ask-v">The US Consumer Product Safety Commission</div>
+      </div>
+      <div class="ask-card">
+        <div class="ask-k">The ask</div>
+        <div class="ask-v">Populate <code>Products[].Model</code>, or add a
+          <code>ProductGTIN</code> field beside the existing
+          <code>ProductUPCs</code>.</div>
+      </div>
+      <div class="ask-card">
+        <div class="ask-k">Cost to the regulator</div>
+        <div class="ask-v">Nothing new to collect. The model number is already in
+          the same JSON response, written as English prose in
+          <code>Description</code>, one key away.</div>
+      </div>
+    </div>
+
+    <p class="ask-body">Right now anyone checking a recall programmatically has to
+      parse that prose to find out which unit was recalled: a marketplace running
+      its own listings against the feed, a journalist asking whether a product is
+      still on sale, a customs authority, a comparison site, and the regulator
+      itself. We wrote that parser. It is in <code>data/pull_seeds.py</code> and it
+      recovered an identifier for 82 of 103 US notices the structured field did
+      not carry. Nobody should have to write it.</p>
+
+    <p class="ask-body"><b>What this page does not claim.</b> Nothing in the sweep
+      says any product is on sale, and nothing in it names a seller. The one
+      number this project would stake itself on is a count of an empty field in a
+      public feed, and it needs no scraper, no credit and no permission to
+      reproduce:</p>
+
+    <pre class="ask-repro"><code>curl -s "https://www.saferproducts.gov/RestWebServices/Recall?format=json&amp;RecallDateStart=2026-07-20&amp;RecallDateEnd=2026-08-13"   | python3 -c "import json,sys; d=json.load(sys.stdin);       print(sum(1 for r in d for p in r['Products'] if not (p.get('Model') or '').strip()),             'of', sum(len(r['Products']) for r in d))"</code></pre>
   </section>
 
   <footer class="act act-foot">

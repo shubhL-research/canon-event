@@ -1478,3 +1478,33 @@ body.is-blackout .days { color: var(--unknown); }
 /* The note above the rows is the only thing in this state that should read at
    full strength, because it is the sentence doing the work. */
 body.is-blackout .historical-note { color: var(--ink); font-weight: 700; }
+
+/* ------------------------------------------------------------------ act 08
+   The ask. A measurement with no addressee is a curiosity, and the page ended
+   on a legend and a collapsed machinery drawer, so a reader got the finding and
+   never the point of it. Set plainly: this is the one part of the page that is
+   a position rather than a measurement, and it should not borrow the authority
+   of the figures above it by looking like them. */
+.act-ask { margin-top: 96px; }
+.ask-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 28px; }
+.ask-card { border-top: 3px solid var(--ink); padding-top: 14px; }
+.ask-k {
+  font-family: var(--font-machine); font-size: 10px; letter-spacing: 0.12em;
+  text-transform: uppercase; color: var(--ink-3);
+}
+.ask-v { margin-top: 8px; font-size: 15px; line-height: 1.5; color: var(--ink); }
+.ask-v code, .ask-body code {
+  font-family: var(--font-machine); font-size: 13px;
+  background: var(--paper-hero); padding: 1px 4px;
+}
+.ask-body { margin: 24px 0 0; max-width: 70ch; font-size: 15px; line-height: 1.6; color: var(--ink-2); }
+.ask-body b { color: var(--ink); }
+.ask-repro {
+  margin: 16px 0 0; padding: 16px 18px; background: var(--paper-hero);
+  border-left: 3px solid var(--flux); overflow-x: auto;
+}
+.ask-repro code {
+  font-family: var(--font-machine); font-size: 12px; line-height: 1.6;
+  white-space: pre; color: var(--ink);
+}
+@media (max-width: 1279px) { .ask-grid { grid-template-columns: 1fr; } }
