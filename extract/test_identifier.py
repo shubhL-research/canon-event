@@ -159,5 +159,27 @@ try:
 except ImportError as e:
     check(False, f"could not load the corpus: {e}")
 
+
+# CPSC returns ProductUPCs as OBJECTS, [{"UPC": "7994..."}], and pull_seeds.py
+# read it as a list of strings. str({"UPC": ...}).isdigit() is False, so every
+# CPSC barcode was discarded at pull time: the same 7 of 213 the README says
+# reach ProductUPCs. Those notices then went down the model path, where until
+# 21 August a brand check could not pass for any CPSC notice at all.
+from pull_seeds import first_upc                                   # noqa: E402
+
+check(first_upc([{"UPC": "799403302902"}]) == "799403302902",
+      "first_upc reads CPSC's object shape")
+check(first_upc(["799403302902"]) == "799403302902",
+      "first_upc still reads a plain string list")
+check(first_upc([{"upc": "0799403302902"}]) == "0799403302902",
+      "first_upc is case-insensitive about the key")
+check(first_upc([{"UPC": "n/a"}, {"UPC": "12"}]) is None,
+      "a value that is not 8 to 14 digits is skipped, never coerced")
+check(first_upc([{"NotUPC": "799403302902"}]) is None,
+      "an object without a UPC key yields nothing")
+check(first_upc(None) is None and first_upc([]) is None,
+      "absent and empty both yield nothing")
 print("\n" + ("%d FAILURES" % len(FAILURES) if FAILURES else "all extractor tests passed"))
 sys.exit(1 if FAILURES else 0)
+
+

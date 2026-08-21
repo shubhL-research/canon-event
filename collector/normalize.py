@@ -551,12 +551,29 @@ def brand_conflict(page_text, expected_brand):
     if not present(page_text) or not expected_brand:
         return False
     # The DISTINCTIVE part, not the regulator's legal identity. See brand_core.
-    want = norm_needle(brand_core(expected_brand))
-    if len(want) < 4:
+    core = brand_core(expected_brand)
+    if len(norm_needle(core)) < 4:
         # Too short to be evidence either way. Unknown is not disagreement, and
         # treating it as one is what made this check discard the world.
         return False
-    return want not in norm_needle(page_text)
+
+    # BOUNDARY-ANCHORED, not a bare substring.
+    #
+    # This compared norm_needle(core) against norm_needle(page_text), which
+    # deletes every non-alphanumeric character from both sides and then asks for
+    # containment. So "ECHO" was satisfied by "echo cancellation technology" on a
+    # Bosch listing, "Acer" by "Placer County", and any brand by any page that
+    # happened to contain those letters in sequence. The check that exists to
+    # stop a hazard claim landing on the wrong manufacturer agreed with almost
+    # every page, which is the direction that produces a false RED.
+    #
+    # needle_pattern is the matcher this project already uses for identifiers:
+    # separator-tolerant and anchored so a match cannot start or end inside a
+    # longer word. A brand deserves the same rule as a model number.
+    pat = needle_pattern(core)
+    if pat is None:
+        return False
+    return not pat.search(str(page_text))
 
 
 def classify(raw, expected_brand=None, expected_name=None):

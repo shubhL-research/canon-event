@@ -55,6 +55,24 @@ def get(url, params):
         return json.loads(r.read().decode("utf-8", "replace"))
 
 
+def first_upc(upcs):
+    """The first usable barcode from CPSC's ProductUPCs.
+
+    Accepts both shapes the feed has used: a list of strings, and a list of
+    objects carrying a UPC key. Anything that is not 8 to 14 digits is not a
+    GTIN and is skipped rather than coerced.
+    """
+    for u in (upcs or []):
+        if isinstance(u, dict):
+            u = u.get("UPC") or u.get("upc") or u.get("Upc")
+        if u is None:
+            continue
+        v = str(u).strip()
+        if v.isdigit() and 8 <= len(v) <= 14:
+            return v
+    return None
+
+
 def clean(s):
     """Collapse whitespace. Never rewrite the regulator's words beyond that."""
     return re.sub(r"\s+", " ", str(s or "")).strip()
@@ -199,8 +217,15 @@ def pull_cpsc(days):
             "model": (clean(p.get("Model")) or model_from_name(pname)
                       or mine_identifier(r.get("Description"), r.get("Title"),
                                          p.get("Description"))),
-            "gtin": next((u for u in (r.get("ProductUPCs") or [])
-                          if str(u).isdigit() and 8 <= len(str(u)) <= 14), None),
+            # CPSC returns ProductUPCs as a list of OBJECTS, [{"UPC": "7994..."}],
+            # not a list of strings. This read `str(u).isdigit()` on the dict, so
+            # it was always False and every CPSC barcode was silently discarded.
+            #
+            # The consequence was not cosmetic. A notice with no gtin goes down
+            # the model path, and until an hour ago the model path ran through a
+            # brand check that could not pass for any CPSC notice, so a barcode
+            # CPSC did publish was thrown away and the notice made unmatchable.
+            "gtin": first_upc(r.get("ProductUPCs")),
             "category": clean(p.get("Type")) or None,
             "hazard": hazard,
             "url": clean(r.get("URL")) or f"https://www.cpsc.gov/Recalls/{r.get('RecallNumber')}",

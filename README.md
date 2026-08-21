@@ -19,6 +19,21 @@ corpus draws from, that field is empty on **213 of 213 product records**. Not sp
 model number is in the same JSON response, written in prose into the top-level `Description`, which
 is non-empty on all 213. A structured barcode reaches `ProductUPCs` on 7 of the 213.
 
+**And this project threw all seven away.** `data/pull_seeds.py` read
+`ProductUPCs` as a list of strings. CPSC returns a list of objects,
+`[{"UPC": "799403302902"}]`, so the digit test ran against a dict, was always
+false, and every CPSC barcode was silently discarded at pull time. Each of those
+notices then went down the model path instead, where until 21 August a brand
+check compared the regulator's full legal identity against page text and could
+not pass for any CPSC notice at all.
+
+The extractor is fixed and accepts both shapes. The committed corpus is not
+re-pulled: the raw archive was fetched from the queries the old corpus produced,
+so adding seven barcodes would create seven queries the archive cannot answer and
+would change denominators without changing a single finding. The corpus is
+therefore one pull behind its own extractor, and this paragraph is the disclosure
+rather than a silent regeneration.
+
 Run this and read the two numbers. The first is product records returned, the second is product
 records whose `Model` is empty.
 
