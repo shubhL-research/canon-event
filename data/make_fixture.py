@@ -678,6 +678,34 @@ def build_fixture(variant, rows, stats):
     base["arms"] = arms
     base["stats"] = stats
     base["rows"] = rows
+
+    # THE FILMED STATES MUST CARRY THE CRITERION-4 AND 5 EVIDENCE.
+    #
+    # renderPlatform and renderDetectors both return an empty string when their
+    # key is absent, and no fixture carried either. So ?state=blackout,
+    # ?state=gate and ?state=healing rendered the whole Bright Data section and
+    # the whole detector board as nothing, and those are precisely the states
+    # DEMO.md films the failure modes from. The evidence vanished in exactly the
+    # frames it needed to be in.
+    #
+    # These are read from the live payload rather than invented, so a fixture can
+    # never claim platform usage the real sweep did not produce. If the live
+    # payload is absent, the keys stay absent and the sections stay empty, which
+    # is the honest degradation.
+    live = pathlib.Path(__file__).parent / "live.js"
+    if live.exists():
+        try:
+            t = live.read_text(encoding="utf-8")
+            src = json.loads(t[t.index("{"):t.rindex(";")])
+            for key in ("platform", "heals", "detectors", "detector_summary"):
+                if src.get(key):
+                    base[key] = src[key]
+            base.setdefault("provenance", {})["platform_from_live"] = (
+                "The Bright Data section and the detector board are carried from the "
+                "live payload. The sweep figures on this page are fixture; the "
+                "collector ids, heals and detector verdicts are not.")
+        except Exception:
+            pass
     return base
 
 
