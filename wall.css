@@ -1437,13 +1437,27 @@ body { overflow-x: clip; max-width: 100%; }
    Set apart by a hazard rule because it IS the accusation, and marked in its own
    words as coming from outside the sweep, so the separation the whole act rests
    on survives being quoted out of context on the very first screen. */
+/* This paragraph sits on the dark finding act and was the one thing in it still
+   styled with the light-ground ink tokens: --ink-2 on #14171A is about 2.2:1 and
+   --ink is about 1.05:1, so the sentence was murky and the link was legible only
+   as an underline. The cursor was the only thing telling a reader it could be
+   clicked, which is the same failure as a control with no label. The act already
+   sets color: var(--ink-inv) and this rule was overriding it.
+
+   The link is now the brightest thing in the paragraph, because it is the only
+   control in this act. Hover thickens the rule rather than colouring it: red is
+   an accusation on this wall and a hover state is not one. */
 .found-anyway {
   margin: 32px 0 0; max-width: 62ch; font-size: 15px; line-height: 1.6;
-  color: var(--ink-2); border-left: 3px solid var(--hazard);
+  color: #C9CDD1; border-left: 3px solid var(--hazard);
   padding: 12px 0 12px 18px;
 }
-.found-anyway b { color: var(--hazard-deep); }
-.found-anyway a { color: var(--ink); text-decoration: underline; text-underline-offset: 2px; }
+.found-anyway b { color: var(--hazard); }
+.found-anyway a {
+  color: var(--ink-inv); text-decoration: underline; text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
+}
+.found-anyway a:hover { text-decoration-thickness: 2px; }
 .act-finding.is-withheld .found-anyway { color: var(--void-ink); border-left-color: var(--void-ink); }
 .act-finding.is-withheld .found-anyway b,
 .act-finding.is-withheld .found-anyway a { color: var(--void-ink); }
