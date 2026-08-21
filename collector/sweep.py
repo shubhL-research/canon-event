@@ -658,16 +658,26 @@ def adjudicate_from_raw(seeds, arms=None, now=None):
     return rows, doc
 
 
-def already_swept():
-    """Refs the raw archive already holds rows for, per arm and pooled.
+def already_swept(arms=None):
+    """Refs the archive already holds rows for, for the arms being swept.
 
     A notice is only worth re-fetching if something about the query changed. The
-    archive is committed to disk and --from-raw re-scores it for free, so
-    sweeping a notice we already own rows for spends money to learn nothing.
+    archive is committed and --from-raw re-scores it free, so sweeping a notice we
+    already own rows for spends money to learn nothing.
+
+    `arms` matters and omitting it was a bug. Pooled across every arm, this told a
+    single-arm sweep to skip notices some OTHER arm had covered: the IN retry was
+    offered 30 notices to sweep when IN had reached 55 of 207 and the 177 it
+    skipped were mostly US rows. A notice is swept for an arm when that arm has
+    rows for it, not when the project does.
     """
     raw = pathlib.Path(__file__).parent.parent / "data" / "sweeps" / "raw"
     seen = set()
-    for path in sorted(raw.glob("*.jsonl")):
+    paths = ([raw / ("%s.jsonl" % a) for a in arms] if arms
+             else sorted(raw.glob("*.jsonl")))
+    for path in paths:
+        if not path.exists():
+            continue
         arm = path.stem
         seeds = load_seeds()
         by_url = {url: ref for url, ref, _s, _n in plan_arm(arm, seeds)}
@@ -732,7 +742,7 @@ def main(argv):
     seeds = load_seeds(limit=limit)
 
     if "--unswept" in argv:
-        done = already_swept()
+        done = already_swept(sorted(arms))
         seeds = [s for s in seeds if s["ref"] not in done]
         print("skipping %d notices already in the archive" % len(done))
 
