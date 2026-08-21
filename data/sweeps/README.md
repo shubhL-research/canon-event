@@ -16,7 +16,7 @@ a natural-language brief, which is why they are `add_to_cart_button_text` and
 `manufacturer_part_number` rather than anything we would have picked. A library
 scraper would have handed back a fixed schema we did not choose.
 
-`sweep-2026-08-20.csv`
+`sweep-2026-08-20.csv` **(SUPERSEDED: a 60-notice trial. Its summary carries the retracted 46.4% unsearchable rate. Not the published sweep.)**
 The full three-arm sweep after adjudication. 60 notices, three storefronts, 180
 notice-arm verdicts, one row each. Carries the arm state and coverage, the
 verdict, the tier, the discard reasons and which of the two query strategies

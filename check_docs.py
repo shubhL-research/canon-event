@@ -141,6 +141,28 @@ def main():
             problems.append("the hero sentence does not state the %d it validated"
                             % hero["eu_barcode_valid"])
 
+    # THE PRIMARY-EVIDENCE POINTER MUST NAME THE PUBLISHED SWEEP.
+    #
+    # README's "The primary evidence" table offered sweep-2026-08-20.csv as "the
+    # full three-arm sweep". It is a 60-notice trial whose summary still carries
+    # the retracted 46.4% unsearchable rate and a survival interval of [0, 6.2]
+    # on 58 observations. A judge following the project's own pointer found it
+    # committing the error the README apologises for, on four headline numbers.
+    import re as _re
+    readme = (ROOT / "README.md").read_text(encoding="utf-8")
+    sweep_id = doc.get("sweep_id", "")
+    stem = _re.sub(r"[^A-Za-z0-9]", "", sweep_id)
+    named = _re.findall(r"s_2026\d{4}T\d{4}Z\w*\.jsonl", readme)
+    if named:
+        published = [n for n in named if _re.sub(r"[^A-Za-z0-9]", "", n).startswith(stem[:14])]
+        if not published:
+            problems.append(
+                "README names %s as evidence but the wall publishes %s. The "
+                "primary-evidence pointer must name the sweep on screen."
+                % (named[0], sweep_id))
+    else:
+        problems.append("README's primary-evidence table names no sweep file at all")
+
     # The arms must also add up to the total they are printed beside, which is
     # the one sum a judge can do in their head on the page itself.
     parts = f["US_listings"] + f["DE_listings"] + f["IN_listings"]

@@ -560,7 +560,8 @@ it, in `data/sweeps/` and `examples/`:
 
 | | |
 |---|---|
-| `sweep-2026-08-20.csv` | Every notice-arm verdict, one row each |
+| `s_20260821T2041Zreplay.jsonl` | Every notice-arm verdict for the published sweep, one row each |
+| `sweep-2026-08-20.csv` | A superseded 60-notice trial. Not the published sweep and not a current figure |
 | `s_*.jsonl` | Raw sweep rows |
 | `s_*-health.json` | What every detector concluded, per sweep |
 | `examples/` | The structured output shape, with its schema |
@@ -587,7 +588,8 @@ to check the claim rather than take it:
 | File | What it is |
 |---|---|
 | `raw-row-kaufland-de.json` | One row exactly as Scraper Studio returned it, field names and all |
-| `sweep-2026-08-20.csv` | The full three-arm sweep after adjudication, 180 notice-arm verdicts |
+| `s_20260821T2041Zreplay.jsonl` | **The sweep this wall publishes.** 207 notices, one row each, all three arm verdicts per row |
+| `sweep-2026-08-20.csv` | A **superseded** 60-notice trial, 180 notice-arm verdicts. Its summary still carries the retracted 46.4% unsearchable rate and a survival interval of [0, 6.2] on 58 observations. Kept as the record of what that run produced, not as a current figure. See "The unsearchable rate was wrong" above |
 
 The field names in the raw row were chosen by the Scraper Studio AI Agent when it
 built the collector from a natural-language brief. `add_to_cart_button_text` and
