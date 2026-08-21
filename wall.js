@@ -67,7 +67,7 @@
   function field(label, value, opts) {
     opts = opts || {};
     var present = value !== undefined && value !== null && value !== "";
-    var cls = "field" + (present ? "" : " is-missing") + (opts.mono ? " mono-v" : "");
+    var cls = "field" + (present ? "" : " is-missing");
     var shown = present ? esc(value) : "MISSING";
     return '<div class="' + cls + '">' +
       '<div class="k">' + esc(label) + "</div>" +
@@ -236,11 +236,11 @@
 
     if (s.border_escape.v === null) {
       out.push(instrument("Border escape", "PENDING",
-        esc(s.border_escape.pending.slice(0, 64)) + "…", "is-apparatus is-pending"));
+        esc(s.border_escape.pending.slice(0, 64)) + "…", "is-pending"));
     } else {
       out.push(instrument("Border escape", pct(s.border_escape.v),
         s.border_escape.n + " of " + s.border_escape.d + " · " + ci(s.border_escape.ci95),
-        "is-apparatus " + struck(s.border_escape)));
+        struck(s.border_escape)));
     }
 
     /* Precision carries its interval next to the number it qualifies, never in a
@@ -249,11 +249,11 @@
        and prints the count still needed. */
     if (s.precision.v === null) {
       out.push(instrument("Precision", "PENDING", esc(s.precision.pending),
-        "is-apparatus is-pending"));
+        "is-pending"));
     } else {
       out.push(instrument("Precision", pct(s.precision.v),
         s.precision.n + " of " + s.precision.d + " hand-verified · " + ci(s.precision.ci95),
-        "is-apparatus"));
+        ""));
     }
 
     /* Recall is not directly measured: capture-recapture across the two query
@@ -268,20 +268,20 @@
         ? "overlap " + rc.m_both + " of " + rc.observed + " observed · " : "";
       out.push(instrument("Recall", "NOT ESTIMABLE",
         "capture-recapture · " + overlap + esc(rc.reportable_note),
-        "is-apparatus is-pending"));
+        "is-pending"));
     } else {
       out.push(instrument("Recall, floor", "≥ " + Math.round(rc.missed_floor) + " missed",
         "capture-recapture, " + esc(rc.estimator.split(" ")[0]) + " · lower bound",
-        "is-apparatus"));
+        ""));
     }
 
     out.push(instrument("Arms measured", s.arms_measured.n + " of " + s.arms_measured.d,
       doc.arms.map(function (a) { return a.code + " " + a.state.toLowerCase(); }).join(" · "),
-      "is-apparatus"));
+      ""));
 
     out.push(instrument("Last sweep", '<span style="font-size:11px">' +
       esc(freshness(doc.swept_at)) + "</span>",
-      "freshness bound " + doc.freshness_bound_s / 3600 + "h", "is-apparatus"));
+      "freshness bound " + doc.freshness_bound_s / 3600 + "h", ""));
 
     /* Defensive because a payload is data, and data can be short a key.
        A missing stat used to throw inside renderInstruments and halt boot() after
@@ -291,7 +291,7 @@
        already obeys. */
     if (s.credits) {
       out.push(instrument("Search loads", commas(s.credits.used),
-        "of " + commas(s.credits.cap) + " budgeted", "is-apparatus"));
+        "of " + commas(s.credits.cap) + " budgeted", ""));
     }
 
     el("instruments").innerHTML = out.join("");

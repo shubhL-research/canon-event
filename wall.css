@@ -213,6 +213,14 @@ body {
 }
 .chip.v-RED { background: var(--hazard); border-color: var(--hazard); color: #fff; }
 .chip.v-WITHHELD { background: var(--void); border-color: var(--void); color: #fff; }
+/* Hollow IS the rendering for NOT_FOUND, and this rule exists to say so rather
+   than to change anything. The base .chip is already correct: we looked in that
+   country and found nothing, which is a measurement and should not shout. It is
+   written out because the neighbouring NOT_SWEPT rule turns entirely on the
+   difference between "hollow" and "never ran", and an intent carried only by the
+   absence of a rule is one edit away from becoming the bug that shipped once
+   already, when WITHHELD rendered identically to healthy. */
+.chip.v-NOT_FOUND { background: var(--surface); border-color: var(--rule-strong); }
 .chip.v-STALE { background: repeating-linear-gradient(45deg,
   var(--surface), var(--surface) 2px, var(--hatch) 2px, var(--hatch) 4px); }
 /* An arm that never ran is not the hollow chip. Hollow already means we looked in

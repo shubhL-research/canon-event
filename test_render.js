@@ -181,6 +181,54 @@ if (fs.existsSync(LIVE)) {
     check(doc.hunt.findings.every((f) => !("days" in f) && !("tier" in f)),
           "no hunt finding carries sweep row fields");
   }
+  /* Every class the renderer emits must have a rule somewhere.
+     This exists because of a real bug that shipped: `.verdict.is-withheld`
+     styled a class the renderer never emitted, so a WITHHELD verdict rendered
+     in the same black as a healthy one and every suite still passed, because
+     nothing in the suite looked at colour. A dead selector is invisible to a
+     test that only asks whether text appeared. This asks the other question. */
+  const styles = fs.readFileSync(path.join(ROOT, "wall.css"), "utf8") +
+                 fs.readFileSync(path.join(ROOT, "contract", "tokens.css"), "utf8");
+  const wordChar = new RegExp("[A-Za-z0-9_-]");
+  const emitted = new Set();
+  (html.match(/class="([^"]+)"/g) || []).forEach((m) =>
+    m.slice(7, -1).trim().split(" ").forEach((c) => c && emitted.add(c.trim())));
+
+  // A rule counts only if the class name ENDS there. Matching ".hunt" inside
+  // ".hunt-item" would let a genuinely dead class pass.
+  function hasRule(cls) {
+    const needle = "." + cls;
+    for (let k = styles.indexOf(needle); k > -1;
+         k = styles.indexOf(needle, k + 1)) {
+      if (!wordChar.test(styles.charAt(k + needle.length))) return true;
+    }
+    return false;
+  }
+  const orphans = [...emitted].filter((c) => !hasRule(c));
+  check(orphans.length === 0,
+        "every rendered class has a CSS rule (" + orphans.length + " orphan: " +
+        orphans.slice(0, 8).join(", ") + ")");
+
+  // The verdict colours must be distinct rules, not the same one twice. This is
+  // the specific shape of the bug above: two states, one colour, silent.
+  function ruleBody(sel) {
+    const k = styles.indexOf(sel);
+    if (k < 0) return "";
+    return styles.slice(k, styles.indexOf("}", k));
+  }
+  const redBody = ruleBody(".hunt-chip.is-red");
+  const amberBody = ruleBody(".hunt-chip.is-amber");
+  check(redBody.indexOf("var(--hazard)") > -1,
+        "the hunt RED chip resolves to the hazard token");
+  check(amberBody.indexOf("var(--amber)") > -1,
+        "the hunt AMBER chip resolves to the amber token");
+  check(redBody !== amberBody,
+        "hunt RED and AMBER are different rules, not the same colour twice");
+
+
+
+
+
   console.log("");
 } else {
   console.log("live payload: none published, skipping\n");
