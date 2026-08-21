@@ -26,7 +26,7 @@ and narrate over it.
 Open `wall.html` and scroll to the bottom. The provenance strip prints one of two
 things:
 
-- `LIVE MEASUREMENT. TRIAL SLICE, 60 of 207 notices.` Good, shoot it.
+- `LIVE MEASUREMENT. Republished from the archived sweep payload.` Good, shoot it.
 - Anything containing `FIXTURE`. Then `data/live.js` is missing. Stop and ask
   before filming, because the whole script assumes the live payload.
 
@@ -44,6 +44,7 @@ quotes the figures as they stand today:
 | Discard panel | `identifier not reasserted 246`, `brand conflict 15`, `no join key 4` |
 | Ledger | `207 rows`, `173 AMBER`, `34 DISCARDED`, `0 RED` |
 | Arm rail | all three `DEGRADED`, join coverage `45.9%` US, `53.6%` DE, `26.6%` IN against an 80% bound |
+| Listings adjudicated | `24,679` across three arms. Shot 1 says this as words, so check it against the arm rail before recording |
 | Detectors | `2 of 8 firing`, `3 could not run` |
 | Act 06 | one confirmed RED found by hand, Acer AES015 at `$379.99`, outside the sweep |
 | Every arm | `exit not attested on this sweep` |
@@ -124,218 +125,157 @@ scrolls into view, so pause on them rather than scrolling through them.
 
 ---
 
-## Shot 1 · 0:00 to 0:20 · The problem, and the headline
+## Shot 1 · 0:00 to 0:20 · The problem, and the one we found
 
-**On screen.** Tab B1, `wall.html`, top of page, Act I only. The corner filing
-mark top left, the hero sentence centred, nothing else in frame.
+**On screen.** Tab B1, `wall.html`, top of page. The hero sentence, then the
+hazard-ruled line beneath it naming the scooter.
 
 **Action.**
 
-- 0:00 to 0:02 Hold on first paint. Do not cut. The number is still counting.
-- 0:02 to 0:14 Static on the settled hero sentence.
-- 0:14 to 0:20 Slow scroll down just far enough that the scroll cue and the top
-  of Act 01 enter frame. Stop before the figures start counting.
+- 0:00 to 0:02 Hold on first paint. Do not cut, the number is still counting.
+- 0:02 to 0:12 Static on the settled hero sentence.
+- 0:12 to 0:20 Scroll just far enough to bring the **We found one anyway** line
+  fully into frame. Stop there. Do not continue into Act 01.
 
 **Say.**
 
-> Governments recall products for burning, choking and killing people. Nobody
-> checks whether those products actually leave the shelves. This is what one week
-> of checking looks like. Twenty one of two hundred and seven recall notices name
-> nothing a machine can search for. Nobody can check those at all.
+> Governments recall products for burning, choking and killing children. Nobody
+> checks whether those products actually leave the shelves. We checked. Three
+> marketplaces, two regulators, twenty four thousand six hundred and seventy nine
+> listings, and the sweep came back with nothing. Then we looked somewhere it does
+> not cover, and found a recalled electric scooter on sale.
 
-**Do not** read the number from this file. Read it from the screen.
+**Why this shot is first.** Five of the eight public projects in this hackathon
+are self-healing scrapers. Opening on a heal gate makes this the sixth. Opening
+on a recalled product still for sale makes it the only one.
 
 ---
 
-## Shot 2 · 0:20 to 0:40 · The finding, verifiable live
+## Shot 2 · 0:20 to 0:45 · The scooter, and our own blind spot
 
-This is the strongest twenty seconds in the project. It is a finding, and the
-viewer can reproduce it while the video is still playing.
-
-**On screen.** Two browser windows side by side. Left is B2, the CPSC recall
-notice page for the Fisher-Price dumbbell toy. Right is B3, the same recall from
-CPSC's own API, in the Firefox JSON viewer.
+**On screen.** Act 06, the first finding card. RED chip, the hazard sentence, the
+facts grid, then the cross-reference line under it.
 
 **Action.**
 
-- 0:20 to 0:24 Both windows in frame. Left shows the notice, headline visible.
-- 0:24 to 0:30 On the right, expand `Products` then `0`. Put the cursor on the
-  line `Model: ""`. Hold on it.
-- 0:30 to 0:34 On the right, scroll to `Description`. Highlight the phrase
-  `The model number GJD49 is located on the back of the kettlebell toy in the
-  gift set.`
-- 0:34 to 0:40 Cut to T1. Type and run one line:
-
-```bash
-curl -s "https://www.saferproducts.gov/RestWebServices/Recall?format=json&RecallDateStart=2025-08-20&RecallDateEnd=2026-08-20" | grep -o '"Model":"[^"]*"' | sort | uniq -c
-```
-
-  One line of output comes back. It reads `543 "Model":""` or whatever the count
-  is on the day you shoot. Hold on that output for three seconds.
+- 0:20 to 0:26 Land on the RED card. Hold on the hazard sentence and the price.
+- 0:26 to 0:34 Move down the facts grid. Let `AES015 11x on page`,
+  `Add to Cart` and `$379.99` be legible.
+- 0:34 to 0:45 Hold on the cross-reference line, then on the banner above the
+  list. Both must be readable in the cut.
 
 **Say.**
 
-> Here is why. A CPSC recall notice, and the same notice from CPSC's own API. The
-> Model field is empty. The model number is in the description, written in prose.
-> One line checks a year of them. Five hundred and forty three product records,
-> every Model field empty.
+> Recalled because the front tube can fold down while you are riding it. On sale
+> today at three hundred and seventy nine dollars, with a live Add to Cart, and
+> the word recall appears nowhere on that page. We fetched it, committed it, and
+> the same classifier that ran the sweep scored it red.
+>
+> And here is the part we are not hiding. Our own sweep searched for this scooter
+> in three marketplaces and returned not found in every one. It is a row in the
+> ledger further up this page. This is not a different story from our zero. It is
+> our zero, seen from outside.
 
-**Caption**, lower third, plain white on black, from 0:36 to 0:40:
-
-> EU Safety Gate, same corpus: 104 of 104 alerts carry a typed barcode.
-
-**Do not** say a count the terminal did not print. The command prints its own
-number. Read that one. CPSC keeps publishing, so it climbs.
+**Do not** cut the second paragraph to save time. It is the most honest thing in
+the video and it is the reason the finding is credible. Cut from Shot 4 instead.
 
 ---
 
-## Shot 3 · 0:40 to 1:00 · What the sweep measured, and what it could not
+## Shot 3 · 0:45 to 1:10 · The zero, and why it is worth believing
 
-**On screen.** Tab B1, scrolled to Act 01, then Act 03.
+**On screen.** Act 01 figures, then the regulator comparison, then
+**Before you believe the zero** in Act 07.
 
 **Action.**
 
-- 0:40 to 0:48 Act 01, both figures settled. Left figure reads `0.0%` with
-  `0 of 180 searchable notices · 95% confidence 0.0% to 2.1%` under it. Right
-  figure reads `13.0%` with `no scraper touches this figure` under it.
-- 0:48 to 0:53 Scroll to Act 03. Hold on the instrument strip. The `Precision`
-  cell reads `PENDING` with its reason printed beside it.
-- 0:53 to 0:57 Continue to the arm rail. Three arms, all DEGRADED: `US amazon.com`,
-  `IN flipkart.com` degraded, collector ids visible.
-- 0:57 to 1:00 Jump to Act 04, the `What we did not see` panel. Put the cursor on
-  the line reading `AMBER 5812`.
+- 0:45 to 0:52 The two figures. Let them finish counting.
+- 0:52 to 1:00 Scroll to the two regulator cards. Hold so both percentages and
+  both intervals are legible.
+- 1:00 to 1:10 Jump to the two matcher-proof cards. Hold on the counts.
 
 **Say.**
 
-> Three arms ran. Twenty-four thousand six hundred and seventy-nine listings came back, and
-> every one was adjudicated. None was a recalled product. Zero of fifty eight,
-> with the interval printed beside it. The scraper was not broken, it looked.
-> Precision says pending, because there are no red rows to hand check.
-
-**Note for the editor.** This is the densest shot. If it runs long, cut the last
-sentence and hold the `PENDING` cell in silence instead. The screen says it.
-
-**The arm rail now states the adjudicated listing count directly**, so point
-there for the 24,679 rather than at the discard panel. Each arm card also names
-its join coverage against the 80% bound, which is the reason all three read
-DEGRADED, and that is worth one sentence: they returned plenty and matched
-little, which is a different failure from returning nothing.
+> Zero of a hundred and eighty searchable notices found on sale. A zero is only
+> worth anything if you can tell it apart from a broken matcher, so we prove both
+> directions: thirteen planted products that must all come back red, and
+> twenty one deliberate near misses that must all be discarded. Both hold.
+>
+> The finding that needs no scraper at all is here. One in five American recall
+> notices names nothing you could type into a search box. For Europe it is one in
+> seventeen, and the confidence intervals do not overlap. A recall nobody can
+> search for cannot be enforced by anyone.
 
 ---
 
-## Shot 4 · 1:00 to 1:20 · The heal the agent refused to ship
+## Shot 4 · 1:10 to 1:28 · Bright Data, and the structured output
 
-Nobody fakes a rejection. This is the hardest thing in the project to fabricate
-and it is a plain text file with a date on it.
-
-**On screen.** Editor E1, `heals/2026-08-19-de-001.md`. Full screen, no browser
-in frame.
+**On screen.** Act 04, the field-name chips and the geo table, then a cut to
+`examples/row.json` open in the editor.
 
 **Action.**
 
-- 1:00 to 1:05 Top of file. The title line reads `Heal DE-001`, followed by the
-  word REFUSED. The header block under it is in view:
-
-  ```
-      collector   c_mt000dde2qdd6uln7z   (arm DE, amazon.de)
-      outcome     REJECTED at the approval gate
-      production  unchanged
-  ```
-
-- 1:05 to 1:09 Scroll to `## The break, as observed`. Hold on the
-  `wait_element_timeout` block for two seconds.
-- 1:09 to 1:16 Scroll to `## What the canary found`. Hold on this line and let it
-  sit:
-
-  ```
-  ean   "4.1 4.1 ud af 5 stjerner (50) 4.1 ud af 5 stjerner"
-  ```
-
-- 1:16 to 1:20 Show the folder listing for `heals/`. Three files. Two say
-  REFUSED, one says APPROVED.
+- 1:10 to 1:18 Hold on the row of field-name chips. `add_to_cart_button_text`
+  and `manufacturer_part_number` must both be legible.
+- 1:18 to 1:23 The geo table, asked against observed.
+- 1:23 to 1:28 Cut to tab E1, `examples/row.json`. Hold still, do not scroll.
 
 **Say.**
 
-> The German collector broke on a real product page. The repair worked, and it
-> was refused anyway. The canary found the barcode field holding a review star
-> rating, in Danish. Digits are what the matcher searches for. The template is
-> unchanged. The arm is still withheld, and the reason is written down.
+> The rules disqualify prebuilt scrapers, so the question is whether these are
+> custom. The agent named these fields itself. Nobody picks
+> add_to_cart_button_text by hand. Three requests, three countries asked for,
+> three countries observed. And this is what comes out the other end: one row,
+> one schema, every absent field marked missing rather than guessed.
 
-**Do not** cut to `wall.html?state=gate` here. That screen renders a fixture heal
-pointing at a ledger file that does not exist, and putting it beside this real
-refusal would blur which of the two happened. The file is the evidence. Stay in
-the file.
+**Structured output is a submission requirement**, and this is the only shot that
+shows it. If you cut anything here, cut the geo table, not `row.json`.
 
 ---
 
-## Shot 5 · 1:20 to 1:40 · The black screen
+## Shot 5 · 1:28 to 1:48 · The repair we refused to ship
 
-**On screen.** Tab B4, `wall.html?state=blackout`. Full bleed black,
-`Verdict withheld · every collector`, and the line
-`We do not know, so we will not say.`
+**On screen.** Act 04, the heal cards, then the three-refusal table.
 
 **Action.**
 
-- 1:20 to 1:23 Cut in on the wall as normal, Act 01, one second.
-- 1:23 to 1:26 Show the address bar. The query string `?state=blackout` must be
-  legible in frame. This is the honesty of the shot and it is not optional.
-- 1:26 to 1:34 Hold on the black screen. Say nothing for the first two seconds of
-  the hold. Silence is the point.
-- 1:34 to 1:40 Scroll down two screens. Every figure struck through. Every arm
-  black. The ledger rows still present and labelled historical rather than
-  deleted.
+- 1:28 to 1:36 The refusal cards. Let one `REFUSED AT THE GATE` and its stated
+  reason be readable.
+- 1:36 to 1:48 The three-attempt table, then the loud line beneath it.
 
 **Say.**
 
-> When the collector breaks, the wall goes empty. An empty hazard wall does not
-> read as broken. It reads as safe. So it goes black instead, and says what it
-> does not know. This is the fixture state, opened from the address bar. Nothing
-> broke while filming and I am not pretending it did.
-
-**Do not** shorten the last two sentences. They are the reason this shot is
-allowed to exist.
+> Five repairs run against live collectors. Four refused. Three of them on one
+> collector, failing the same way every time: asked to add one field, it dropped
+> eleven. Every one came back awaiting approval. Any pipeline that reads a status
+> and promotes on a pass would have shipped all three, and the third would have
+> emptied a working collector two days before this deadline.
 
 ---
 
-## Shot 6 · 1:40 to 2:00 · One row, the schema under it, and the check
+## Shot 6 · 1:48 to 2:00 · The black screen, and the ask
 
-**On screen.** Tab B1, Act 02 ledger, then editor E2, then terminal T1, then an
-end card.
+**On screen.** `wall.html?state=blackout`, typed in the address bar on camera,
+then a cut to Act 08.
 
 **Action.**
 
-- 1:40 to 1:44 Ledger in view. Click the **second row**, currently `Foam mat`,
-  `SAFETY_GATE A12/02404/24`, `719` days. It expands in place into the two pane
-  receipt card. If the ledger has been re-swept and that row has moved, use any
-  row whose hazard sentence names a child, and read that sentence instead.
-- 1:44 to 1:50 Hold on the open card. Left pane is the regulator's record. Right
-  pane says the listing was not confirmed, and that the row is excluded from every
-  statistic.
-- 1:50 to 1:54 Cut to E2, `examples/row.json`. The first line on screen is the
-  `_STATUS` key reading `FIXTURE DATA`. Scroll to the `evidence` block: assertion
-  needle, dom path, content hash, trace, job id.
-- 1:54 to 1:58 Cut to T1. Run `./verify.sh`. Hold on `ALL CHECKS PASSED`.
-- 1:58 to 2:00 End card, no voice. White text on black:
-
-  ```
-  There is no green in this interface.
-  The absence of a red row is not evidence of safety.
-
-  github.com/shubhL-research/canon-event
-  ```
+- 1:48 to 1:51 Type the state into the address bar in frame. This is what makes
+  it unambiguous that the failure was opened, not induced.
+- 1:51 to 1:57 Hold on the black hero and the hatched, greyed rows beneath it.
+- 1:57 to 2:00 Cut to Act 08, the ask.
 
 **Say.**
 
-> The regulator's record on the left, what we found on the right. Recalled seven
-> hundred and nineteen days ago because a child could choke on it. We looked twice
-> in each country. Not found, so it stays amber. Every row ships as structured
-> output against a frozen schema, and one command checks all of it on a clean
-> clone.
+> This is what the page does when a detector says the data got suspiciously
+> better. I opened that from the address bar just now, nothing broke during
+> filming. Every figure is withheld and the rows go grey, because red is an
+> accusation and we cannot stand behind one here.
+>
+> All we are asking is that the American regulator fill in a field it already
+> writes, one key away in the same response.
 
-**Do not** open a row from `?state=v1` for this shot. That fixture has red rows
-with full evidence chains and no live sweep has produced one. Showing a fixture
-receipt while narrating a real finding is the exact confusion this project exists
-to refuse.
+**Do not** cut the sentence about the address bar. It is in the never-film rules
+above for a reason.
 
 ---
 
@@ -352,16 +292,28 @@ to refuse.
 
 ---
 
-## What each shot is doing, against criterion 6
+## What each shot is doing, against the five criteria
 
-Criterion 6 asks whether the demo explains the problem, the scraper workflow, the
-structured output, and the final product. Nothing in the rubric may be orphaned.
+The criteria are equally weighted, so nothing may be orphaned and nothing should
+get two shots while another gets none.
 
-| Shot | Covers |
+| Shot | Criteria it feeds |
 |---|---|
-| 1 | The problem, and the final product on screen in its normal state |
-| 2 | The problem again at source, and the seed layer, which spends zero credits by design |
-| 3 | The scraper workflow, what it measured, and what it refuses to publish |
-| 4 | Extraction failure and self-healing, with the gate refusing a repair |
-| 5 | The final product's failure state, which is the thesis |
-| 6 | The structured output, the audit trail, and the clean clone check |
+| 1 | Idea and impact. The problem, and a real product on sale in the first twenty seconds |
+| 2 | Idea and impact, and technical execution. The finding, and the sweep admitting it missed it |
+| 3 | Technical execution. The zero, both directions of the matcher proof, and the one result no scraper failure can touch |
+| 4 | Bright Data Scraper Studio, and the structured output requirement |
+| 5 | Self-healing. Four refusals and what they characterised |
+| 6 | Presentation, and idea again. The failure state that is the thesis, then the ask |
+
+**The ordering is deliberate.** Five of the eight public projects in this
+hackathon are self-healing scrapers, because the organisers' own suggested-project
+list names it the hero project. Self-healing is our method, not our product, so it
+sits at 1:28 as supporting evidence rather than opening the video. A judge who has
+already watched four gate demos today should meet the scooter first.
+
+**What is deliberately not in the video, and where it lives instead.** The
+capture-recapture calibration, the platform telemetry disagreement, the detector
+board and act 07 are all strong and none of them survives a 120 second cut. They
+are what the README and the wall are for. A demo that tries to show everything
+shows nothing.
