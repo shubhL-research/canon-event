@@ -1,0 +1,102 @@
+{
+  "sweep_id": "s_2026-08-20T17:53Z",
+  "swept_at": "2026-08-20T17:53:32Z",
+  "arms": {
+    "DE": {
+      "state": "DEGRADED",
+      "reason": "join_key_coverage_below_bound",
+      "rows": 0,
+      "listings": 1031,
+      "fails": 0,
+      "inputs": 83,
+      "joined": 55,
+      "collector_id": "c_mt1fb5322gyynjvohh"
+    }
+  },
+  "detectors": {
+    "identity_reassertion": {
+      "fired": false,
+      "scope": "per row",
+      "note": "Every RED row re-asserted its identifier on the fetched page.",
+      "checked": 0,
+      "offending": null
+    },
+    "zero_is_a_fault": {
+      "fired": false,
+      "scope": "per claim",
+      "note": "DE returned 1031 listings and adjudicated every one.",
+      "arm": "DE"
+    },
+    "join_key_coverage": {
+      "fired": true,
+      "scope": "per arm",
+      "note": "Tracked separately from row count. An arm can return thousands of clean rows that match nothing, and a row-count check passes it happily.",
+      "arm": "DE",
+      "coverage": 0.6627,
+      "bound": 0.8
+    },
+    "sibling_differential": {
+      "fired": false,
+      "scope": "across arms",
+      "note": "No arm has collapsed against its siblings across two sweeps.",
+      "collapsed": [
+        "DE"
+      ],
+      "holding": null,
+      "requires": "persistence across two sweeps"
+    },
+    "implausible_cleanliness": {
+      "fired": false,
+      "scope": "whole board",
+      "note": "No prior sweep to compare against.",
+      "threshold": 0.4
+    },
+    "currency_fingerprint": {
+      "fired": false,
+      "scope": "per row",
+      "note": "Every DE row must carry EUR, every IN row INR, every US row USD. Kills a country-drift failure class that cross-arm comparison is blind to.",
+      "offending": null
+    },
+    "schema_drift": {
+      "fired": false,
+      "scope": "per arm",
+      "note": "Every field the collectors returned is mapped by the contract.",
+      "drifted": null
+    },
+    "freshness": {
+      "fired": false,
+      "scope": "whole board",
+      "note": "Rows older than the freshness bound are historical. DAY counters freeze at last capture rather than continuing to count.",
+      "age_s": 0,
+      "bound_s": 14400
+    }
+  },
+  "reports": [
+    {
+      "in": 1031,
+      "out": 1031,
+      "orphaned": 0,
+      "by_code": {
+        "AMBER": 1014,
+        "brand_conflict": 4,
+        "no_join_key": 13
+      },
+      "currency_mismatch": 0,
+      "by_query": {
+        "model_only": 411,
+        "brand_model": 620
+      },
+      "arm": "DE",
+      "collector_id": "c_mt1fb5322gyynjvohh",
+      "listings": 1031,
+      "planned_loads": 128,
+      "batches": 4,
+      "fetch_errors": [],
+      "unmapped_fields": [],
+      "with_language": 1030,
+      "with_currency": 1029
+    }
+  ],
+  "verdict": "Partial for DE. Figures computed from the seed corpus are unaffected and remain live.",
+  "blackout": false
+}

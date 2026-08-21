@@ -143,7 +143,12 @@ BATCH_SIZE = 40
 # cost of four times as many jobs, which is the correct trade — a job that times
 # out costs an hour and yields nothing, so a smaller job that returns is cheaper
 # in every sense.
-ARM_BATCH_SIZE = {"US": 10}
+# IN joins US at a smaller batch after a 22-URL flipkart job hit the same
+# one-hour ceiling amazon.com hits at 40. Flipkart returns 100 to 400 rows per
+# search, so a batch that fits inside the timeout there is nearer ten than forty.
+# kaufland stays at the default: four batches of forty completed in under an hour
+# on the same night this failed.
+ARM_BATCH_SIZE = {"US": 10, "IN": 10}
 
 
 def batch_size_for(arm, override=None):
