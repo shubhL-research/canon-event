@@ -215,8 +215,16 @@ def still_buyable(rows, arms=None):
 # interval. If CPSC adds the field, this headline stops being true and should be
 # retired rather than quietly softened.
 CPSC_MODEL_FIELD_EMPTY = {
-    "empty": 183,
-    "checked": 183,
+    # 213, not 183. The constant carried the 19 August count under a
+    # measured_on of 20 August, so the wall's H1 published a figure the README
+    # explicitly labels superseded, on the same page that explains the
+    # supersession: "The figure recorded when this corpus was pulled on 19 August
+    # was 183 of 183. Re-checked on 20 August it is 213 of 213, because CPSC kept
+    # publishing." A headline should not be the older of two numbers its own
+    # documentation reconciles.
+    "empty": 213,
+    "checked": 213,
+    "superseded": {"empty": 183, "checked": 183, "measured_on": "2026-08-19"},
     "eu_with_barcode": 104,
     "measured_on": "2026-08-20",
     "source": "saferproducts.gov/RestWebServices/Recall",

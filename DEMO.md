@@ -37,7 +37,7 @@ quotes the figures as they stand today:
 
 | Where | Figure as scripted |
 |---|---|
-| Hero sentence | `The US recall feed has a model-number field. It is empty on 183 of 183 product records. Every one of 104 EU alerts carries a barcode, and 98 of them pass their own check digit.` |
+| Hero sentence | `The US recall feed has a model-number field. It is empty on 213 of 213 product records. Every one of 104 EU alerts carries a barcode, and 98 of them pass their own check digit.` |
 | Figure 1 | `0.0%` still on sale, `0 of 176 searchable notices`, CI `0.0% to 2.1%` |
 | Figure 2 | `15.0%` unsearchable, `31 of 207 notices` |
 | Regulators | CPSC `24.3%` unsearchable against Safety Gate `5.8%`, intervals do not overlap |

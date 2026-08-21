@@ -101,7 +101,7 @@ by the matcher, so only candidates that could reach RED cost a browser load.
 
 ## Self-healing, including the three that were refused
 
-Four heals were run against live collectors through `refactor_template` and three
+Five heals were run against live collectors through `refactor_template` and four
 of them were refused. Ledgers are in `heals/`, each with the verbatim prompt, the
 canary result and the decision.
 

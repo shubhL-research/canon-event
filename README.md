@@ -87,7 +87,7 @@ One full sweep, 20 August 2026. **All 207 notices, all three arms, both regulato
 | Unsearchable | 13.0%, 27 of 207. CPSC 20.4%, Safety Gate 5.8% |
 | Precision | not computed, and cannot be. There are no RED rows to hand-verify |
 | Border escape | pending. The India arm is DEGRADED, so nothing is claimed outside the EU |
-| Exit attestation | **none.** Every arm renders "exit not attested on this sweep". Three heals tried to add it in-stage and all three were refused for stripping the extraction |
+| Exit attestation | **none.** Every arm renders "exit not attested on this sweep". Three heals tried to add it in-stage and all three were refused for stripping the extraction; five heals were run in total and four were refused |
 | Credits | not stated. 1,107 is page loads planned and issued, which is what the collector controls. The billing figure is on the account, not in the sweep output |
 
 **All three arms are DEGRADED and that is not a footnote.** Each returned
@@ -96,13 +96,18 @@ thousands of listings and joined fewer than half its notices to a candidate: 95,
 It says nothing recalled was confirmed among what we could see, not that nothing
 recalled is there.
 
-**The corpus could barely have produced a hit on two of the three arms, and that
-has to be said before anyone else says it.** Every notice in this sweep is an EU
-Safety Gate alert: Danish fireworks, a French whisk, a Polish slime doll, an
-Italian nail varnish. Those were searched on `amazon.com` and `flipkart.com`,
-where European regional retail stock is not listed in the first place. A null
-result there is closer to a statement about distribution than about recall
-enforcement.
+**Part of the corpus could barely have produced a hit on two of the three arms,
+and that has to be said before anyone else says it.** This paragraph used to open
+"Every notice in this sweep is an EU Safety Gate alert", which was true of the
+60-notice trial it was written for and is false of the sweep it now sits under:
+104 of the 207 notices are Safety Gate, and the other 103 are CPSC.
+
+The point survives on the half it applies to. The EU half is Danish fireworks, a
+French whisk, a Polish slime doll, an Italian nail varnish, and those were
+searched on `amazon.com` and `flipkart.com`, where European regional retail stock
+is not listed in the first place. A null result on those pairings is closer to a
+statement about distribution than about recall enforcement. The same is true in
+reverse for the 103 CPSC notices searched on `kaufland.de`.
 
 The DE arm is the only one where the question was posed fairly, and it returned
 1,066 listings, joined 58 of 60 notices to candidates, and confirmed none of
@@ -243,15 +248,16 @@ an identifier, which is exactly the variable the unsearchable rate measures.
 
 **So a pooled rate across the two regulators is a property of our sampling frame, not of the world.**
 The pooled figure above is reported only as the arithmetic of this corpus. The figures that mean
-something are the by-authority ones, US 20.4% against an EU rate between 0.0% and 5.8%, and that
+something are the by-authority ones, US 24.3% [17.0, 33.4] against an EU rate of 5.8% [2.7, 12.0], and that
 split is shown wherever the pooled number appears. Any comparison that averages the two regulators together describes this file
 and nothing more.
 
-### Survival is 0 of 180, from all 207 notices on three arms, every one of them degraded
+### Survival is 0 of 176, from all 207 notices on three arms, every one of them degraded
 
 Zero listings reached RED. That is a real measurement and it is reported as one, with a Wilson
-interval of [0, 6.2] rather than as a bare zero, because 58 observations cannot exclude a survival
-rate of 6%.
+interval of [0.0, 2.1] rather than as a bare zero, because 176 observations cannot exclude a small
+survival rate. This paragraph carried [0, 6.2] on 58 observations for days after the sweep it
+described was superseded, three lines under a heading that already said the right denominator.
 
 What it is not: it is not a clean measurement. All 207 notices were queried on all three arms, and
 **every one of the three came back DEGRADED**, joining 91, 110 and 55 notices of 207 to any candidate
@@ -458,7 +464,7 @@ There is no `--country`. That matters because it means the country we requested 
 configuration, and a config file is not evidence. See the currency weakness above: the page's own
 `lang` attribute is the attestation.
 
-### Four heals, three of them refused
+### Five heals, four of them refused
 
 All three are on real breaks that nobody staged. They are in `heals/`, written up in full.
 
