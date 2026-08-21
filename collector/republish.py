@@ -135,6 +135,26 @@ def main():
             "on this page was recomputed from the current corpus and the current "
             "rules.")
 
+    # THE RAW ROW, and the GEO ATTESTATION.
+    #
+    # Criterion 3 disqualifies library scrapers outright, so the load-bearing
+    # question is whether these collectors are custom. Four opaque collector ids
+    # and a sentence asserting it are not evidence. One unmodified row is: the AI
+    # Agent CHOSE those field names, and nobody picks add_to_cart_button_text or
+    # manufacturer_part_number by hand. It was committed and rendered nowhere.
+    #
+    # The attestation is the same story inverted. Three requests, three matching
+    # countries, and the wall reported only the part we had to retract.
+    raw_row = ROOT / "data" / "sweeps" / "raw-row-kaufland-de.json"
+    if raw_row.exists():
+        built["raw_row"] = json.loads(raw_row.read_text(encoding="utf-8"))
+
+    attest_dir = ROOT / "data" / "attest"
+    if attest_dir.exists():
+        files = sorted(attest_dir.glob("exit-attestation-*.json"))
+        if files:
+            built["attestation"] = json.loads(files[-1].read_text(encoding="utf-8"))
+
     # PLATFORM TELEMETRY. Bright Data's own numbers about our collections.
     #
     # Deliberately NOT merged into arms[].job. Our `fails` is self-measured from

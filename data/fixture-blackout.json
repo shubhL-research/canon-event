@@ -10100,5 +10100,76 @@
         "reconciliation": "Not a contradiction. Our `fails` counts inputs that returned neither a row nor an archived empty-result page, computed from collector output. The platform counts pages it could not collect. A page that failed at the fetch layer and returned nothing is a failure to them and simply an absent input to us. We could not have seen these two without being told."
       }
     ]
+  },
+  "raw_row": {
+    "_what": "One unmodified row as Bright Data Scraper Studio returned it.",
+    "_why": "Criterion 4 asks whether Scraper Studio is central. Every other artifact in this repository is our own derived shape, so this is the only place a reader can see what the platform actually hands back, field names and all. The collector's field names were chosen by the Scraper Studio AI Agent, not by us, which is itself the evidence that the collector is custom rather than a library scraper.",
+    "_collector": "c_mt00jidz6zhqjbpew",
+    "_arm": "DE",
+    "_storefront": "kaufland.de",
+    "_captured": "2026-08-19",
+    "_read_this_row_against": "data/sweeps/sweep-2026-08-20.csv, which is the same pipeline's output after adjudication. The gap between the two is the matcher.",
+    "_three_things_this_row_shows": [
+      "brand and manufacturer_part_number both hold '9.161225.12.25.11 9.161225.12.25.11', the same value doubled. The collector duplicates a field it read once, which is why collapse_repeat() exists in collector/normalize.py.",
+      "ean holds '8721003407246 8721003407246', doubled the same way. It passes its modulo-10 check digit once collapsed, and would fail as written.",
+      "The notice this was matched against is a Besrey stroller; the page returned a MamaLoes buggy from a reseller. The EAN matches, the brand does not. That is the case brand_conflict() deliberately does NOT reject, because a GTIN is globally unique and settles identity on its own."
+    ],
+    "row": {
+      "title": "MamaLoes Milan Taupe 1-Personen-Buggy",
+      "brand": "9.161225.12.25.11 9.161225.12.25.11",
+      "price": {
+        "value": 44,
+        "currency": "EUR",
+        "symbol": "€"
+      },
+      "currency_symbol": "€",
+      "availability_text": "Do. 20. – Fr. 21. August",
+      "add_to_cart_button_text": "In den Warenkorb",
+      "seller_name": "MamaLoes",
+      "ean": "8721003407246 8721003407246",
+      "manufacturer_part_number": "9.161225.12.25.11 9.161225.12.25.11",
+      "product_page_url": "https://www.kaufland.de/product/568730910/",
+      "input": {
+        "url": "https://www.kaufland.de/s/?search_value=Besrey"
+      }
+    }
+  },
+  "attestation": {
+    "_what": "Exit-IP attestation, measured against brdtest.com/myip.json.",
+    "_measured": "2026-08-20T13:36Z",
+    "_how": "bdata scrape https://brdtest.com/myip.json --country {us,de,in}, one request each, through the CLI's default unlocker zone.",
+    "_what_this_proves": "Geo targeting resolves. Three requests, three distinct countries, each with a matching timezone. The country a request is made from is a thing this toolchain actually controls, and that is the capability the three-arm design rests on.",
+    "_what_this_does_NOT_prove": "That the exits are RESIDENTIAL. Every ASN here belongs to a hosting company: The Constant Company and HostRoyale are infrastructure providers, not consumer ISPs. A residential exit would name a carrier such as Vodafone, Comcast or Reliance Jio. This project's own evidence standard is that an ASN naming a consumer ISP rather than a datacentre is the proof, and by that standard these are not residential.",
+    "_scope": "Measured through the CLI's default unlocker zone, NOT from inside a collector session. The collectors may run through a different zone entirely, so this neither confirms nor refutes their exit type. It cannot: only an attestation request issued inside the same collector stage as the product fetch can, and the collectors do not currently make one. That is the gap this file exists to make visible rather than to paper over.",
+    "_consequence": "The README claimed 'residential exit IPs'. It no longer does. Until a collector attests its own exit, the defensible claim is geo-accurate exit IPs, which is what was measured.",
+    "observations": [
+      {
+        "requested_country": "us",
+        "observed_country": "US",
+        "asn": 20473,
+        "asn_org": "The Constant Company, LLC",
+        "city": "Piscataway",
+        "region_name": "New Jersey",
+        "tz": "America/New_York"
+      },
+      {
+        "requested_country": "de",
+        "observed_country": "DE",
+        "asn": 203020,
+        "asn_org": "HostRoyale Technologies Pvt Ltd",
+        "city": "Berlin",
+        "region_name": "State of Berlin",
+        "tz": "Europe/Berlin"
+      },
+      {
+        "requested_country": "in",
+        "observed_country": "IN",
+        "asn": 133499,
+        "asn_org": "HostRoyale Technologies Pvt Ltd",
+        "city": "",
+        "region_name": "",
+        "tz": "Asia/Kolkata"
+      }
+    ]
   }
 }

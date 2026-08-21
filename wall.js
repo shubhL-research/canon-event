@@ -896,6 +896,86 @@
       }).join("");
     }
 
+    /* THE PROOF THAT THESE COLLECTORS ARE CUSTOM.
+
+       Criterion 3 disqualifies library scrapers, so this is the load-bearing
+       claim of the whole act, and it was being made by assertion: four opaque
+       collector ids and a sentence. The evidence was committed and rendered
+       nowhere.
+
+       One unmodified row settles it. The AI Agent CHOSE these field names, and
+       nobody picks add_to_cart_button_text or manufacturer_part_number by hand.
+       A library scraper returns a fixed schema you did not choose, which is
+       exactly the distinction the rule turns on.
+
+       The same row is also the best argument for the adjudicator, because it is
+       visibly WRONG in three ways at once, and shipping it as a finding is what
+       the identity re-assertion exists to prevent. */
+    var rr = doc.raw_row, rawBlock = "";
+    if (rr && rr.row) {
+      var names = Object.keys(rr.row).filter(function (k) { return k !== "input"; });
+      var chips = names.map(function (k) {
+        return '<code class="rawf">' + esc(k) + "</code>";
+      }).join("");
+      var shows = (rr._three_things_this_row_shows || []).map(function (t) {
+        return "<li>" + esc(t) + "</li>";
+      }).join("");
+      rawBlock =
+        '<h3 class="platform-sub">The AI Agent named these fields, which is why ' +
+          "this is not a library scraper</h3>" +
+        '<p class="act-lede">One row, exactly as the platform returned it, from ' +
+          esc(rr._collector) + " on " + esc(rr._storefront) + ", captured " +
+          esc(rr._captured) + ". Nobody picks <code>add_to_cart_button_text</code> " +
+          "or <code>manufacturer_part_number</code> by hand. A prebuilt scraper " +
+          "returns a fixed schema you did not choose, and the rules disqualify " +
+          "one, so the field names are the evidence.</p>" +
+        '<div class="rawf-grid">' + chips + "</div>" +
+        (shows ? '<p class="raw-lede">And it is wrong in three ways at once, ' +
+          "which is the argument for adjudicating every row rather than trusting " +
+          "the collector:</p>" + '<ol class="raw-shows">' + shows + "</ol>" : "") +
+        '<p class="pj-limit">Committed at <a href="' + esc(REPO) +
+          '/blob/main/data/sweeps/raw-row-kaufland-de.json" target="_blank" ' +
+          'rel="noopener noreferrer">data/sweeps/raw-row-kaufland-de.json</a>, ' +
+          "unmodified.</p>";
+    }
+
+    /* THE GEO ATTESTATION, including the half we could prove.
+
+       The wall reported only the retraction. Three requests were made with a
+       country flag, three came back from that country, and that is the whole
+       basis of a three-arm design. Both halves belong here: the targeting
+       resolved, and the exits are datacentre ASNs rather than consumer ISPs. */
+    var att = doc.attestation, attBlock = "";
+    if (att && att.observations && att.observations.length) {
+      var obs = att.observations.map(function (o) {
+        var ok = String(o.requested_country).toUpperCase() === String(o.observed_country).toUpperCase();
+        return "<tr><td>" + esc(String(o.requested_country).toUpperCase()) + "</td>" +
+          "<td>" + esc(o.observed_country) + (ok ? "" : " MISMATCH") + "</td>" +
+          "<td>AS" + esc(o.asn) + "</td><td>" + esc(o.asn_org) + "</td>" +
+          "<td>" + esc(o.city || "") + "</td></tr>";
+      }).join("");
+      var allOk = att.observations.every(function (o) {
+        return String(o.requested_country).toUpperCase() === String(o.observed_country).toUpperCase();
+      });
+      attBlock =
+        '<h3 class="platform-sub">Where the requests actually came from</h3>' +
+        '<p class="act-lede">' + (allOk
+          ? "Three requests, three countries asked for, three countries observed. "
+            + "A config file claiming de is unfalsifiable; an observed exit is not. "
+            + "The three-arm design rests entirely on this resolving, and it does."
+          : "At least one exit did not resolve to the country requested.") + "</p>" +
+        '<table class="platform-table"><tr><th>asked</th><th>observed</th>' +
+          "<th>ASN</th><th>operator</th><th>city</th></tr>" + obs + "</table>" +
+        '<p class="pj-limit"><b>And the half we had to withdraw.</b> ' +
+          "Every operator above is a hosting company. A consumer exit would name a " +
+          "carrier such as Vodafone, Comcast or Reliance Jio, so by this project's " +
+          "own standard these are geo-accurate and nothing stronger. The claim was " +
+          "corrected everywhere rather than left standing. This attestation also " +
+          "went through the CLI's own zone rather than through a collector session, " +
+          "so it proves where OUR requests came from and not yet where the " +
+          "collectors' do: heal US-002 tried to close that gap and was refused.</p>";
+    }
+
     /* The platform's own telemetry, where it DISAGREES with our board.
 
        Our `fails` is computed from what the collector returned to us. That is
@@ -953,10 +1033,15 @@
           '<p class="act-lede">' + esc(heals.note) + "</p>" +
           '<div class="heal-grid">' + healBlock + "</div>"
         : "") +
+      rawBlock +
+      attBlock +
       pjBlock +
       '<p class="platform-foot">' + esc(p.seed_layer) +
-        (cr.cap ? " Credits used this sweep: " + commas(cr.used || 0) + " of " +
-                  commas(cr.cap) + "." : "") + "</p>";
+        (cr.cap ? " Page loads issued this sweep: " + commas(cr.used || 0) +
+                  " against a self-imposed cap of " + commas(cr.cap) +
+                  ". That is loads planned and issued, not a billing figure: what " +
+                  "a load costs is the platform's to state and not ours, so the " +
+                  "number we can defend is the one we counted." : "") + "</p>";
   }
 
 

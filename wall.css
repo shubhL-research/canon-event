@@ -1344,3 +1344,17 @@ body { overflow-x: clip; max-width: 100%; }
   line-height: 1.5;
 }
 .det.is-fired .det-measured { color: var(--hazard-deep); font-weight: 700; }
+
+/* ------------------------------------------------- the raw row, as returned
+   The field names are the evidence, so they are set as data and given room.
+   A judge scanning this act should be able to see, without reading a sentence,
+   that these names were chosen by something looking at a page rather than
+   handed down by a library. */
+.rawf-grid { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 20px; }
+.rawf {
+  font-family: var(--font-machine); font-size: 12px; padding: 5px 9px;
+  border: 1px solid var(--rule-strong); background: var(--paper-hero); color: var(--ink);
+}
+.raw-lede { margin: 22px 0 0; max-width: 68ch; font-size: 14px; line-height: 1.55; color: var(--ink); }
+.raw-shows { margin: 12px 0 0; padding-left: 22px; max-width: 74ch; }
+.raw-shows li { font-size: 13px; line-height: 1.55; color: var(--ink-2); margin-bottom: 8px; }
