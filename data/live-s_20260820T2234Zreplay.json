@@ -7907,7 +7907,7 @@
    "method": "isotonic regression (PAVA), nonparametric MLE for current-status data",
    "assumption": "survival is monotone non-increasing in days since recall",
    "confound": "Age is confounded with cohort: a 2024 recall is not exchangeable with a 2026 one. This is a cross-sectional age profile, not a within-product survival trajectory.",
-   "n": 177,
+   "n": 171,
    "n_still_buyable": 0,
    "blocks": [
     {
@@ -8081,12 +8081,6 @@
     {
      "from_day": 20,
      "to_day": 20,
-     "survival": 0.0,
-     "n": 1
-    },
-    {
-     "from_day": 33,
-     "to_day": 33,
      "survival": 0.0,
      "n": 1
     },
@@ -8357,18 +8351,6 @@
     {
      "from_day": 68,
      "to_day": 68,
-     "survival": 0.0,
-     "n": 1
-    },
-    {
-     "from_day": 69,
-     "to_day": 69,
-     "survival": 0.0,
-     "n": 1
-    },
-    {
-     "from_day": 69,
-     "to_day": 69,
      "survival": 0.0,
      "n": 1
     },
@@ -8853,24 +8835,6 @@
      "n": 1
     },
     {
-     "from_day": 712,
-     "to_day": 712,
-     "survival": 0.0,
-     "n": 1
-    },
-    {
-     "from_day": 712,
-     "to_day": 712,
-     "survival": 0.0,
-     "n": 1
-    },
-    {
-     "from_day": 712,
-     "to_day": 712,
-     "survival": 0.0,
-     "n": 1
-    },
-    {
      "from_day": 713,
      "to_day": 713,
      "survival": 0.0,
@@ -8981,7 +8945,7 @@
       0.0,
       0.7935
      ],
-     "support": 177,
+     "support": 171,
      "block_n": 1,
      "thin": true,
      "publishable": false
@@ -8993,7 +8957,7 @@
       0.0,
       0.7935
      ],
-     "support": 148,
+     "support": 142,
      "block_n": 1,
      "thin": true,
      "publishable": false
@@ -9005,7 +8969,7 @@
       0.0,
       0.7935
      ],
-     "support": 90,
+     "support": 87,
      "block_n": 1,
      "thin": true,
      "publishable": false
@@ -9017,7 +8981,7 @@
       0.0,
       0.7935
      ],
-     "support": 48,
+     "support": 45,
      "block_n": 1,
      "thin": true,
      "publishable": false
@@ -9116,7 +9080,7 @@
    "search_page_loads": 1107,
    "batches": 0,
    "total_page_loads": 1107,
-   "working": "180 searchable of 207 notices x 2 queries x 3 arms = 1107 search loads.",
+   "working": "369 unique URLs planned per arm x 3 arms = 1107 search loads, from 180 searchable of 207 notices.",
    "note": "Only searchable notices are queried. 27 of 207 notices in this plan carry no usable identifier and were never submitted, so they cost nothing. Batching is what makes a full sweep possible: one job per 40 urls rather than one job per url."
   },
   "findings": {
