@@ -48,6 +48,9 @@ echo
 echo "== republish the wall payload =="
 python3 collector/republish.py
 echo
+echo "== the wall re-derived from the raw platform archive, offline =="
+python3 check_replay.py
+echo
 echo "== wall renderer, headless =="
 node test_render.js
 echo
