@@ -241,8 +241,14 @@ if (fs.existsSync(LIVE)) {
      in the same black as a healthy one and every suite still passed, because
      nothing in the suite looked at colour. A dead selector is invisible to a
      test that only asks whether text appeared. This asks the other question. */
-  const styles = fs.readFileSync(path.join(ROOT, "wall.css"), "utf8") +
-                 fs.readFileSync(path.join(ROOT, "contract", "tokens.css"), "utf8");
+  /* Comments are stripped before scanning, or a comment ABOUT a class counts as
+     a rule FOR it. That is not hypothetical: this file explains .is-blackout in
+     a comment above the rules, and with comments left in, deleting every one of
+     those rules still passed. A guard that a sentence can satisfy is not a
+     guard. */
+  const styles = (fs.readFileSync(path.join(ROOT, "wall.css"), "utf8") +
+                  fs.readFileSync(path.join(ROOT, "contract", "tokens.css"), "utf8"))
+                 .replace(/\/\*[\s\S]*?\*\//g, " ");
   const wordChar = new RegExp("[A-Za-z0-9_-]");
   const emitted = new Set();
   (html.match(/class="([^"]+)"/g) || []).forEach((m) =>
@@ -278,6 +284,32 @@ if (fs.existsSync(LIVE)) {
         "the hunt AMBER chip resolves to the amber token");
   check(redBody !== amberBody,
         "hunt RED and AMBER are different rules, not the same colour twice");
+  /* Classes added through classList, which the attribute scan cannot see.
+
+     The dead-class check above reads class="..." out of rendered HTML. It could
+     never have caught .is-blackout, because that one is attached to <body> by
+     boot() at runtime. And .is-blackout had no rule at all: in the one state
+     that exists to say we do not know, 101 RED rows drew exactly as they do on a
+     healthy day, red bars and all. Same bug as the withheld verdict, arriving by
+     a route the guard did not watch. */
+  const js = fs.readFileSync(path.join(ROOT, "wall.js"), "utf8");
+  const added = new Set();
+  for (const m of js.matchAll(/classList\.add\(\s*"([^"]+)"/g)) {
+    m[1].split(" ").forEach((c) => c && added.add(c));
+  }
+  for (const m of js.matchAll(/classList\.toggle\(\s*"([^"]+)"/g)) {
+    m[1].split(" ").forEach((c) => c && added.add(c));
+  }
+  const noRule = [...added].filter((c) => {
+    const needle = "." + c;
+    for (let k = styles.indexOf(needle); k > -1; k = styles.indexOf(needle, k + 1)) {
+      if (!wordChar.test(styles.charAt(k + needle.length))) return false;
+    }
+    return true;
+  });
+  check(noRule.length === 0,
+        "every class added at runtime has a CSS rule (" + noRule.join(", ") + ")");
+
 
 
 
@@ -437,6 +469,26 @@ if (fs.existsSync(LIVE)) {
   check(bad.length === 0,
         "no link points relatively at a path the host does not serve (" +
         [...new Set(bad)].slice(0, 4).join(", ") + ")");
+  console.log("");
+}
+
+/* A MISTYPED STATE MUST NOT BECOME A FIXTURE.
+
+   The resolver read `if (!doc) doc = all.v1`, so ?state=blackut, or any typo, or
+   a stale link from an old README, served fixture v1 in silence. That fixture's
+   hero asserts 28 products in a cart and 714 days on sale. The live sweep found
+   zero. A mistyped URL therefore handed a reader invented figures in the voice
+   of a measurement, and would have done it on camera without a word. */
+if (fs.existsSync(LIVE)) {
+  console.log("unrecognised ?state=");
+  const bad = run("blackut", LIVE);
+  check(/is not a state of this page/.test(bad.nodes.historicalNote.textContent),
+        "an unknown state says so instead of substituting silently");
+  check(!/714 days|in a cart right now/.test(bad.html),
+        "an unknown state does not serve the fixture's invented hero");
+  const live = run("v1", LIVE);
+  check(bad.nodes.verdict.innerHTML === live.nodes.verdict.innerHTML,
+        "an unknown state falls back to the live sweep, which is the truth");
   console.log("");
 }
 

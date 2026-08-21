@@ -1766,7 +1766,27 @@
        clone has no such file, so the wall falls back to the fixture — and the
        provenance block says which of the two is on screen, because a reader must
        never have to guess whether a number was measured. */
-    var doc = asked ? all[asked] : (window.CANON_LIVE || all.v1);
+    /* AN UNRECOGNISED STATE MUST NOT SILENTLY BECOME A FIXTURE.
+
+       This read `if (!doc) doc = all.v1`, so ?state=blackut, or any typo, or a
+       stale link, served fixture v1 without a word. That fixture's hero asserts
+       "28 products recalled for burning or choking children are in a cart right
+       now. The oldest has been buyable for 714 days." The live sweep found zero.
+
+       So a mistyped URL handed a reader invented figures in the voice of a
+       measurement, and on camera it would have done it silently. The fallback is
+       now the live payload, which is the truth, and the substitution is
+       announced rather than performed. */
+    var doc, badState = null;
+    if (asked) {
+      doc = all[asked];
+      if (!doc) {
+        badState = asked;
+        doc = window.CANON_LIVE || all.v1;
+      }
+    } else {
+      doc = window.CANON_LIVE || all.v1;
+    }
     if (!doc) doc = all.v1;
 
     /* Each section renders inside a guard.
@@ -1828,6 +1848,22 @@
           + Math.round(doc.freshness_bound_s / 3600) + "h freshness bound. The rows "
           + "below are what the last sweep found, not a claim about what is on "
           + "sale right now, and every day count is frozen at that capture.";
+      }
+    }
+
+    /* Prepended last, so it survives whichever branch above wrote to this node.
+       A mistyped URL and a stale sweep are different facts about different
+       things, and neither cancels the other. The earlier attempt wrote this
+       first and the staleness branch silently overwrote it, which is the same
+       last-writer-wins bug in miniature. */
+    if (badState) {
+      var bn = el("historicalNote");
+      if (bn) {
+        bn.textContent = "“?state=" + badState + "” is not a state of "
+          + "this page, so nothing was substituted for it: what follows is the "
+          + "live sweep. The states that exist are "
+          + Object.keys(all).sort().join(", ") + ". "
+          + (bn.textContent || "");
       }
     }
   }

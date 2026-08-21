@@ -1436,3 +1436,34 @@ body { overflow-x: clip; max-width: 100%; }
 .act-finding.is-withheld .found-anyway { color: var(--void-ink); border-left-color: var(--void-ink); }
 .act-finding.is-withheld .found-anyway b,
 .act-finding.is-withheld .found-anyway a { color: var(--void-ink); }
+
+/* ---------------------------------------------------------- global blackout
+   The state that exists to say we do not know, and it had no styling at all.
+
+   boot() adds .is-blackout to <body> when implausible_cleanliness fires, and
+   there was no rule for it, so the hero went black, every figure struck out, and
+   then 101 RED rows rendered underneath exactly as they do on a good day. That
+   is the same failure as the withheld verdict drawing in the healthy black: a
+   class emitted with nothing behind it.
+
+   Red is an accusation on this wall. In a blackout the entire claim is that we
+   cannot stand behind any accusation, so red is the one thing these rows must
+   not be. They stay on the page, because deleting them would be a different lie
+   and a reader needs to see what the last trustworthy sweep found, but they are
+   drawn as history: hatched, desaturated, and with the hazard bar reduced to the
+   same unknown grey the withheld verdicts use. */
+body.is-blackout .row .track > i { background: var(--unknown); }
+body.is-blackout .row.is-red .track > i { background: var(--unknown); }
+body.is-blackout .chip.v-RED {
+  background: var(--unknown); border-color: var(--unknown); color: var(--void-ink);
+}
+body.is-blackout .c-verdict, body.is-blackout .c-hazard .quote { color: var(--ink-2); }
+body.is-blackout #wall {
+  background: repeating-linear-gradient(45deg,
+    transparent, transparent 3px, var(--hatch) 3px, var(--hatch) 4px);
+}
+body.is-blackout .row { background: var(--paper); }
+body.is-blackout .days { color: var(--unknown); }
+/* The note above the rows is the only thing in this state that should read at
+   full strength, because it is the sentence doing the work. */
+body.is-blackout .historical-note { color: var(--ink); font-weight: 700; }
