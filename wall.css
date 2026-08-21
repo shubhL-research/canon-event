@@ -393,8 +393,19 @@ details.machinery th { color: var(--ink-3); font-weight: 400; }
     display: block; padding: 16px; margin: 16px 0; border: 1px solid var(--amber);
     color: var(--amber); font-size: 12px;
   }
-  .wall-head, .row { grid-template-columns: 28px 1fr 100px 140px; }
-  .c-hazard, .c-tier { display: none; }
+  /* The grid for this range is set in the later 1279px block, which declares
+     five columns and reserves 84px for the verdict. This block used to declare
+     four AND hide .c-tier; the later grid won and the hide stayed, so between
+     768px and 1279px the header printed "Verdict" over a reserved column with
+     nothing drawn in it.
+
+     That range is not exotic. It is a browser window that is not maximised, or
+     110 to 125 percent zoom on a 1440 or 1536 screen, which is exactly what
+     people do when filming so the text is legible on video.
+
+     The verdict is the one column this ledger exists to publish. Dropping the
+     hazard quote to make room is the right trade; dropping the verdict is not. */
+  .c-hazard { display: none; }
   .panels, .receipt-grid { grid-template-columns: 1fr; }
 }
 

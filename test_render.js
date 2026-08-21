@@ -472,6 +472,73 @@ if (fs.existsSync(LIVE)) {
   console.log("");
 }
 
+/* The ledger grid must declare as many columns as it draws cells.
+
+   Two separate max-width:1279px blocks disagreed. The first declared four
+   columns and hid .c-tier; the second declared five and reserved 84px for it.
+   The later grid won and the hide stayed, so between 768px and 1279px the header
+   printed "Verdict" above a reserved column with nothing in it.
+
+   That range is a browser window that is not maximised, or 110 to 125 percent
+   zoom on a 1440 or 1536 screen, which is exactly what someone does when filming
+   so the text is legible on video. */
+{
+  const raw = fs.readFileSync(path.join(ROOT, "wall.css"), "utf8")
+                .replace(/\/\*[\s\S]*?\*\//g, " ");
+
+  /* Brace counting, not a regex. A media query holds many rules, each with its
+     own braces, and the obvious nested-brace pattern matched zero of the seven
+     blocks in this stylesheet while looking entirely correct. It reported no
+     problems because it read nothing, which is the same shape as the guard that
+     had a backspace in it. */
+  function mediaBodies(src, header) {
+    const out = [];
+    let i = 0;
+    while ((i = src.indexOf(header, i)) > -1) {
+      const open = src.indexOf("{", i);
+      let depth = 0, k = open;
+      for (; k < src.length; k++) {
+        if (src[k] === "{") depth++;
+        else if (src[k] === "}") { depth--; if (!depth) break; }
+      }
+      out.push(src.slice(open + 1, k));
+      i = k;
+    }
+    return out;
+  }
+
+  const CELLS = ["c-gutter", "c-id", "c-hazard", "chips", "c-bar", "c-tier"];
+  for (const width of ["1279px", "767px"]) {
+    const body = mediaBodies(raw, "@media (max-width: " + width + ")").join(" ");
+    if (!body.trim()) continue;
+    const grids = [...body.matchAll(/\.wall-head, \.row \{ grid-template-columns: ([^;}]+)/g)];
+    if (!grids.length) continue;
+    const cols = grids[grids.length - 1][1].trim().split(/\s+/).length;
+
+    /* Split into rules and read each one's selector and declarations
+       separately. Matching a selector and a declaration with one regex across a
+       whole block quietly matched nothing here, and reported every cell as
+       drawn, which is how a broken check looks from outside: agreeable. */
+    const rules = [];
+    for (const chunk of body.split("}")) {
+      const at = chunk.indexOf("{");
+      if (at < 0) continue;
+      rules.push({ sel: chunk.slice(0, at), decl: chunk.slice(at + 1) });
+    }
+    const drawn = CELLS.filter((c) => {
+      const mentions = (r) => r.sel.split(",").some(
+        (s) => s.trim().split(/\s+/).some((tok) => tok === "." + c ||
+                                                    tok.startsWith("." + c + ":")));
+      const hidden = rules.some((r) => mentions(r) && /display:\s*none/.test(r.decl));
+      const restored = rules.some((r) => mentions(r) && /display:\s*(block|flex|grid)/.test(r.decl));
+      return !hidden || restored;
+    });
+    check(cols === drawn.length,
+          "at " + width + " the row grid declares " + cols + " columns and draws " +
+          drawn.length + " cells (" + drawn.join(", ") + ")");
+  }
+}
+
 /* A MISTYPED STATE MUST NOT BECOME A FIXTURE.
 
    The resolver read `if (!doc) doc = all.v1`, so ?state=blackut, or any typo, or

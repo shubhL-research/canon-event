@@ -308,6 +308,34 @@ def precision(rows, graded=None):
     if graded and graded.get("filled", 0) >= PRECISION_MINIMUM:
         return dict(graded, contaminated=False)
     filled = (graded or {}).get("filled", 0)
+    reds = sum(1 for r in rows if r.get("tier") == "RED")
+
+    # PENDING MEANS TWO DIFFERENT THINGS AND ONLY ONE OF THEM IS TRUE HERE.
+    #
+    # "0 of 50 verified, 50 to go" reads as an afternoon of clicking. It is not.
+    # Precision measures how many of our RED calls are correct, and this sweep
+    # produced no RED call, so there is nothing to hand-verify and no amount of
+    # effort produces the number. Not-computable and not-yet-done look identical
+    # from a progress counter, and the README already says the true one:
+    # "Precision
+    # needs RED rows to hand-verify, and there are no RED rows."
+    if not reds:
+        return {
+            "v": None, "n": filled, "d": PRECISION_MINIMUM, "ci95": None,
+            "contaminated": False,
+            "pending": ("Not pending on effort. It cannot be computed for this "
+                        "sweep at all. Precision "
+                        "is the share of our RED calls that are correct, and this "
+                        "sweep produced no RED call, so there is nothing to "
+                        "hand-verify. It becomes computable the first time a sweep "
+                        "reaches RED, and the worksheet in golden/ is ready for "
+                        "that. The adversarial set is a different measurement and "
+                        "is labelled as one: 21 near-misses we chose ourselves, all "
+                        "correctly discarded, which shows the matcher refuses known "
+                        "traps and is not a precision figure."),
+            "not_computable_because": "no RED rows in this sweep",
+            "recall": recapture_from_rows(rows),
+        }
     return {
         "v": None, "n": filled, "d": PRECISION_MINIMUM, "ci95": None,
         "contaminated": False,
