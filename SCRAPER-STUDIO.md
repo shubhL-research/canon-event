@@ -58,18 +58,38 @@ separable.
 
 ## What the platform actually did
 
-Full corpus, three arms, one sweep. The load count is the plan the collectors
-issued, not a multiplication: 180 of the 207 notices carry a searchable
-identifier, and planning them produces 369 unique URLs per arm rather than a
-clean 360, because a notice can yield more than two distinct queries.
+Full corpus, three arms, one sweep.
+
+The plan is exactly two queries per searchable notice, brand-plus-model and model
+alone, which are also the two capture occasions the recall estimate uses. 180 of
+the 207 notices carry a searchable identifier, so the plan is **360 unique URLs
+per arm, 1,080 across the three**.
+
+The archive holds **369 per arm, 1,107 in total**, and the nine-URL gap is not a
+rounding difference. The sweep that produced this archive used a looser
+searchability test than the wall publishes: `needle_for` accepted any non-empty
+identifier, while the wall decides searchability with
+`extract/identifier.py:classify`, which rejects a GTIN failing its own check
+digit, a bare `P1`, and a model field reading `Year 2026 Teryx4 H2`. The two
+disagreed on 8 notices, so the sweep queried 8 that this page reports as having
+no searchable identifier at all.
+
+That is now fixed at the source: `needle_for` calls the owned rule, and a fresh
+plan comes out at exactly 360. The archive is left as it is and reported as it
+is, because rewriting a record of what happened to match what should have
+happened is the one repair this project may never make. Searching extra notices
+cannot manufacture a finding, only turn up more, so the zero is unaffected. The
+claim and the behaviour now agree, and until the next sweep the difference
+between them is stated here rather than smoothed over.
 
 ```
-369 unique URLs planned per arm x 3 arms  =   1,107 search page loads
+360 unique URLs planned per arm x 3 arms  =   1,080 planned
+369 unique URLs held in the archive x 3   =   1,107 actually issued
 US amazon.com    14,632 listings,  95 of 207 notices joined
-DE kaufland.de    1,037 listings,  59 of 207 notices joined
+DE kaufland.de    2,061 listings, 111 of 207 notices joined
 IN flipkart.com    7,986 listings,  55 of 207 notices joined
                  ------                                    
-listings adjudicated                          23,655
+listings adjudicated                          24,679
 ```
 
 Stage one runs on the Code worker over search HTML, which is cheap and returns

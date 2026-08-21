@@ -377,3 +377,24 @@ check(graded.get("v") == 0.94,
 
 print("\n" + ("%d FAILURES" % len(FAILURES) if FAILURES else "all sweep tests passed"))
 sys.exit(1 if FAILURES else 0)
+
+
+# THE PLAN MUST QUERY EXACTLY WHAT THE WALL CALLS SEARCHABLE.
+#
+# needle_for used to read `gtin or model`, which accepts any non-empty string,
+# while the wall decides searchability through extract/identifier.py. The two
+# disagreed on 8 notices, so the sweep queried 8 that the page reports as having
+# no searchable identifier, on a page which states that unsearchable notices were
+# never submitted. Two rules is two numbers, and this project has already shipped
+# that bug once, when three different denominators appeared on one screen.
+_seeds = json.loads((HERE.parent / "data" / "seeds.json").read_text(encoding="utf-8"))["seeds"]
+from publish import searchable as _searchable                      # noqa: E402
+_expected = sum(1 for _s in _seeds if _searchable(_s))
+for _arm in ("US", "DE", "IN"):
+    _plan = S.plan_arm(_arm, _seeds)
+    check(len(_plan) == _expected * 2,
+          "%s plans %d URLs for %d searchable notices; two queries each means it "
+          "must be %d, or the sweep and the wall are using different rules"
+          % (_arm, len(_plan), _expected, _expected * 2))
+    check(len({p[1] for p in _plan}) == _expected,
+          "%s plans for exactly the %d notices the wall calls searchable" % (_arm, _expected))

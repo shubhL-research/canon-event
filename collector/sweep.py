@@ -325,7 +325,28 @@ def _is_legal_entity(brand):
 
 def needle_for(seed):
     """What identity will be re-asserted against. GTIN preferred: it is the
-    stronger claim and it validates itself."""
+    stronger claim and it validates itself.
+
+    A SECOND DEFINITION OF SEARCHABLE, WHICH IS HOW THIS WENT WRONG BEFORE
+    ----------------------------------------------------------------------
+    This used to read `seed.get("gtin") or seed.get("model")`, which accepts any
+    non-empty string. The wall publishes searchability through
+    extract.identifier.classify(), which rejects a GTIN that fails its own check
+    digit, a bare "P1", and a model field holding "Year 2026 Teryx4 H2".
+
+    The two rules disagreed on 8 notices, so the sweep planned queries for 8
+    notices the wall reports as having no searchable identifier at all, and the
+    page states that unsearchable notices were never submitted. Searching extra
+    is harmless to the finding, since it can only turn up more, but the claim and
+    the behaviour have to match: this project's whole argument is that its numbers
+    describe what it actually did.
+
+    This is the same failure that once produced three different denominators on
+    one page. The rule has one owner and this is not it.
+    """
+    from publish import searchable as _owned_searchable
+    if not _owned_searchable(seed):
+        return None
     return seed.get("gtin") or seed.get("model")
 
 

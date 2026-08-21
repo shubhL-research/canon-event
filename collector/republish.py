@@ -211,11 +211,32 @@ def main():
         ar = built["stats"]["arithmetic"]
         pl, arms_n = ar.get("search_page_loads") or 0, ar.get("arms") or 0
         if pl and arms_n:
-            ar["working"] = ("%d unique URLs planned per arm x %d arms = %d search "
-                             "loads, from %d searchable of %d notices."
-                             % (pl // arms_n, arms_n, pl,
-                                ar.get("searchable_seeds") or 0,
-                                ar.get("corpus_seeds") or ar.get("notices") or 207))
+            # PLANNED AND ISSUED ARE DIFFERENT NUMBERS. This called the second
+            # one the first, which is the last piece of the cost figure that did
+            # not add up: the plan is two queries per searchable notice, 180 x 2
+            # = 360 per arm, and the archive holds 369. The nine-URL gap is real.
+            # The sweep that built the archive used a looser searchability test
+            # than the wall publishes, so it queried 8 notices this page reports
+            # as unsearchable. needle_for now calls the owned rule and a fresh
+            # plan comes out at exactly 360, but the archive records what
+            # happened and is not rewritten to match what should have.
+            per = pl // arms_n
+            sear = ar.get("searchable_seeds") or 0
+            expect = sear * 2
+            if per != expect and sear:
+                ar["working"] = (
+                    "%d unique URLs per arm x %d arms = %d search loads issued. "
+                    "The plan is 2 queries for each of %d searchable notices, "
+                    "%d per arm; the extra %d per arm are notices an older and "
+                    "looser searchability test accepted, and which this page "
+                    "reports as unsearchable. The archive is left as it is."
+                    % (per, arms_n, pl, sear, expect, per - expect))
+            else:
+                ar["working"] = (
+                    "%d unique URLs planned per arm x %d arms = %d search loads, "
+                    "2 queries for each of %d searchable notices of %d."
+                    % (per, arms_n, pl, sear,
+                       ar.get("corpus_seeds") or ar.get("notices") or 207))
 
         w = built["stats"]["arithmetic"].get("working") or ""
         if "0 batch jobs" in w:

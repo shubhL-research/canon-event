@@ -21,6 +21,9 @@ echo
 echo "== source bytes: no collapsed escapes =="
 python3 check_sources.py
 echo
+echo "== prose figures against the payload =="
+python3 check_docs.py
+echo
 echo "== collector normalizer =="
 python3 collector/test_normalize.py
 echo

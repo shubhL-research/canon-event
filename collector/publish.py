@@ -471,13 +471,33 @@ def arithmetic(seeds, reports):
         # multiplied concluded we had queried the notices we say we never
         # submitted. A cost figure nobody can re-derive is the thing this block
         # exists to prevent.
-        "working": (("%d unique URLs planned per arm x %d arms = %d search loads, "
-                     "from %d searchable of %d notices"
+        # PLANNED AND ISSUED ARE DIFFERENT NUMBERS, and calling the second one
+        # the first was the last piece of this that did not add up.
+        #
+        # The plan is two queries per searchable notice: 180 x 2 = 360 per arm.
+        # `planned` here is summed from the reports, and on a replay a report
+        # counts the distinct URLs in the ARCHIVE, which is 369. The nine-URL gap
+        # is real: the sweep that built the archive used a looser searchability
+        # test than the wall publishes, so it queried 8 notices this page reports
+        # as unsearchable. needle_for now calls the owned rule and a fresh plan
+        # comes out at exactly 360, but the archive records what happened and is
+        # not rewritten to match what should have.
+        "working": (("%d unique URLs per arm x %d arms = %d search loads issued. "
+                     "The plan is 2 queries per searchable notice, %d x 2 = %d per "
+                     "arm; the extra %d per arm were notices an older, looser "
+                     "searchability test accepted and this page reports as "
+                     "unsearchable"
                      % (planned // arms if arms else planned, arms, planned,
-                        searchable_seeds, len(seeds)))
-                    + ((", submitted as %d batch jobs."
-                        % sum(r.get("batches", 0) for r in reports))
-                       if sum(r.get("batches", 0) for r in reports) else ".")),
+                        searchable_seeds, searchable_seeds * 2,
+                        (planned // arms if arms else planned) - searchable_seeds * 2))
+                    if arms and (planned // arms) != searchable_seeds * 2 else
+                    ("%d unique URLs planned per arm x %d arms = %d search loads, "
+                     "2 queries for each of %d searchable notices of %d"
+                     % (planned // arms if arms else planned, arms, planned,
+                        searchable_seeds, len(seeds))))
+                   + ((", submitted as %d batch jobs."
+                       % sum(r.get("batches", 0) for r in reports))
+                      if sum(r.get("batches", 0) for r in reports) else "."),
         # Counted, not typed. This sentence carried a hardcoded 96 from a corpus
         # pull that missed the CPSC Description key, and the seed correction left
         # it stating a number the same block contradicts two lines above.
