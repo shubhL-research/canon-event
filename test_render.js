@@ -377,7 +377,33 @@ for (const variant of VARIANTS) {
           "v1 renders the withheld verdict band");
     check(/HEAL REJECTED/.test(html), "v1 renders the rejected heal, the hardest thing to fake");
     check(/prompt budget \d+ \/ 1000/.test(html), "prompt budget meter rendered");
-    check(/Vodafone|Reliance|Comcast/.test(html), "exit attestation names a residential ASN");
+    /* INVERTED. This required the fixtures to name a consumer ISP, which is the
+       claim the project retracted after measuring its own exits and finding
+       every one to be a hosting ASN. The guard elsewhere in this file watches
+       for the WORD "residential"; the claim was surviving as DATA, in the four
+       states the demo films, enforced by this assertion. */
+    check(/Constant Company|HostRoyale/.test(html),
+          "exit attestation names the hosting ASN actually measured");
+    /* Scoped to the attestation DATA, not the rendered page. The wall has to be
+       able to explain what a consumer exit would look like in order to say its
+       own are not: "a carrier such as Vodafone, Comcast or Reliance Jio". The
+       forbidden thing is a fixture ASSERTING one, not the page naming one while
+       withdrawing the claim. */
+    {
+      const orgs = [];
+      for (const f of fs.readdirSync(path.join(ROOT, "data"))) {
+        if (!/^fixture-.*\.json$/.test(f)) continue;
+        const fx = JSON.parse(fs.readFileSync(path.join(ROOT, "data", f), "utf8"));
+        for (const a of fx.arms || []) {
+          if (a.attest && a.attest.asn_org) orgs.push(a.attest.asn_org);
+        }
+      }
+      const consumer = orgs.filter((o) => /Vodafone|Reliance Jio|Comcast|AT&T|Verizon|BT Group/i.test(o));
+      check(consumer.length === 0,
+            "no fixture attestation names a consumer ISP, which is the retracted " +
+            "claim stated as data (" + [...new Set(consumer)].join(", ") + ")");
+      check(orgs.length > 0, "fixtures carry an exit attestation at all");
+    }
     /* The invariant is that MISSING belongs to the evidence receipt and never to
        the collapsed row list. This used to be asserted as "MISSING appears
        nowhere", which held only because the suite never opened a receipt: the

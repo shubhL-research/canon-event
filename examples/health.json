@@ -12,7 +12,7 @@
       "rows": 164,
       "fails": 0,
       "exit_country": "US",
-      "exit_asn_org": "Comcast Cable Communications"
+      "exit_asn_org": "The Constant Company, LLC"
     },
     "DE": {
       "state": "WITHHELD",
@@ -20,7 +20,7 @@
       "rows": 0,
       "fails": 0,
       "exit_country": "DE",
-      "exit_asn_org": "Vodafone GmbH"
+      "exit_asn_org": "HostRoyale Technologies"
     },
     "IN": {
       "state": "DEGRADED",
@@ -28,7 +28,7 @@
       "rows": 139,
       "fails": 41,
       "exit_country": "IN",
-      "exit_asn_org": "Reliance Jio Infocomm"
+      "exit_asn_org": "HostRoyale Technologies"
     }
   },
   "detectors": {

@@ -598,9 +598,25 @@ def arm(code, host, state, **kw):
         "collector_id": {"US": "c_mp3tuab31lswoxvpwa", "DE": "c_mp3tuab31lswoxvpws", "IN": "c_mp3tuab31lswoxvpwi"}[code],
         "template": {"US": "t_m9jty150kxgwtzcgi.4", "DE": "t_m9jty150kxgwtzcgi.4", "IN": "t_m9jty150kxgwtzcgi.4"}[code],
         "attest": {
-            "US": {"exit_ip": "72.14.201.55", "country": "US", "asn_org": "Comcast Cable Communications", "asn": 7922, "city": "Denver", "tz": "America/Denver"},
-            "DE": {"exit_ip": "93.104.212.77", "country": "DE", "asn_org": "Vodafone GmbH", "asn": 3209, "city": "Munchen", "tz": "Europe/Berlin"},
-            "IN": {"exit_ip": "49.36.180.14", "country": "IN", "asn_org": "Reliance Jio Infocomm", "asn": 55836, "city": "Mumbai", "tz": "Asia/Kolkata"},
+            # THE RETRACTED CLAIM, ALIVE IN THE STATES WE FILM.
+            #
+            # These read Comcast, Vodafone GmbH and Reliance Jio: three consumer
+            # ISPs. The project measured its own exits and every one is a hosting
+            # ASN, withdrew the word "residential" from the README, the wall and
+            # every fixture, and built a guard to keep it out.
+            #
+            # The guard watches for the WORD. The claim survived as data, in the
+            # four states the demo actually films, and a renderer test at
+            # test_render.js:380 REQUIRED it: "exit attestation names a
+            # residential ASN". A fixture asserting Vodafone is the retracted
+            # claim, stated more precisely than the sentence ever did.
+            #
+            # These are now the exits actually measured on 2026-08-20 and
+            # recorded in data/attest/. A fixture may be illustrative; it may not
+            # illustrate something we went out of our way to stop saying.
+            "US": {"exit_ip": "45.63.11.204", "country": "US", "asn_org": "The Constant Company, LLC", "asn": 20473, "city": "Piscataway", "tz": "America/New_York"},
+            "DE": {"exit_ip": "185.242.87.19", "country": "DE", "asn_org": "HostRoyale Technologies", "asn": 203020, "city": "Berlin", "tz": "Europe/Berlin"},
+            "IN": {"exit_ip": "103.171.244.62", "country": "IN", "asn_org": "HostRoyale Technologies", "asn": 133499, "city": "Mumbai", "tz": "Asia/Kolkata"},
         }[code],
         "job": {"id": "j_ma13y9ay1piehrso8r", "inputs": 180, "data_lines": 0, "fails": 0,
                 "pages": 180, "success_rate": 0.0, "job_time_ms": 71459, "queue_time_ms": 645, "page_loads": 180},
