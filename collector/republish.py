@@ -135,6 +135,15 @@ def main():
             "on this page was recomputed from the current corpus and the current "
             "rules.")
 
+    # THE HEAL PATTERN. Three refusals with one failure mode.
+    #
+    # One refusal is a repair that did not work. Three with an identical failure
+    # is a characterised behaviour, which is both more useful and much harder to
+    # fake, and it was readable only by opening a markdown file.
+    hp = ROOT / "data" / "heal-pattern.json"
+    if hp.exists():
+        built["heal_pattern"] = json.loads(hp.read_text(encoding="utf-8"))
+
     # THE RAW ROW, and the GEO ATTESTATION.
     #
     # Criterion 3 disqualifies library scrapers outright, so the load-bearing

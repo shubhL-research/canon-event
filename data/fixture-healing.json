@@ -10169,5 +10169,35 @@
         "tz": "Asia/Kolkata"
       }
     ]
+  },
+  "heal_pattern": {
+    "_what": "Three heals on one collector, three refusals, the same failure every time.",
+    "_source": "heals/2026-08-20-us-003-and-the-pattern.md, transcribed. Every claim below is in that ledger with its canary output; nothing here is summarised beyond it.",
+    "_why_this_is_the_finding": "One refusal is a repair that did not work. Three refusals with an identical failure mode is a characterised behaviour of the tool, which is a more useful thing to report and a much harder thing to fake.",
+    "collector": "c_mt1fh690ebsllah9n",
+    "arm": "US",
+    "attempts": [
+      {
+        "heal": "US-001",
+        "asked_for": "wait for the right results container",
+        "returned": "rows containing only a URL"
+      },
+      {
+        "heal": "US-002",
+        "asked_for": "add three attestation fields, keep the rest",
+        "returned": "rows containing only a URL"
+      },
+      {
+        "heal": "US-003",
+        "asked_for": "add three fields, eleven named as protected",
+        "returned": "rows containing only a URL"
+      }
+    ],
+    "the_pattern": "Asked to add one field, it dropped eleven. Naming the protected fields explicitly changed nothing, which is the part worth reporting: the failure is not a vague prompt. Reducing a collector to the URLs it visited is a valid transformation of 'make this page work' and an invalid answer to every question actually asked.",
+    "why_a_status_check_is_not_a_gate": "All three returned awaiting_approval. Any pipeline that reads a status field and promotes on a pass would have shipped all three, and the third would have silently emptied a working production collector two days before a deadline.",
+    "what_caught_them": "US-001 was caught by reading preview rows, which worked only because its preview happened to be non-empty. US-002 and US-003 had empty previews, and an empty preview proves nothing here: production returns zero rows for that same query, so the emptiness was the query rather than the repair. Both were decided by running the proposed template at version=dev against a query the archive shows had produced 798 listings on production.",
+    "the_rule_it_produced": "A preview is a sample the platform chose. A draft run is the template answering a question you chose. Run the draft.",
+    "why_it_stopped": "Three attempts is enough to call it. The attestation would have upgraded one sentence on the wall from 'exit not attested on this sweep' to a named ASN. The remaining route is the Scraper Studio IDE, where request() is written rather than described, and that is more work than the thing it buys.",
+    "_honesty": "This is a finding about three heals on one collector, not a general claim about the platform. DE-002 was approved on this same flow and is in production. A different collector, a different prompt or a different page could behave otherwise, and nothing here should be read as saying the AI Agent cannot repair a template."
   }
 }

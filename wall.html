@@ -56,6 +56,15 @@
       <span class="act-num">01</span> What the sweep found
     </h2>
     <div class="figures" id="figures"></div>
+
+    <!-- The one finding that survives every collector failing at once.
+         It is computed from the two regulators' own published corpus and needs
+         no sweep, so no scraper fault can touch it. stats.unsearchable carries a
+         note promising that the per-regulator split is "published beside this
+         figure and never instead of it", and the split rendered nowhere, which
+         made that note a promise the page broke. -->
+    <div class="regulators" id="regulators"></div>
+
     <a class="act-jump" href="#method">How these were measured ↓</a>
   </section>
 

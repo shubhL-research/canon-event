@@ -214,6 +214,75 @@
       '<p class="figure-basis">' + basis + "</p></div>";
   }
 
+
+  /* THE TWO REGULATORS DO NOT FAIL THE SAME WAY.
+
+     This sweep's headline is a zero, so every finding that is NOT null is
+     scarce, and this is the strongest one the project has. It is computed
+     entirely from the regulators' own published corpus: no marketplace, no
+     collector, no credit. Every arm could fail at once and this number would be
+     unchanged, which is the opposite of everything else on the page.
+
+     A recall you cannot search for cannot be enforced by anyone: not by us, not
+     by a marketplace's own safety team, not by a parent who heard about it.
+     Roughly one in five CPSC notices publishes no identifier a person could type
+     into a search box. For the EU it is one in seventeen.
+
+     The intervals do not overlap, which is what makes it a finding rather than
+     an observation, and the failure modes are different in kind as well as in
+     rate: CPSC's are mostly an absent field, the EU's are mostly a bare numeric
+     SKU with no brand to disambiguate it. */
+  function renderRegulators(doc) {
+    var node = el("regulators");
+    if (!node) return;
+    var by = doc.stats && doc.stats.unsearchable_by_authority;
+    if (!by) { node.innerHTML = ""; return; }
+
+    var NAMES = { CPSC: "US CPSC", SAFETY_GATE: "EU Safety Gate" };
+    var keys = Object.keys(by);
+    var cards = keys.map(function (k) {
+      var a = by[k];
+      var kinds = Object.keys(a.by_kind || {}).map(function (kk) {
+        return "<li>" + esc(kk.replace(/_/g, " ")) + " <b>" + a.by_kind[kk] + "</b></li>";
+      }).join("");
+      return '<div class="reg-card">' +
+        '<div class="reg-name">' + esc(NAMES[k] || k) + "</div>" +
+        '<div class="reg-figure">' + pct(a.v) + "</div>" +
+        '<div class="reg-basis">' + a.n + " of " + a.d + " notices · 95% " +
+          ci(a.ci95) + "</div>" +
+        (kinds ? '<ul class="reg-kinds">' + kinds + "</ul>" : "") +
+      "</div>";
+    }).join("");
+
+    // Only claimed when it is actually true of the numbers on screen.
+    var sep = "";
+    if (keys.length === 2) {
+      var a = by[keys[0]], b = by[keys[1]];
+      var hi = a.v >= b.v ? a : b, lo = a.v >= b.v ? b : a;
+      var hiName = NAMES[a.v >= b.v ? keys[0] : keys[1]];
+      var loName = NAMES[a.v >= b.v ? keys[1] : keys[0]];
+      if (hi.ci95 && lo.ci95 && hi.ci95[0] > lo.ci95[1]) {
+        sep = "The intervals do not overlap. " + esc(hiName) + " publishes a " +
+          "notice nobody can search for at roughly " +
+          (hi.v / lo.v).toFixed(1) + " times the rate " + esc(loName) + " does, " +
+          "and the two fail differently in kind as well as in rate.";
+      } else {
+        sep = "The intervals overlap, so the difference between these two rates " +
+          "is not established by this corpus and is not claimed.";
+      }
+    }
+
+    node.innerHTML =
+      "<h3>A recall nobody can search for cannot be enforced by anyone</h3>" +
+      '<p class="lede">Not by us, not by a marketplace safety team, not by a ' +
+        "parent who heard about it. This is the one measurement here that needs " +
+        "no scraper at all: it comes from what the regulators themselves " +
+        "published, so every collector on this page could fail at once and it " +
+        "would not move.</p>" +
+      '<div class="reg-grid">' + cards + "</div>" +
+      (sep ? '<p class="reg-sep">' + sep + "</p>" : "");
+  }
+
   function renderFigures(doc) {
     var s = doc.stats, out = [];
 
@@ -896,6 +965,46 @@
       }).join("");
     }
 
+    /* THREE REFUSALS, ONE FAILURE MODE.
+
+       Criterion 4 is a fifth of the score and the wall answered it with five
+       cards reading REFUSED AT THE GATE and a filename. It never showed what the
+       refusals TAUGHT, and that is the part worth having: one refusal is a
+       repair that did not work, three with an identical failure is a
+       characterised behaviour of the tool, which is both more useful and far
+       harder to fake than a success.
+
+       The load-bearing sentence is the one about status fields. Every one of the
+       three came back awaiting_approval, so any pipeline that reads a status and
+       promotes on green would have shipped all three, and the third would have
+       silently emptied a working production collector two days before a
+       deadline. That is the entire argument for a canary gate, made by evidence
+       rather than by assertion. */
+    var hp = doc.heal_pattern, patBlock = "";
+    if (hp && hp.attempts && hp.attempts.length) {
+      var rows2 = hp.attempts.map(function (a) {
+        return "<tr><td>" + esc(a.heal) + "</td><td>" + esc(a.asked_for) +
+          "</td><td>" + esc(a.returned) + "</td></tr>";
+      }).join("");
+      patBlock =
+        '<h3 class="platform-sub">Three attempts on one collector, and the same ' +
+          "failure every time</h3>" +
+        '<p class="act-lede">' + esc(hp._why_this_is_the_finding) + "</p>" +
+        '<table class="platform-table pattern-table">' +
+          "<tr><th>heal</th><th>asked for</th><th>returned</th></tr>" +
+          rows2 + "</table>" +
+        '<p class="pattern-punch">' + esc(hp.the_pattern) + "</p>" +
+        '<p class="pattern-punch is-loud">' + esc(hp.why_a_status_check_is_not_a_gate) +
+          "</p>" +
+        '<p class="raw-lede">' + esc(hp.what_caught_them) + "</p>" +
+        '<p class="pattern-rule">' + esc(hp.the_rule_it_produced) + "</p>" +
+        '<p class="pj-limit"><b>What this does not say.</b> ' + esc(hp._honesty) +
+          " " + esc(hp.why_it_stopped) +
+          ' Full ledger with canary output: <a href="' + esc(REPO) +
+          '/blob/main/heals/2026-08-20-us-003-and-the-pattern.md" target="_blank" ' +
+          'rel="noopener noreferrer">heals/2026-08-20-us-003-and-the-pattern.md</a>.</p>';
+    }
+
     /* THE PROOF THAT THESE COLLECTORS ARE CUSTOM.
 
        Criterion 3 disqualifies library scrapers, so this is the load-bearing
@@ -1033,6 +1142,7 @@
           '<p class="act-lede">' + esc(heals.note) + "</p>" +
           '<div class="heal-grid">' + healBlock + "</div>"
         : "") +
+      patBlock +
       rawBlock +
       attBlock +
       pjBlock +
@@ -1578,6 +1688,7 @@
     section("armRail", function () { renderArms(doc); });
     section("wall", function () { renderRows(doc); });
     section("curve", function () { renderCurve(doc); });
+    section("regulators", function () { renderRegulators(doc); });
     section("platform", function () { renderPlatform(doc); });
     section("detectors", function () { renderDetectors(doc); });
     section("hunt", function () { renderHunt(doc); });

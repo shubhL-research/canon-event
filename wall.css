@@ -1358,3 +1358,54 @@ body { overflow-x: clip; max-width: 100%; }
 .raw-lede { margin: 22px 0 0; max-width: 68ch; font-size: 14px; line-height: 1.55; color: var(--ink); }
 .raw-shows { margin: 12px 0 0; padding-left: 22px; max-width: 74ch; }
 .raw-shows li { font-size: 13px; line-height: 1.55; color: var(--ink-2); margin-bottom: 8px; }
+
+/* --------------------------------------------------- the two regulators
+   Set at figure scale because it earns it: this is the only measurement on the
+   page that survives every collector failing at once, and in a sweep whose
+   headline is a zero, a finding that cannot be broken by a scraper fault is
+   worth more than one that can. */
+.regulators { margin-top: 48px; padding-top: 28px; border-top: 2px solid var(--rule-ink); }
+.regulators h3 {
+  margin: 0; font-family: var(--font-display); font-variation-settings: "wdth" 104;
+  font-size: 20px; font-weight: 700; letter-spacing: -0.015em; max-width: 32ch;
+}
+.regulators .lede { margin: 14px 0 0; max-width: 64ch; font-size: 15px; line-height: 1.55; color: var(--ink-2); }
+.reg-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 28px; }
+.reg-card { border-top: 3px solid var(--ink); padding-top: 16px; }
+.reg-name {
+  font-family: var(--font-machine); font-size: 11px; letter-spacing: 0.1em;
+  text-transform: uppercase; color: var(--ink-3);
+}
+.reg-figure {
+  font-family: var(--font-display); font-variation-settings: "wdth" 108;
+  font-size: var(--type-figure); font-weight: 700; line-height: 1; margin-top: 8px;
+  letter-spacing: -0.02em;
+}
+.reg-basis { font-family: var(--font-machine); font-size: 11px; color: var(--ink-2); margin-top: 8px; }
+.reg-kinds { list-style: none; margin: 12px 0 0; padding: 0; }
+.reg-kinds li {
+  font-family: var(--font-machine); font-size: 11px; color: var(--ink-3);
+  display: flex; justify-content: space-between; gap: 12px;
+  padding: 4px 0; border-top: 1px solid var(--rule);
+}
+.reg-kinds b { color: var(--ink); }
+.reg-sep { margin-top: 24px; max-width: 68ch; font-size: 15px; line-height: 1.6; font-weight: 700; color: var(--ink); }
+@media (max-width: 719px) { .reg-grid { grid-template-columns: 1fr; } }
+
+/* ------------------------------------------------- the three-refusal pattern
+   The status-field sentence is the load-bearing one in the whole self-healing
+   argument, so it is set louder than the prose around it. It is the only place
+   this project can say what would have happened if it had trusted a passing
+   status, and the answer is that a working production collector would have been
+   emptied two days before the deadline. */
+.pattern-table td:last-child { color: var(--hazard-deep); font-weight: 700; }
+.pattern-punch { margin: 20px 0 0; max-width: 72ch; font-size: 14px; line-height: 1.6; color: var(--ink); }
+.pattern-punch.is-loud {
+  font-weight: 700; font-size: 15px; border-left: 3px solid var(--hazard);
+  padding: 12px 0 12px 16px; background: var(--hazard-wash);
+}
+.pattern-rule {
+  margin: 20px 0 0; max-width: 60ch; font-family: var(--font-machine);
+  font-size: 13px; line-height: 1.6; color: var(--ink); font-weight: 700;
+  border-top: 1px solid var(--rule-strong); padding-top: 14px;
+}
