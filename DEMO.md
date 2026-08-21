@@ -38,11 +38,14 @@ quotes the figures as they stand today:
 | Where | Figure as scripted |
 |---|---|
 | Hero sentence | `The US recall feed has a model-number field. It is empty on 183 of 183 product records. Every one of 104 EU alerts carries a barcode.` |
-| Figure 1 | `0.0%` still on sale, `0 of 120 searchable notices`, CI `0.0% to 3.1%` |
+| Figure 1 | `0.0%` still on sale, `0 of 180 searchable notices`, CI `0.0% to 2.1%` |
 | Figure 2 | `13.0%` unsearchable, `27 of 207 notices` |
-| Discard panel | `identifier not reasserted 194`, `brand conflict 15`, `no join key 3` |
-| Ledger | `40 of 207 shown`, `121 AMBER`, `0 RED` |
-| Arm rail | all three `DEGRADED`. US reached 95 of 207 notices, DE 59, IN 55 |
+| Regulators | CPSC `20.4%` unsearchable against Safety Gate `5.8%`, intervals do not overlap |
+| Discard panel | `identifier not reasserted 246`, `brand conflict 15`, `no join key 4` |
+| Ledger | `207 rows`, `173 AMBER`, `34 DISCARDED`, `0 RED` |
+| Arm rail | all three `DEGRADED`, join coverage `45.9%` US, `53.6%` DE, `26.6%` IN against an 80% bound |
+| Detectors | `2 of 8 firing`, `3 could not run` |
+| Act 06 | one confirmed RED found by hand, Acer AES015 at `$379.99`, outside the sweep |
 | Every arm | `exit not attested on this sweep` |
 
 If a re-sweep has moved any of these, **say the number that is on the screen**,
@@ -193,18 +196,18 @@ number. Read that one. CPSC keeps publishing, so it climbs.
 **Action.**
 
 - 0:40 to 0:48 Act 01, both figures settled. Left figure reads `0.0%` with
-  `0 of 58 searchable notices · 95% confidence 0.0% to 6.2%` under it. Right
+  `0 of 180 searchable notices · 95% confidence 0.0% to 2.1%` under it. Right
   figure reads `13.0%` with `no scraper touches this figure` under it.
 - 0:48 to 0:53 Scroll to Act 03. Hold on the instrument strip. The `Precision`
   cell reads `PENDING` with its reason printed beside it.
-- 0:53 to 0:57 Continue to the arm rail. Two arms: `DE kaufland.de` measured,
+- 0:53 to 0:57 Continue to the arm rail. Three arms, all DEGRADED: `US amazon.com`,
   `IN flipkart.com` degraded, collector ids visible.
 - 0:57 to 1:00 Jump to Act 04, the `What we did not see` panel. Put the cursor on
   the line reading `AMBER 5812`.
 
 **Say.**
 
-> Two arms ran. Five thousand eight hundred and twelve listings came back, and
+> Three arms ran. Twenty-four thousand six hundred and seventy-nine listings came back, and
 > every one was adjudicated. None was a recalled product. Zero of fifty eight,
 > with the interval printed beside it. The scraper was not broken, it looked.
 > Precision says pending, because there are no red rows to hand check.
@@ -212,9 +215,11 @@ number. Read that one. CPSC keeps publishing, so it climbs.
 **Note for the editor.** This is the densest shot. If it runs long, cut the last
 sentence and hold the `PENDING` cell in silence instead. The screen says it.
 
-**If the arm rail states the adjudicated listing count directly**, point there
-for the 5,812 instead of at the discard panel. Either location is the same
-number.
+**The arm rail now states the adjudicated listing count directly**, so point
+there for the 24,679 rather than at the discard panel. Each arm card also names
+its join coverage against the 80% bound, which is the reason all three read
+DEGRADED, and that is worth one sentence: they returned plenty and matched
+little, which is a different failure from returning nothing.
 
 ---
 

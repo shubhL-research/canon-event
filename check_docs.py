@@ -97,6 +97,29 @@ def main():
                 problems.append("%s:%d claims %s = %s, payload says %s"
                                 % (fname, line, key, commas(claimed), commas(actual)))
 
+    # DEMO.md tells the presenter which numbers to read aloud, and its own text
+    # calls a voiceover that disagrees with its frame "the single worst thing
+    # this video could do". Four of its seven scripted figures had gone stale.
+    demo = ROOT / "DEMO.md"
+    if demo.exists():
+        text = demo.read_text(encoding="utf-8")
+        d_sear = f["searchable"]
+        expected = [
+            ("0 of %d searchable notices" % d_sear, "the survival denominator"),
+            ("%s" % commas(f["listings_total"]), "the adjudicated listing total"),
+        ]
+        for needle, what in expected:
+            if needle not in text:
+                problems.append("DEMO.md does not contain %s (%s). The script "
+                                "tells the presenter what to say; a figure it "
+                                "carries must be one that is on the screen."
+                                % (needle, what))
+        # And no figure the payload has moved past.
+        for stale in ("0 of 120 searchable", "0 of 124 searchable", "0 of 58 searchable",
+                      "23,655"):
+            if stale in text:
+                problems.append("DEMO.md still scripts the stale figure %r" % stale)
+
     # The arms must also add up to the total they are printed beside, which is
     # the one sum a judge can do in their head on the page itself.
     parts = f["US_listings"] + f["DE_listings"] + f["IN_listings"]
