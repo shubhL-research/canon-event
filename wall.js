@@ -1606,7 +1606,11 @@
           "A NEAR-MISS REACHED RED. This is a precision bug and blocks the freeze.",
           adv.n, "deliberate near-misses", adv.note);
       }
-      var bothHold = (!ctl || ctl.all_red) && (!adv || adv.all_discarded);
+      /* "Both hold" requires BOTH cards. With only one set present this
+         printed "Both hold" under a single card, which is not a weaker claim
+         than the truth, it is a different and false one. */
+      var haveBoth = !!(ctl && adv);
+      var bothHold = haveBoth && ctl.all_red && adv.all_discarded;
       var realRed = (((doc.hunt || {}).findings) || []).filter(function (f) {
         return f.code_verdict === "RED";
       })[0];
@@ -1638,7 +1642,11 @@
             "fetched from a live retailer and committed to this repository " +
             "unmodified. Planted controls prove the matcher fires on inputs we " +
             "chose; that one proves it fires on a page nobody here authored.</p>" : "") +
-          '<p class="mp-close">' + esc(bothHold
+          '<p class="mp-close">' + esc(!haveBoth
+            ? "Only one of the two sets is present in this state, so neither "
+              + "direction is established here. Both run on every sweep and both "
+              + "are published on the live wall."
+            : bothHold
             ? "Both hold. The matcher accepts what it should and refuses what it "
               + "should, so the zero is a statement about the three marketplaces "
               + "we swept rather than about our own code. It is still only a "

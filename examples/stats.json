@@ -487,47 +487,17 @@
     "contaminated": true
   },
   "adversarial_precision_set": {
-    "n": 6,
+    "n": 21,
     "all_discarded": true,
-    "note": "Deliberate near-misses fed to the matcher. Every one must land in DISCARDED. Any that reaches RED is a precision bug and blocks the freeze. Distinct from the heal loop's negative canaries, which are dead listings.",
-    "probes": [
-      {
-        "probe": "Papablic Archie Infant Swing (2025 revision, PAPABLIC61B)",
-        "against": "24325",
-        "kind": "successor_sku",
-        "expect": "identity_mismatch"
-      },
-      {
-        "probe": "HALO 2000 Portable Power Station PS-2000",
-        "against": "24350",
-        "kind": "same_brand_different_model",
-        "expect": "identity_mismatch"
-      },
-      {
-        "probe": "Generic 'PS-1000' bench power supply, unrelated brand",
-        "against": "24350",
-        "kind": "same_model_different_brand",
-        "expect": "identity_mismatch"
-      },
-      {
-        "probe": "Ambiano Single Serve Coffee Maker 708926",
-        "against": "24341",
-        "kind": "same_brand_adjacent_model",
-        "expect": "identity_mismatch"
-      },
-      {
-        "probe": "Fisher-Price Baby Biceps Gift Set (no dumbbell, GJD50)",
-        "against": "24351",
-        "kind": "successor_sku",
-        "expect": "identity_mismatch"
-      },
-      {
-        "probe": "Squeeze Plush Ball Toy, GTIN 810447020543",
-        "against": "24348",
-        "kind": "adjacent_gtin",
-        "expect": "identity_mismatch"
-      }
-    ]
+    "by_kind": {
+      "adjacent_gtin": 4,
+      "same_brand_diff_model": 4,
+      "same_model_diff_brand": 1,
+      "successor_sku": 4,
+      "superstring_trap": 4,
+      "truncated_identifier": 4
+    },
+    "note": "Deliberately confusable near-misses fed to the matcher. Every one must land in DISCARDED. Any that reaches RED is a precision bug and blocks the freeze. Distinct from the heal loop's negative canaries, which are dead listings testing the collector rather than live products testing the matcher."
   },
   "arithmetic": {
     "corpus_seeds": 207,

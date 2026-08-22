@@ -624,47 +624,68 @@
       "browser": 101
     },
     "adversarial_precision_set": {
-      "n": 6,
+      "n": 21,
       "all_discarded": true,
-      "note": "Deliberate near-misses fed to the matcher. Every one must land in DISCARDED. Any that reaches RED is a precision bug and blocks the freeze. Distinct from the heal loop's negative canaries, which are dead listings.",
-      "probes": [
-        {
-          "probe": "Papablic Archie Infant Swing (2025 revision, PAPABLIC61B)",
-          "against": "24325",
-          "kind": "successor_sku",
-          "expect": "identity_mismatch"
+      "by_kind": {
+        "adjacent_gtin": 4,
+        "same_brand_diff_model": 4,
+        "same_model_diff_brand": 1,
+        "successor_sku": 4,
+        "superstring_trap": 4,
+        "truncated_identifier": 4
+      },
+      "note": "Deliberately confusable near-misses fed to the matcher. Every one must land in DISCARDED. Any that reaches RED is a precision bug and blocks the freeze. Distinct from the heal loop's negative canaries, which are dead listings testing the collector rather than live products testing the matcher."
+    },
+    "unsearchable_by_authority": {
+      "CPSC": {
+        "label": "unsearchable, CPSC",
+        "v": 0.2233,
+        "n": 23,
+        "d": 103,
+        "ci95": [
+          0.1537,
+          0.3128
+        ],
+        "method": "Wilson score interval, 95%",
+        "by_kind": {
+          "absent": 19,
+          "battery_type": 1,
+          "capacity": 1,
+          "too_generic": 2
         },
-        {
-          "probe": "HALO 2000 Portable Power Station PS-2000",
-          "against": "24350",
-          "kind": "same_brand_different_model",
-          "expect": "identity_mismatch"
+        "contaminated": false
+      },
+      "SAFETY_GATE": {
+        "label": "unsearchable, SAFETY_GATE",
+        "v": 0.0577,
+        "n": 6,
+        "d": 104,
+        "ci95": [
+          0.0267,
+          0.1202
+        ],
+        "method": "Wilson score interval, 95%",
+        "by_kind": {
+          "bare_numeric_sku": 4,
+          "too_generic": 2
         },
-        {
-          "probe": "Generic 'PS-1000' bench power supply, unrelated brand",
-          "against": "24350",
-          "kind": "same_model_different_brand",
-          "expect": "identity_mismatch"
-        },
-        {
-          "probe": "Ambiano Single Serve Coffee Maker 708926",
-          "against": "24341",
-          "kind": "same_brand_adjacent_model",
-          "expect": "identity_mismatch"
-        },
-        {
-          "probe": "Fisher-Price Baby Biceps Gift Set (no dumbbell, GJD50)",
-          "against": "24351",
-          "kind": "successor_sku",
-          "expect": "identity_mismatch"
-        },
-        {
-          "probe": "Squeeze Plush Ball Toy, GTIN 810447020543",
-          "against": "24348",
-          "kind": "adjacent_gtin",
-          "expect": "identity_mismatch"
-        }
-      ]
+        "contaminated": false
+      }
+    },
+    "positive_control_set": {
+      "n": 13,
+      "all_red": true,
+      "by_kind": {
+        "arm_language": 2,
+        "buy_control": 3,
+        "doubled_identifier": 1,
+        "gtin14_form": 1,
+        "gtin_leading_zero": 2,
+        "gtin_reassert": 1,
+        "live_fixture_row": 1,
+        "model_reassert": 2
+      },
+      "note": "Positive controls: known-good products with real recall identifiers, on pages written in each marketplace's own vocabulary, run through the same path as the sweep (fromstudio.to_raw, normalize.classify, normalize.normalize). Every one must reach RED. `leaked` here means the opposite of the adversarial file's: a control that fell OUT of RED, which is a recall bug and blocks the freeze. The pair is the whole claim. adversarial.json shows the matcher refuses what it should, this file shows it accepts what it should, and a sweep that reaches no RED rows describes the market only if both hold."
     }
   },
   "rows": [

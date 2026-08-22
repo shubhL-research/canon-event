@@ -716,6 +716,23 @@ def build_fixture(variant, rows, stats):
             for key in ("platform", "heals", "detectors", "detector_summary", "hunt", "platform_jobs", "raw_row", "attestation", "heal_pattern"):
                 if src.get(key):
                     base[key] = src[key]
+
+            # THREE STATS BLOCKS THAT ARE FACTS ABOUT THE CORPUS AND THE MATCHER,
+            # NOT ABOUT ANY SWEEP, SO A FIXTURE MAY CARRY THEM AS MEASURED.
+            #
+            # Without them ?state=v1 rendered the regulator comparison as an
+            # EMPTY SECTION, and the matcher proof drew one card while still
+            # printing "Both hold" underneath it, which is a false statement in a
+            # state a judge can open from the README.
+            #
+            # unsearchable_by_authority is computed from the regulators' own
+            # published corpus; the two control sets are properties of the
+            # matcher. None of the three depends on a sweep, so carrying them is
+            # the same argument as carrying the detector board.
+            for key in ("unsearchable_by_authority", "positive_control_set",
+                        "adversarial_precision_set"):
+                if (src.get("stats") or {}).get(key):
+                    base.setdefault("stats", {})[key] = src["stats"][key]
             base.setdefault("provenance", {})["platform_from_live"] = (
                 "The Bright Data section and the detector board are carried from the "
                 "live payload. The sweep figures on this page are fixture; the "
