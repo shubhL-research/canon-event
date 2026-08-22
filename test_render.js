@@ -206,7 +206,10 @@ if (fs.existsSync(LIVE)) {
   // The invariant is that a headline renders, not that it is a withheld one.
   // Whether the verdict band appears depends on whether a collector broke, and a
   // test should not require the sweep to have gone badly.
-  check(/<h1>/.test(out.nodes.verdict.innerHTML),
+  // Matches an opening h1 with or without attributes: heroH1() adds a length
+  // band class to long sentences, and a headline with a class on it is still a
+  // headline. The regex, not the invariant, was the thing that was too narrow.
+  check(/<h1[ >]/.test(out.nodes.verdict.innerHTML),
         "the live payload renders a headline");
   check(out.nodes.figures.innerHTML.indexOf("figure-claim") > -1,
         "the live payload renders its two figures");

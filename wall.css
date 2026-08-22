@@ -549,6 +549,22 @@ details.machinery th { color: var(--ink-3); font-weight: 400; }
   line-height: 1.02; margin: 28px 0 0; max-width: 26ch;
   text-wrap: balance;
 }
+/* --type-hero is sized for the RED sentence, which is two short clauses. The
+   fallback sentence is 176 characters, and at the 82px cap it ran to five lines
+   that filled the viewport on their own: the sub, the clause and the hunt line
+   were all below the fold on a screen whose entire job is to state the finding.
+
+   heroH1() in wall.js picks the band from the raw character count. Each band
+   drops the size and widens the measure together, so all three land near four
+   lines instead of near a fixed size. Leading tightens as the size falls
+   because large display type needs the air and 40px type does not. */
+.act-finding h1.is-long {
+  font-size: clamp(30px, 3.8vw, 56px); max-width: 34ch; line-height: 1.05;
+}
+.act-finding h1.is-xlong {
+  font-size: clamp(26px, 2.9vw, 40px); max-width: 46ch; line-height: 1.12;
+  letter-spacing: -0.02em;
+}
 /* The day count inside the sentence is the finding. It gets the width axis and
    the only red on this screen. */
 .act-finding h1 .count {

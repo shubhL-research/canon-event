@@ -145,6 +145,24 @@
     });
   }
 
+  /* The hero sentence is data, not copy: the RED path produces "Recalled 714
+     days ago. Still on sale." and the fallback path produces a 176-character
+     sentence about model-number fields. One font size cannot serve both. At the
+     82px cap the long one filled the entire viewport and pushed the sub, the
+     clause and the hunt line below the fold, so the screen that is supposed to
+     state the finding stated only its first clause.
+
+     Three bands, measured on the raw sentence before markup is added, chosen so
+     every band lands at roughly four lines rather than at a fixed size. The
+     thresholds are character counts because that is what actually drives the
+     wrap; ch-based max-width widens with the band for the same reason. */
+  function heroH1(sentence) {
+    var n = (sentence || "").length;
+    var band = n > 150 ? "is-xlong" : n > 90 ? "is-long" : "";
+    return "<h1" + (band ? ' class="' + band + '"' : "") + ">" +
+      heroSentence(sentence) + "</h1>";
+  }
+
   /* The line under the headline has to agree with the headline.
      When the sweep confirms listings, it says what they are. When it confirms
      none, saying "found on sale again" would contradict the sentence directly
@@ -203,7 +221,7 @@
       var a = withheld[0];
       body =
         '<span class="withheld-mark">Verdict withheld · ' + esc(a.code) + "</span>" +
-        "<h1>" + heroSentence(hero.sentence) + "</h1>" +
+        heroH1(hero.sentence) +
         heroSub(hero, doc) +
         '<p class="clause">The ' + esc(a.code) + " collector has been broken since " +
         esc(doc.swept_at.slice(11, 16)) + " UTC, so anything that depends on it is " +
@@ -211,7 +229,7 @@
         doc.stats.arms_measured.d + " countries measured.</p>";
     } else {
       body =
-        "<h1>" + heroSentence(hero.sentence) + "</h1>" +
+        heroH1(hero.sentence) +
         heroSub(hero, doc) +
         '<p class="clause">' + doc.stats.arms_measured.n + " of " +
         doc.stats.arms_measured.d + " countries measured" +
