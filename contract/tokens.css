@@ -51,7 +51,21 @@
      which is invisible. Display ink is never set on the hero. */
   --ink-display:   #16191D;
   --ink-2:         #464E55;
-  --ink-3:         #6B747C;
+  /* Was #6B747C, which measures 3.94:1 on --paper and 3.80:1 on --surface-sunk.
+     Both are under the 4.5:1 AA floor, and this token carries the 10px and 11px
+     qualification tier in 55 places: the ledger's six column labels, the basis
+     line under both headline figures, the provenance strip, the sort note, the
+     detector scopes, every hunt fact label.
+
+     check_contrast.py guarded three grounds and never tested this pair, so the
+     page passed its own accessibility check with every caveat on it below AA. On
+     a page whose authority IS its caveats, and whose whole argument is that a
+     passing status is not the same as a working collector, that is the most
+     on-theme bug it could have had.
+
+     Same cool grey, lifted only as far as it takes to clear all three light
+     grounds: 4.81:1 on paper, 4.64:1 on sunk, 5.81:1 on white. */
+  --ink-3:         #5F666E;
   --ink-inv:       #FFFFFF;
 
   /* Hazard: ISO 3864 safety red, Pantone 485 C.

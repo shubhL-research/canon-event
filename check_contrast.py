@@ -103,6 +103,10 @@ def main():
         ("withheld mark",        t["--hazard-on-dark"], VOID,          4.5, "12px on void, filmed state"),
         ("body copy",            t["--ink"],            PAPER,         4.5, "15px normal"),
         ("secondary copy",       t["--ink-2"],          PAPER,         4.5, "13px normal"),
+        # The tier this guard never tested. 55 uses, all 10px and 11px, and it
+        # was shipping at 3.94:1 while the check reported every ground clear.
+        ("caveat tier on paper", t["--ink-3"],          PAPER,         4.5, "10-11px, 55 uses"),
+        ("caveat tier on sunk",  t["--ink-3"],          "#E3E6E9",     4.5, "11px on --surface-sunk"),
         ("display type",         t["--ink-display"],    PAPER,         3.0, "56px+, large"),
         ("tier-box RED",         t["--hazard-deep"],    PAPER,         4.5, "10px verdict label"),
         ("tier-box AMBER",       t["--amber"],          PAPER,         4.5, "10px, on 173 of 207 rows"),

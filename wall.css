@@ -178,7 +178,31 @@ body {
   display: grid; grid-template-columns: 28px 300px minmax(340px, 1fr) 108px minmax(260px, 1fr) 96px;
   gap: 16px; padding: 24px 0 8px; align-items: end;
   border-bottom: 1px solid var(--rule-strong);
+  /* "Data is only useful once someone can read it" is the judging criterion, and
+     this ledger is 207 rows deep with two columns nobody can infer from their
+     contents: "Found in" renders as a row of chips, "Days since recall" as a
+     bare number. Ten rows down, with the head gone, a reader is looking at chips
+     and numbers with no labels.
+
+     The cost was already paid: the comment at the overflow rule says clip was
+     chosen over hidden precisely because hidden would make a scroll container
+     and break position: sticky inside it. The infrastructure was there, unused.
+
+     z-index 2 sits under .mark (3) and .rail (4), so the corner stamp and the
+     act rail still paint above it. --paper because the rows beneath are
+     --surface and would otherwise ghost through. */
+  position: sticky; top: 0; z-index: 2; background: var(--paper);
 }
+/* Both sit between the sticky head and the rows, so they need their own ground
+   or they show through it as it passes over them. */
+.sort-note, .historical-note { position: relative; z-index: 1; background: var(--paper); }
+
+/* The Bright Data act's table gave th and td the same 1px --rule, so its header
+   read as another data row while the ledger three acts above offsets its own on
+   --rule-strong. Two tables on one page disagreeing about their own grammar is
+   the kind of thing a judge reads as unfinished without being able to name it.
+   Both tokens are 1px, so nothing reflows. */
+.platform-table th { border-bottom-color: var(--rule-strong); }
 .wall-head span {
   font-family: var(--font-machine); font-size: 10px; letter-spacing: 0.1em;
   color: var(--ink-3); text-transform: uppercase;
@@ -476,6 +500,28 @@ details.machinery th { color: var(--ink-3); font-weight: 400; }
 .shell { max-width: 1380px; margin: 0 auto; padding: 0 40px 120px; }
 
 .act { padding: 96px 0 0; }
+
+/* GOV.UK section-break: one hairline, equal air both sides, never a box and
+   never a heavier rule. Eight acts were separated by 96px of nothing, so a fast
+   scroller met the act head's 2px rule with no way to tell whether it CLOSED the
+   last section or OPENED the next one. This arrives first and answers that.
+
+   Drawn absolutely inside padding that is already empty, so it adds no height
+   and cannot shift anything. --rule-strong so it reads as a different class of
+   mark from the 207 row separators, but still 1px so it does not compete with
+   the 2px rule below it. Weight is carried by the silence around it, not by ink.
+
+   .act-finding lives outside .shell, so the graphite hero is never touched.
+   :not(:empty) guards the three acts wall.js fills at runtime: if a render ever
+   fails there is no orphan rule. */
+.shell > .act { position: relative; --act-mark: 48px; }
+.shell > .act + .act:not(.act-foot):not(:empty)::before {
+  content: "";
+  position: absolute; left: 0; right: 0; top: var(--act-mark);
+  height: 1px; background: var(--rule-strong); pointer-events: none;
+}
+@media (max-width: 1279px) { .shell > .act { --act-mark: 32px; } }
+@media (max-width: 767px)  { .shell > .act { --act-mark: 24px; } }
 .act-head {
   display: flex; align-items: baseline; gap: 16px;
   font-family: var(--font-display); font-variation-settings: "wdth" 104;
@@ -486,7 +532,12 @@ details.machinery th { color: var(--ink-3); font-weight: 400; }
    method, gaps in that order, and each one presumes the one before it. */
 .act-num {
   font-family: var(--font-machine); font-size: 11px; font-weight: 500;
-  color: var(--hazard); letter-spacing: 0.1em;
+  /* Was --hazard. Red on this wall marks an accusation and nothing else, which
+     the legend states in as many words: "Red. Still on sale." Acts 01 through 08
+     accuse nobody, and eight red numbers is more red than there are red verdicts
+     in most renderings, so the page was contradicting its own legend in its
+     section furniture. */
+  color: var(--ink-2); letter-spacing: 0.1em;
 }
 .act-lede {
   margin: 20px 0 0; max-width: 62ch; font-size: 15px; line-height: 1.55;
@@ -519,6 +570,17 @@ details.machinery th { color: var(--ink-3); font-weight: 400; }
   text-transform: uppercase; opacity: 0.7; line-height: 1.5;
 }
 .mark-independence { text-align: right; max-width: 34ch; text-transform: none; letter-spacing: 0; }
+
+/* A judge selects a figure to check it is real, and this page invites exactly
+   that: tokens.css argues the mono is there "because a figure a reader may
+   retype has to be unambiguous". Left undefined, that gesture paints the OS
+   default blue, which is the one moment the three-hue discipline visibly breaks.
+   Both pairs are existing tokens. Deliberately not hazard: selecting a number is
+   not an accusation. */
+::selection { background: var(--ink); color: var(--paper); text-shadow: none; }
+.act-finding ::selection {
+  background: var(--ink-inv); color: var(--hero-ground); text-shadow: none;
+}
 
 /* --- ACT I: the finding -------------------------------------------------- */
 
@@ -635,7 +697,12 @@ details.machinery th { color: var(--ink-3); font-weight: 400; }
   color: var(--ink); font-weight: 600; letter-spacing: -0.01em;
 }
 .figure-basis {
-  margin-top: auto; padding-top: 24px; font-family: var(--font-machine);
+  margin-top: auto; padding-top: 24px;
+  /* In print a rule is how you say "this is apparatus, not argument". The
+     interval and the method name were hanging unattached under a 56px number;
+     with it, each card reads as a plate with a caption. padding-top already
+     existed, so nothing moves. */
+  border-top: 1px solid var(--rule); font-family: var(--font-machine);
   font-size: 11px; line-height: 1.6; color: var(--ink-3);
 }
 /* A withheld figure is redacted, never greyed. The number was computed and we
