@@ -13,10 +13,35 @@
       "trigger_type": "CLI",
       "pages": 8,
       "errors": 2,
-      "success_rate": 0.80,
+      "success_rate": 0.8,
       "reported_by": "Bright Data collection monitoring",
       "our_board_said": "fails: 0 for the US arm in every health file written on 2026-08-20",
       "reconciliation": "Not a contradiction. Our `fails` counts inputs that returned neither a row nor an archived empty-result page, computed from collector output. The platform counts pages it could not collect. A page that failed at the fetch layer and returned nothing is a failure to them and simply an absent input to us. We could not have seen these two without being told."
+    },
+    {
+      "collector_name": "canon-in",
+      "collector_id": null,
+      "collector_id_note": "The alert names the collector 'canon-in' and carries no id. The IN arm on the published sweep is c_mt03cj5z2fo651wy8q; mapping the name to that id would be a guess, so it is left null.",
+      "job_id": "six collections: j_mt2r6kugxdxhieg9t, j_mt2vevjsavi1er7s0, j_mt2z9ipf1fq0ockb8l, j_mt30p0cwr7lvj2kks, j_mt31833267s9ow7xa, j_mt33zfxy13ak58zo99",
+      "started_at": "2026-08-21T09:34:46Z to 2026-08-21T15:33:09Z",
+      "trigger_type": "CLI",
+      "pages": 2500,
+      "errors": 11886,
+      "success_rate": 0.1738,
+      "per_collection_failure_rate": [
+        0.4407,
+        0.9136,
+        0.9369,
+        0.9584,
+        0.9577,
+        0.9614
+      ],
+      "reported_by": "Bright Data collection monitoring",
+      "our_board_said": "fails: 0 for the IN arm, which was not a measurement",
+      "reconciliation": "The India collector degraded across 21 August, from 44% of pages failing on the first collection to 96% on the last. Our board reported fails: 0 for that arm on the same day. It was not wrong so much as not asking: collector/sweep.py set fails=0 on the replay path, and a replay re-scores rows already in the archive without issuing a request, so it cannot observe a fetch failure. Asserting 0 turned 'we did not look' into 'nothing went wrong'. That path now records fails as not-measured and the arm card says so.",
+      "does_this_affect_the_published_figures": "No, and this was checked rather than assumed. data/sweeps/raw/IN.jsonl was captured 2026-08-20 at 21:06 UTC. Every one of the six failing collections began on 21 August, after it. No row from them reached the archive, the payload or the wall. What they do establish is that the collector is degraded NOW: anyone re-running the India arm today gets almost nothing back.",
+      "what_it_cost": "2,500 pages and 11,886 errors across six collections. The error count exceeds the page count because failed pages were retried. What that spent is on the account, not in the sweep output, and this project does not state a billing figure it cannot derive."
     }
-  ]
+  ],
+  "_result": "Two alerts, and between them they make the same point twice. Bright Data's own monitoring saw a 20% page failure on a US collection and then a collapse to 17% success on the India collector, and on both days our health board reported zero fails for those arms. The board reads what the collector handed us; the platform reads what happened at the fetch layer. We only know because we were told."
 }

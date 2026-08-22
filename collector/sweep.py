@@ -665,7 +665,16 @@ def adjudicate_from_raw(seeds, arms=None, now=None):
         listings = report.get("listings", 0)
         arm_states[arm] = dict(
             health.arm_state(arm, listings, len(seeds), 0, joined),
-            rows=reds, listings=listings, fails=0, inputs=len(seeds),
+            # NOT ZERO. NOT MEASURED.
+            #
+            # A replay re-scores rows that are already in the archive. It issues
+            # no requests, so it cannot observe a fetch failure, and asserting 0
+            # turned "we did not look" into "nothing went wrong". The wall then
+            # printed "0 inputs failed" for the India arm on the same day Bright
+            # Data recorded 11,886 errors and a 17.38% success rate on that
+            # collector. Our board could not have known, because on this path it
+            # was never asking.
+            rows=reds, listings=listings, fails=None, inputs=len(seeds),
             joined=joined, collector_id=COLLECTORS.get(arm, "replayed-from-archive"),
         )
 
@@ -846,8 +855,9 @@ def _write(rows, doc, seeds, limit, replayed=False):
         print("REPLAYED from data/sweeps/raw/. No network, no credits spent.")
     print("rows      %d   RED %d   AMBER %d" % (len(rows), reds, ambers))
     for arm, state in sorted(doc["arms"].items()):
-        print("  %-3s %-10s red=%-4d fails=%-3d %s"
-              % (arm, state["state"], state["rows"], state["fails"],
+        print("  %-3s %-10s red=%-4d fails=%-3s %s"
+              % (arm, state["state"], state["rows"],
+                 "?" if state["fails"] is None else state["fails"],
                  state["reason"] or ""))
     for r in doc.get("reports", []):
         if r.get("replayed"):

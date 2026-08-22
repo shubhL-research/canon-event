@@ -550,13 +550,18 @@
            is worse than the sentence it replaced. */
         if (a.reason === "join_key_coverage_below_bound" &&
             typeof j.joined === "number" && typeof j.inputs === "number" &&
-            typeof j.fails === "number" && j.inputs) {
+            typeof j.inputs === "number" && j.inputs) {
           return "Partial. " + (listings === null ? "This arm" : commas(listings) +
             " listings were") + " returned and adjudicated, but only " + j.joined +
             " of " + j.inputs + " notices matched one, which is " +
             pct(j.joined / j.inputs) + " against an 80% bound. The shortfall is " +
-            "notices nothing matched, not inputs that failed: " + j.fails +
-            " inputs failed. Rows are shown and counts carry a partial stamp.";
+            "notices nothing matched, not inputs that failed. " +
+            (typeof j.fails === "number"
+              ? j.fails + " inputs failed. "
+              : "How many inputs failed is not measured on a replay: it " +
+                "re-scores archived rows and issues no requests, so it cannot " +
+                "observe a fetch failure. This card used to print 0 there. ") +
+            "Rows are shown and counts carry a partial stamp.";
         }
         return "Partial. " + j.fails + " of " + j.inputs + " inputs returned no row and no " +
           "archived empty-result page. Rows from this arm are shown. Counts carry a partial stamp.";
@@ -1221,6 +1226,11 @@
             "<div><dt>we recorded</dt><dd>" + esc(j.our_board_said) + "</dd></div>" +
           "</dl>" +
           '<p class="pj-reconcile">' + esc(j.reconciliation) + "</p>" +
+          (j.does_this_affect_the_published_figures
+            ? '<p class="pj-reconcile"><b>Does it change what this page '
+              + "publishes?</b> " + esc(j.does_this_affect_the_published_figures)
+              + "</p>"
+            : "") +
         "</div>";
       }).join("");
       pjBlock =
