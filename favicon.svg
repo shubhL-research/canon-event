@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="CANON EVENT">
+  <!-- The masthead mark is CANON·EVENT with the separator in hazard red. At 16px
+       the words are unreadable and the dot is not, so the dot is the favicon.
+       Paper ground rather than white, matching --paper, so the tab does not
+       flash a brighter square than the page it opens. -->
+  <rect width="64" height="64" fill="#E7EAEC"/>
+  <rect x="0" y="0" width="64" height="4" fill="#DA291C"/>
+  <circle cx="32" cy="36" r="13" fill="#DA291C"/>
+</svg>

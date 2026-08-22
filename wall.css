@@ -523,7 +523,19 @@ details.machinery th { color: var(--ink-3); font-weight: 400; }
 /* --- ACT I: the finding -------------------------------------------------- */
 
 .act-finding {
-  background: var(--hero-ground); color: var(--ink-inv);
+  /* A vignette rather than a flat fill, so the type sits in a space instead of
+     on a swatch. It only DARKENS toward the edges: the measured contrast of
+     white on --hero-ground is a floor here rather than an average, so no text
+     can end up on a lighter ground than check_contrast.py verified. */
+  background:
+    radial-gradient(120% 90% at 50% 38%,
+      rgba(255, 255, 255, 0.035) 0%,
+      rgba(255, 255, 255, 0) 55%),
+    radial-gradient(140% 120% at 50% 50%,
+      rgba(0, 0, 0, 0) 40%,
+      rgba(0, 0, 0, 0.35) 100%),
+    var(--hero-ground);
+  color: var(--ink-inv);
   min-height: 92vh; padding: 0;
   display: grid; align-content: center;
 }
@@ -568,6 +580,7 @@ details.machinery th { color: var(--ink-3); font-weight: 400; }
 /* The day count inside the sentence is the finding. It gets the width axis and
    the only red on this screen. */
 .act-finding h1 .count {
+  font-variant-numeric: tabular-nums;
   color: var(--hazard); font-variation-settings: "wdth" 118;
   font-variant-numeric: tabular-nums;
 }
@@ -609,6 +622,11 @@ details.machinery th { color: var(--ink-3); font-weight: 400; }
   font-family: var(--font-display); font-variation-settings: "wdth" 112;
   font-size: var(--type-display); font-weight: 700; line-height: 0.94;
   letter-spacing: -0.035em;
+  /* Tabular figures, because these count up. Proportional digits change width
+     as they cycle, so a 56px number jitters for the whole animation and the
+     layout settles a fraction late. It reads as a page still loading. */
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
 }
 /* The sentence, not the label. A reader should be able to read the figure and
    the line beneath it aloud and have said something true. */
@@ -783,11 +801,18 @@ details.machinery th { color: var(--ink-3); font-weight: 400; }
 .act-finding h1,
 .act-finding .sub,
 .act-finding .clause,
+.act-finding .found-anyway,
 .act-finding .scroll-cue { animation: rise var(--t-arrive) var(--ease) both; }
 .act-finding h1 { animation-delay: 90ms }
 .act-finding .sub { animation-delay: 220ms }
 .act-finding .clause { animation-delay: 300ms }
-.act-finding .scroll-cue { animation-delay: 420ms }
+/* Added to the stagger, not left behind it. This line arrived on the first
+   screen today and was the only element there that did not rise with the rest,
+   so the hero assembled itself in sequence and then the finding was abruptly
+   already present. It lands after the clause and before the cue, which is the
+   order a reader needs: the measurement, then the exception to it. */
+.act-finding .found-anyway { animation-delay: 380ms }
+.act-finding .scroll-cue { animation-delay: 480ms }
 @keyframes rise {
   from { opacity: 0; transform: translateY(18px) }
   to { opacity: 1; transform: none }

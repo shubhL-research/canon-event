@@ -175,9 +175,19 @@ console.log("wall renderer smoke test\n");
    here was looking at colour. */
 {
   const css = fs.readFileSync(path.join(ROOT, "wall.css"), "utf8");
-  const heroRule = /\.act-finding\s*\{[^}]*background:\s*var\(--([a-z-]+)\)/.exec(css);
-  check(!!heroRule, "the hero declares a background token");
-  check(heroRule && heroRule[1] !== "void",
+  /* Reads the whole background declaration, not just its first token. The hero
+     gained a layered vignette and this regex matched only a bare
+     "background: var(--x)", so a legitimate multi-layer background read as no
+     token at all. The invariant was never "one flat colour", it is "grounded in
+     --hero-ground and never --void". */
+  const heroDecl = /\.act-finding\s*\{([^}]*)\}/.exec(css);
+  const heroBg = heroDecl
+    ? (/background:\s*([\s\S]*?);/.exec(heroDecl[1]) || [, ""])[1]
+    : "";
+  const heroRule = /var\(--([a-z-]+)\)\s*$/.exec(heroBg.trim()) ||
+                   /var\(--(hero-ground)\)/.exec(heroBg);
+  check(!!heroRule, "the hero grounds itself in a colour token");
+  check(heroRule && heroRule[1] !== "void" && !/var\(--void\)/.test(heroBg),
         "the hero ground is NOT black: black has to stay available as a signal");
   check(/\.act-finding\.is-withheld\s*\{[^}]*background:\s*var\(--void\)/.test(css),
         "the withheld hero IS black, on the class the renderer actually applies");
@@ -487,8 +497,15 @@ if (fs.existsSync(LIVE)) {
         "the footer carries a verification path back to the repository");
 
   // Anything the deployed host does not serve must be linked absolutely.
+  /* netlify.toml publishes the repository root, so anything committed at a path
+     the page references is served. The list is the set of assets the page
+     actually loads, and it grew when the favicons and the social card were
+     added: a guard that does not know about a real asset reports a real link as
+     broken, which is the same false alarm in the other direction. */
   const SERVED = ["wall.html", "wall.css", "wall.js", "index.html",
-                  "data/fixtures.js", "data/live.js", "contract/tokens.css"];
+                  "data/fixtures.js", "data/live.js", "contract/tokens.css",
+                  "favicon.svg", "favicon-32.png", "favicon-180.png",
+                  "social-card.png"];
   const bad = [];
   for (const m of all.matchAll(/href="([^"#][^"]*)"/g)) {
     const href = m[1];
