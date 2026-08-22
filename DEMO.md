@@ -41,9 +41,9 @@ quotes the figures as they stand today:
 | Figure 1 | `0.0%` still on sale, `0 of 178 searchable notices`, CI `0.0% to 2.1%` |
 | Figure 2 | `14.0%` unsearchable, `29 of 207 notices` |
 | Regulators | CPSC `22.3%` unsearchable against Safety Gate `5.8%`, intervals do not overlap |
-| Discard panel | `identifier not reasserted 246`, `brand conflict 15`, `no join key 4` |
-| Ledger | `207 rows`, `173 AMBER`, `34 DISCARDED`, `0 RED` |
-| Arm rail | all three `DEGRADED`, join coverage `44.0%` US, `53.1%` DE, `26.6%` IN against an 80% bound |
+| Discard panel | `identifier not reasserted 247`, `brand conflict 10`, `no join key 0` |
+| Ledger | `207 rows`, `169 AMBER`, `38 DISCARDED`, `0 RED` |
+| Arm rail | all three `DEGRADED`, join coverage `44.4%` US, `53.1%` DE, `26.6%` IN against an 80% bound |
 | Listings adjudicated | `23,813` across three arms. Shot 1 says this as words, so check it against the arm rail before recording |
 | Detectors | `2 of 8 firing`, `3 could not run` |
 | Act 06 | one confirmed RED found by hand, Acer AES015 at `$379.99`, outside the sweep |
@@ -141,7 +141,7 @@ hazard-ruled line beneath it naming the scooter.
 
 > Governments recall products for burning, choking and killing children. Nobody
 > checks whether those products actually leave the shelves. We checked. Three
-> marketplaces, two regulators, twenty three thousand eight hundred and eleven
+> marketplaces, two regulators, twenty three thousand eight hundred and thirteen
 > listings, and the sweep came back with nothing. Then we looked somewhere it does
 > not cover, and found a recalled electric scooter on sale.
 
@@ -195,7 +195,7 @@ the video and it is the reason the finding is credible. Cut from Shot 4 instead.
 
 **Say.**
 
-> Zero of a hundred and eighty searchable notices found on sale. A zero is only
+> Zero of one hundred and seventy eight searchable notices found on sale. A zero is only
 > worth anything if you can tell it apart from a broken matcher, so we prove both
 > directions: thirteen planted products that must all come back red, and
 > twenty one deliberate near misses that must all be discarded. Both hold.

@@ -211,6 +211,40 @@ def main():
                                 "search URLs the committed archive holds for %s"
                                 % (n, arm))
 
+    # THE NUMBERS SAID ALOUD, NOT JUST THE ONES IN THE TABLE.
+    #
+    # DEMO.md's figures table was current while its narration still said "twenty
+    # three thousand eight hundred and eleven" and "a hundred and eighty". Those
+    # are the words a presenter reads over a frame showing 23,813 and 178, and
+    # this file's own rule calls a voiceover that disagrees with its frame "the
+    # single worst thing this video could do".
+    WORDS = {0: "zero", 1: "one", 2: "two", 3: "three", 4: "four", 5: "five",
+             6: "six", 7: "seven", 8: "eight", 9: "nine", 10: "ten",
+             11: "eleven", 12: "twelve", 13: "thirteen", 14: "fourteen",
+             15: "fifteen", 16: "sixteen", 17: "seventeen", 18: "eighteen",
+             19: "nineteen", 20: "twenty", 30: "thirty", 40: "forty",
+             50: "fifty", 60: "sixty", 70: "seventy", 80: "eighty", 90: "ninety"}
+
+    def _spell(n):
+        if n in WORDS:
+            return WORDS[n]
+        if n < 100:
+            t, r = divmod(n, 10)
+            return WORDS[t * 10] + ("" if not r else " " + WORDS[r])
+        if n < 1000:
+            h, r = divmod(n, 100)
+            return WORDS[h] + " hundred" + ("" if not r else " and " + _spell(r))
+        th, r = divmod(n, 1000)
+        return _spell(th) + " thousand" + ("" if not r else " " + _spell(r))
+
+    demo_text = (ROOT / "DEMO.md").read_text(encoding="utf-8")
+    for label, spoken in (("the adjudicated listing total", _spell(f["listings_total"])),
+                          ("the survival denominator", _spell(f["searchable"]))):
+        if spoken not in demo_text:
+            problems.append("DEMO.md's narration does not say %r for %s. A "
+                            "presenter reads these aloud over a frame showing "
+                            "the digits." % (spoken, label))
+
     # The arms must also add up to the total they are printed beside, which is
     # the one sum a judge can do in their head on the page itself.
     parts = f["US_listings"] + f["DE_listings"] + f["IN_listings"]
